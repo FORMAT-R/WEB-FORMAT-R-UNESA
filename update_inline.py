@@ -1,12 +1,28 @@
-@extends('admin.layouts.app')
+import os
 
-@section('page-title', 'Edit Berita')
+def create_editor_content(is_edit=False):
+    title_text = 'Edit Berita' if is_edit else 'Tulis Berita Baru'
+    route_action = "{{ route('admin.berita.update', $berita->id) }}" if is_edit else "{{ route('admin.berita.store') }}"
+    method_field = "@method('PUT')" if is_edit else ""
+    
+    init_judul = "{!! json_encode(old('title', $berita->title)) !!}" if is_edit else "oldTitle"
+    init_konten = "{!! json_encode(old('content', $berita->content)) !!}" if is_edit else "oldContent"
+    init_foto = "{!! $berita->image ? Storage::url($berita->image) : '' !!}" if is_edit else "''"
+    init_status = "{!! old('status', $berita->status) !!}" if is_edit else "'published'"
+    
+    # We will use blade's old() helper safely
+    old_title_decl = '' if is_edit else "const oldTitle = {!! json_encode(old('title', '')) !!};"
+    old_content_decl = '' if is_edit else "const oldContent = {!! json_encode(old('content', '')) !!};"
+
+    return f"""@extends('admin.layouts.app')
+
+@section('page-title', '{title_text}')
 
 @section('content')
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap');
 
-  .newspaper-editor {
+  .newspaper-editor {{
     --paper:#faf7ef;
     --paper-dim:#f2ede0;
     --ink:#1c1a16;
@@ -22,63 +38,63 @@
     background:var(--paper-dim); color:var(--ink); font-family:var(--serif-body); line-height:1.5;
     padding: 2rem;
     min-height: 100vh;
-  }
+  }}
 
-  .newspaper-editor .page {
+  .newspaper-editor .page {{
     max-width:1180px; margin:0 auto; background:var(--paper);
     box-shadow:0 0 0 1px var(--rule), 0 10px 30px rgba(0,0,0,0.1);
     padding:22px clamp(16px,3vw,48px) 40px;
-  }
+  }}
 
   /* Utilities */
-  .newspaper-editor .masthead{text-align:center; padding:26px 0 14px;}
-  .newspaper-editor .masthead h1{ font-family:var(--serif-display); font-weight:900; font-size:clamp(42px,7vw,74px); letter-spacing:.01em; color:var(--ink); margin:0; line-height:1;}
-  .newspaper-editor .masthead .tagline{ font-family:var(--sans); font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--ink-soft); margin-top:6px;}
-  .newspaper-editor .issue-bar{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-top:1px solid var(--rule-dark); border-bottom:3px solid var(--rule-dark); font-family:var(--sans); font-size:11px; letter-spacing:.04em; color:var(--ink-soft);}
+  .newspaper-editor .masthead{{text-align:center; padding:26px 0 14px;}}
+  .newspaper-editor .masthead h1{{ font-family:var(--serif-display); font-weight:900; font-size:clamp(42px,7vw,74px); letter-spacing:.01em; color:var(--ink); margin:0; line-height:1;}}
+  .newspaper-editor .masthead .tagline{{ font-family:var(--sans); font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--ink-soft); margin-top:6px;}}
+  .newspaper-editor .issue-bar{{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-top:1px solid var(--rule-dark); border-bottom:3px solid var(--rule-dark); font-family:var(--sans); font-size:11px; letter-spacing:.04em; color:var(--ink-soft);}}
 
   /* Grid */
-  .newspaper-editor .main-grid{display:grid; grid-template-columns:235px 1fr 265px; gap:26px; padding:26px 0;}
+  .newspaper-editor .main-grid{{display:grid; grid-template-columns:235px 1fr 265px; gap:26px; padding:26px 0;}}
   
   /* Editable elements */
-  [contenteditable="true"] { outline: none; transition: background 0.2s, box-shadow 0.2s; border-radius: 4px; }
-  [contenteditable="true"]:hover { background: rgba(0,0,0,0.03); box-shadow: 0 0 0 4px rgba(0,0,0,0.03); cursor: text; }
-  [contenteditable="true"]:focus { background: rgba(255, 255, 255, 0.7); box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.7), 0 0 0 1px var(--rule); }
-  [contenteditable="true"]:empty:before { content: attr(data-placeholder); color: var(--ink-soft); font-style: italic; opacity: 0.6; pointer-events: none; display: block; }
+  [contenteditable="true"] {{ outline: none; transition: background 0.2s, box-shadow 0.2s; border-radius: 4px; }}
+  [contenteditable="true"]:hover {{ background: rgba(0,0,0,0.03); box-shadow: 0 0 0 4px rgba(0,0,0,0.03); cursor: text; }}
+  [contenteditable="true"]:focus {{ background: rgba(255, 255, 255, 0.7); box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.7), 0 0 0 1px var(--rule); }}
+  [contenteditable="true"]:empty:before {{ content: attr(data-placeholder); color: var(--ink-soft); font-style: italic; opacity: 0.6; pointer-events: none; display: block; }}
 
   /* Hero Article */
-  .newspaper-editor .hero h2{
+  .newspaper-editor .hero h2{{
     font-family:var(--serif-display); font-weight:900; font-size:clamp(26px,3vw,34px); line-height:1.12; margin-bottom:14px;
-    overflow-wrap:break-word; word-break:break-word; text-align:center;
-  }
-  .newspaper-editor .hero figure{margin-bottom:10px; position: relative;}
-  .newspaper-editor .hero .hero-image{ width:100%; aspect-ratio:16/9; overflow:hidden; border-radius:4px; box-shadow:0 4px 12px rgba(0,0,0,0.15); background:#e5e5e5; display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative; transition: filter 0.2s; }
-  .newspaper-editor .hero .hero-image:hover { filter: brightness(0.9); }
-  .newspaper-editor .hero .hero-image img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
-  .newspaper-editor .hero figure figcaption{font-family:var(--sans); font-size:10px; color:var(--ink-soft); margin-top:6px; font-style:italic; display:block;}
-  .newspaper-editor .hero .byline{ font-family:var(--sans); font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--rule); display:flex; gap:4px; align-items:center;}
-  .newspaper-editor .hero .byline b{color:var(--ink); font-weight:bold;}
+    overflow-wrap:break-word; word-break:break-word;
+  }}
+  .newspaper-editor .hero figure{{margin-bottom:10px; position: relative;}}
+  .newspaper-editor .hero .hero-image{{ width:100%; aspect-ratio:16/9; overflow:hidden; border-radius:4px; box-shadow:0 4px 12px rgba(0,0,0,0.15); background:#e5e5e5; display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative; transition: filter 0.2s; }}
+  .newspaper-editor .hero .hero-image:hover {{ filter: brightness(0.9); }}
+  .newspaper-editor .hero .hero-image img{{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }}
+  .newspaper-editor .hero figure figcaption{{font-family:var(--sans); font-size:10px; color:var(--ink-soft); margin-top:6px; font-style:italic; display:block;}}
+  .newspaper-editor .hero .byline{{ font-family:var(--sans); font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--rule); display:flex; gap:4px; align-items:center;}}
+  .newspaper-editor .hero .byline b{{color:var(--ink); font-weight:bold;}}
   
-  .newspaper-editor .body-columns{ columns:2; column-gap:22px; font-size:13px; line-height:1.62; color:var(--ink); min-height:200px; padding-bottom: 20px; }
-  .newspaper-editor .body-columns p{ margin-bottom:10px; }
-  .newspaper-editor .body-columns p:first-of-type::first-letter{ font-family:var(--serif-display); font-size:46px; font-weight:900; float:left; line-height:.82; padding:4px 6px 0 0; color:var(--red); }
+  .newspaper-editor .body-columns{{ columns:2; column-gap:22px; font-size:13px; line-height:1.62; color:var(--ink); min-height:200px; padding-bottom: 20px; }}
+  .newspaper-editor .body-columns p{{ margin-bottom:10px; }}
+  .newspaper-editor .body-columns p:first-of-type::first-letter{{ font-family:var(--serif-display); font-size:46px; font-weight:900; float:left; line-height:.82; padding:4px 6px 0 0; color:var(--red); }}
 
   /* Sidebars (Dummy) */
-  .newspaper-editor .rail-title{ font-family:var(--sans); font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--red); border-bottom:2px solid var(--rule-dark); padding-bottom:6px; margin-bottom:14px; }
-  .newspaper-editor .aside-feature h4{font-family:var(--serif-display); font-size:19px; font-weight:700; line-height:1.22; margin-bottom:6px; margin-top:10px;}
-  .newspaper-editor .aside-feature p{font-size:11.5px; color:var(--ink-soft); line-height:1.55; margin-bottom:7px;}
+  .newspaper-editor .rail-title{{ font-family:var(--sans); font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--red); border-bottom:2px solid var(--rule-dark); padding-bottom:6px; margin-bottom:14px; }}
+  .newspaper-editor .aside-feature h4{{font-family:var(--serif-display); font-size:19px; font-weight:700; line-height:1.22; margin-bottom:6px; margin-top:10px;}}
+  .newspaper-editor .aside-feature p{{font-size:11.5px; color:var(--ink-soft); line-height:1.55; margin-bottom:7px;}}
   
-  .newspaper-editor .latest-box h4{ font-family:var(--sans); font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px; padding-bottom:8px; border-bottom:2px solid var(--rule-dark); color:var(--ink); }
-  .newspaper-editor .latest-box ul{list-style:none; padding:0; margin:0;}
-  .newspaper-editor .latest-box li{display:flex; flex-direction:column; gap:6px; padding:12px 0; border-bottom:1px dotted var(--rule);}
-  .newspaper-editor .latest-box li a{font-family:var(--sans); font-size:13px; font-weight:600; color:var(--ink); line-height:1.3;}
+  .newspaper-editor .latest-box h4{{ font-family:var(--sans); font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px; padding-bottom:8px; border-bottom:2px solid var(--rule-dark); color:var(--ink); }}
+  .newspaper-editor .latest-box ul{{list-style:none; padding:0; margin:0;}}
+  .newspaper-editor .latest-box li{{display:flex; flex-direction:column; gap:6px; padding:12px 0; border-bottom:1px dotted var(--rule);}}
+  .newspaper-editor .latest-box li a{{font-family:var(--sans); font-size:13px; font-weight:600; color:var(--ink); line-height:1.3;}}
 
-  @media (max-width:960px){
-    .newspaper-editor .main-grid{grid-template-columns:1fr;}
-    .newspaper-editor .body-columns{columns:1;}
-  }
+  @media (max-width:960px){{
+    .newspaper-editor .main-grid{{grid-template-columns:1fr;}}
+    .newspaper-editor .body-columns{{columns:1;}}
+  }}
 
   /* Floating Toolbar */
-  .floating-toolbar {
+  .floating-toolbar {{
     position: fixed;
     bottom: 20px;
     left: 50%;
@@ -91,27 +107,27 @@
     align-items: center;
     gap: 20px;
     z-index: 100;
-  }
+  }}
 </style>
 
 <div x-data="inlineEditor()" class="-m-6">
   
-  
+  {{-- Error Messages --}}
   @if ($errors->any())
       <div class="fixed top-4 right-4 bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-lg z-[100] max-w-md">
           <p class="font-bold mb-1">Gagal Menyimpan:</p>
           <ul class="list-disc pl-5 text-sm">
               @foreach ($errors->all() as $error)
-                  <li>{{ $error }}</li>
+                  <li>{{{{ $error }}}}</li>
               @endforeach
           </ul>
       </div>
   @endif
 
-  
-  <form id="newsForm" action="{{ route('admin.berita.update', $berita->id) }}" method="POST" enctype="multipart/form-data" class="hidden">
+  {{-- Hidden Form for Submission --}}
+  <form id="newsForm" action="{route_action}" method="POST" enctype="multipart/form-data" class="hidden">
       @csrf
-      @method('PUT')
+      {method_field}
       <input type="hidden" name="title" :value="form.judul">
       <input type="hidden" name="content" :value="form.konten">
       <input type="hidden" name="author" :value="form.penulis">
@@ -121,7 +137,7 @@
       <input type="file" name="image" id="imageInput" accept="image/*" @change="handleImageUpload">
   </form>
 
-  
+  {{-- Interactive Newspaper Preview --}}
   <div class="newspaper-editor">
     <div class="page">
       
@@ -137,7 +153,7 @@
       </div>
 
       <div class="main-grid">
-        
+        {{-- Left Sidebar (Visual Only) --}}
         <aside class="hidden lg:block opacity-50 select-none pointer-events-none">
           <div class="aside-feature">
             <div class="rail-title">Baca Juga</div>
@@ -147,9 +163,9 @@
           </div>
         </aside>
 
-        
+        {{-- MAIN ARTICLE --}}
         <article class="hero">
-          
+          {{-- Title --}}
           <h2 contenteditable="true" 
               data-placeholder="Ketikkan Judul Berita Di Sini..."
               x-init="$el.innerText = form.judul"
@@ -157,7 +173,7 @@
               @paste="handlePaste($event)"
               @keydown.enter.prevent="$event.target.blur()"></h2>
 
-          
+          {{-- Image --}}
           <figure>
             <div class="hero-image" @click="document.getElementById('imageInput').click()">
               <template x-if="form.fotoPreview">
@@ -170,7 +186,7 @@
                   </div>
               </template>
             </div>
-            
+            {{-- Caption --}}
             <figcaption contenteditable="true"
                         data-placeholder="Tulis keterangan foto (caption) di sini..."
                         x-init="$el.innerText = form.caption"
@@ -179,7 +195,7 @@
                         @keydown.enter.prevent="$event.target.blur()"></figcaption>
           </figure>
 
-          
+          {{-- Byline --}}
           <div class="byline">
             <span class="text-gray-400">Oleh</span>
             <b contenteditable="true" 
@@ -192,7 +208,7 @@
             &middot; Koresponden FORMAT-R
           </div>
 
-          
+          {{-- Content --}}
           <div class="body-columns" 
                contenteditable="true"
                data-placeholder="Mulai ketikkan isi berita di sini. Paragraf pertama akan otomatis menggunakan efek Drop Cap khas koran. Tekan Enter dua kali untuk paragraf baru."
@@ -202,7 +218,7 @@
           </div>
         </article>
 
-        
+        {{-- Right Sidebar (Visual Only) --}}
         <aside class="hidden lg:block opacity-50 select-none pointer-events-none">
           <div class="latest-box">
             <h4>Berita Lainnya</h4>
@@ -218,9 +234,9 @@
     </div>
   </div>
 
-  
+  {{-- Floating Toolbar --}}
   <div class="floating-toolbar">
-      <a href="{{ route('admin.berita.index') }}" class="text-gray-500 hover:text-gray-800 p-2 rounded-full hover:bg-gray-100 transition" title="Batal & Kembali">
+      <a href="{{{{ route('admin.berita.index') }}}}" class="text-gray-500 hover:text-gray-800 p-2 rounded-full hover:bg-gray-100 transition" title="Batal & Kembali">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7-7-7M14 18a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
       </a>
       
@@ -252,69 +268,76 @@
 
 @push('scripts')
 <script>
+{old_title_decl}
+{old_content_decl}
 
-
-
-function inlineEditor() {
-    return {
-        form: {
-            judul: {!! json_encode(old('title', $berita->title)) !!},
+function inlineEditor() {{
+    return {{
+        form: {{
+            judul: {init_judul},
             penulis: 'Redaksi',
             tag: 'Kabar FORMAT',
             caption: '',
-            fotoPreview: {!! json_encode($berita->image ? Storage::url($berita->image) : '') !!},
-            konten: {!! json_encode(old('content', $berita->content)) !!},
-            status: {!! json_encode(old('status', $berita->status)) !!}
-        },
+            fotoPreview: {init_foto},
+            konten: {init_konten},
+            status: {init_status}
+        }},
         isSubmitting: false,
 
-        handleImageUpload(event) {
+        handleImageUpload(event) {{
             const file = event.target.files[0];
-            if (file) {
+            if (file) {{
                 const reader = new FileReader();
-                reader.onload = (e) => {
+                reader.onload = (e) => {{
                     this.form.fotoPreview = e.target.result;
-                };
+                }};
                 reader.readAsDataURL(file);
-            }
-        },
+            }}
+        }},
 
-        handlePaste(e) {
+        handlePaste(e) {{
             e.preventDefault();
             const text = e.clipboardData.getData('text/plain');
             document.execCommand('insertText', false, text);
-        },
+        }},
 
-        handleContentPaste(e) {
+        handleContentPaste(e) {{
             e.preventDefault();
             // Get plain text to avoid weird inline styles and HTML structures
             let text = e.clipboardData.getData('text/plain');
             
             // Convert double newlines to paragraphs
-            let paragraphs = text.split(/\n\s*\n/);
-            let html = paragraphs.map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+            let paragraphs = text.split(/\\n\\s*\\n/);
+            let html = paragraphs.map(p => `<p>${{p.replace(/\\n/g, '<br>')}}</p>`).join('');
             
             document.execCommand('insertHTML', false, html);
-        },
+        }},
 
-        submitForm(status) {
+        submitForm(status) {{
             this.form.status = status;
             
             // Basic validation
-            if (!this.form.judul || this.form.judul.trim() === '') {
+            if (!this.form.judul || this.form.judul.trim() === '') {{
                 alert('Judul berita tidak boleh kosong!');
                 return;
-            }
+            }}
             
-            if (!this.form.konten || this.form.konten.trim() === '') {
+            if (!this.form.konten || this.form.konten.trim() === '') {{
                 alert('Konten berita tidak boleh kosong!');
                 return;
-            }
+            }}
 
             this.isSubmitting = true;
             document.getElementById('newsForm').submit();
-        }
-    }
-}
+        }}
+    }}
+}}
 </script>
 @endpush
+"""
+
+with open('resources/views/admin/news/create.blade.php', 'w', encoding='utf-8') as f:
+    f.write(create_editor_content(is_edit=False))
+
+with open('resources/views/admin/news/edit.blade.php', 'w', encoding='utf-8') as f:
+    f.write(create_editor_content(is_edit=True))

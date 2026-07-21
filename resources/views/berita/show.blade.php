@@ -91,7 +91,7 @@
   /* center hero */
   .hero h2{
     font-family:var(--serif-display); font-weight:900; font-size:clamp(26px,3vw,34px); line-height:1.12; margin-bottom:14px;
-    overflow-wrap:break-word; word-break:break-word;
+    overflow-wrap:break-word; word-break:break-word; text-align:center;
   }
   .hero figure{margin-bottom:10px;}
   .hero .hero-image{
@@ -251,22 +251,26 @@
   <div class="main-grid">
     <!-- LEFT COLUMN -->
     <aside>
-      @if(isset($nextBerita) && $nextBerita)
+      @if(isset($nextBerita) && $nextBerita->count() > 0)
       <div class="aside-feature" style="margin-top:0;">
         <div class="rail-title">Baca Juga</div>
-        <figure>
-          @if($nextBerita->image)
-            <img src="{{ Storage::url($nextBerita->image) }}" alt="{{ $nextBerita->title }}" style="width:100%; object-fit:cover; border:1px solid var(--rule-light); border-radius:4px;">
-          @else
-            <svg viewBox="0 0 230 140" width="100%" height="auto">
-              <rect width="230" height="140" fill="#ece4d1"/>
-              <text x="50%" y="50%" font-family="var(--sans)" font-size="12" fill="#8f978f" text-anchor="middle" dy=".3em">Format News</text>
-            </svg>
-          @endif
-        </figure>
-        <h4><a href="{{ route('berita.show', $nextBerita->slug) }}" style="color:var(--ink); text-decoration:none;">{{ $nextBerita->title }}</a></h4>
-        <p>{{ Str::limit(strip_tags($nextBerita->content), 120) }}</p>
-        <div class="byline">{{ $nextBerita->author ? $nextBerita->author->name : 'Redaksi' }} &middot; FORMAT NEWS</div>
+        @foreach($nextBerita as $nb)
+        <div style="margin-bottom: 24px;">
+          <figure>
+            @if($nb->image)
+              <img src="{{ Storage::url($nb->image) }}" alt="{{ $nb->title }}" style="width:100%; object-fit:cover; border:1px solid var(--rule-light); border-radius:4px;">
+            @else
+              <svg viewBox="0 0 230 140" width="100%" height="auto">
+                <rect width="230" height="140" fill="#ece4d1"/>
+                <text x="50%" y="50%" font-family="var(--sans)" font-size="12" fill="#8f978f" text-anchor="middle" dy=".3em">Format News</text>
+              </svg>
+            @endif
+          </figure>
+          <h4 style="margin-top:8px;"><a href="{{ route('berita.show', $nb->slug) }}" style="color:var(--ink); text-decoration:none;">{{ $nb->title }}</a></h4>
+          <p>{{ Str::limit(strip_tags($nb->content), 120) }}</p>
+          <div class="byline">{{ $nb->author ? $nb->author->name : 'Redaksi' }} &middot; FORMAT NEWS</div>
+        </div>
+        @endforeach
       </div>
       @endif
     </aside>
@@ -305,6 +309,25 @@
           @endforeach
         </ul>
       </div>
+
+      @if(isset($rightFeatured) && $rightFeatured)
+      <div class="aside-feature" style="margin-top:32px;">
+        <div class="rail-title">Pilihan Editor</div>
+        <figure>
+          @if($rightFeatured->image)
+            <img src="{{ Storage::url($rightFeatured->image) }}" alt="{{ $rightFeatured->title }}" style="width:100%; object-fit:cover; border:1px solid var(--rule-light); border-radius:4px;">
+          @else
+            <svg viewBox="0 0 230 140" width="100%" height="auto">
+              <rect width="230" height="140" fill="#ece4d1"/>
+              <text x="50%" y="50%" font-family="var(--sans)" font-size="12" fill="#8f978f" text-anchor="middle" dy=".3em">Format News</text>
+            </svg>
+          @endif
+        </figure>
+        <h4 style="margin-top:8px;"><a href="{{ route('berita.show', $rightFeatured->slug) }}" style="color:var(--ink); text-decoration:none;">{{ $rightFeatured->title }}</a></h4>
+        <p>{{ Str::limit(strip_tags($rightFeatured->content), 100) }}</p>
+      </div>
+      @endif
+
     </aside>
   </div>
 
@@ -340,6 +363,14 @@
   </section>
 
   <footer>
+    <div style="margin-bottom:16px;">
+      <h4 style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--ink); margin-bottom:8px; letter-spacing:.08em;">Sosial Media</h4>
+      <div style="display:flex; justify-content:center; gap:24px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.05em;">
+        <a href="#" style="color:var(--ink-soft); transition:color 0.2s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--ink-soft)'">Instagram</a>
+        <a href="#" style="color:var(--ink-soft); transition:color 0.2s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--ink-soft)'">TikTok</a>
+        <a href="#" style="color:var(--ink-soft); transition:color 0.2s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--ink-soft)'">YouTube</a>
+      </div>
+    </div>
     &copy; {{ date('Y') }} Format R UNESA. Seluruh hak cipta dilindungi.
   </footer>
 

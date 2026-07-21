@@ -1,14 +1,12 @@
 @extends('admin.layouts.app')
 
-@section('page-title', 'Tulis Berita')
+@section('page-title', 'Tulis Berita Baru')
 
 @section('content')
-@push('styles')
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap');
 
-  /* Newspaper Variables */
-  .preview-wrapper {
+  .newspaper-editor {
     --paper:#faf7ef;
     --paper-dim:#f2ede0;
     --ink:#1c1a16;
@@ -17,200 +15,260 @@
     --rule-dark:#1c1a16;
     --red:#a3272f;
     --blue:#5c4632;
-    --gold:#b8935a;
     --serif-display:'Playfair Display', 'Times New Roman', serif;
     --serif-body:'Source Serif 4', 'Georgia', serif;
     --sans:'Inter', 'Helvetica Neue', sans-serif;
     
     background:var(--paper-dim); color:var(--ink); font-family:var(--serif-body); line-height:1.5;
-    padding:20px;
-    border-radius: 12px;
-    border: 1px solid var(--rule);
-    max-height: 800px;
-    overflow-y: auto;
+    padding: 2rem;
+    min-height: 100vh;
   }
 
-  .preview-page {
-    background:var(--paper);
-    box-shadow:0 0 0 1px var(--rule);
-    padding:22px 30px 0;
+  .newspaper-editor .page {
+    max-width:1180px; margin:0 auto; background:var(--paper);
+    box-shadow:0 0 0 1px var(--rule), 0 10px 30px rgba(0,0,0,0.1);
+    padding:22px clamp(16px,3vw,48px) 40px;
   }
 
-  .preview-wrapper * { box-sizing:border-box; margin:0; padding:0; }
+  /* Utilities */
+  .newspaper-editor .masthead{text-align:center; padding:26px 0 14px;}
+  .newspaper-editor .masthead h1{ font-family:var(--serif-display); font-weight:900; font-size:clamp(42px,7vw,74px); letter-spacing:.01em; color:var(--ink); margin:0; line-height:1;}
+  .newspaper-editor .masthead .tagline{ font-family:var(--sans); font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--ink-soft); margin-top:6px;}
+  .newspaper-editor .issue-bar{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-top:1px solid var(--rule-dark); border-bottom:3px solid var(--rule-dark); font-family:var(--sans); font-size:11px; letter-spacing:.04em; color:var(--ink-soft);}
+
+  /* Grid */
+  .newspaper-editor .main-grid{display:grid; grid-template-columns:235px 1fr 265px; gap:26px; padding:26px 0;}
   
-  .preview-masthead { text-align:center; padding:16px 0; border-bottom:3px double var(--rule-dark); margin-bottom: 16px; }
-  .preview-masthead h1 { font-family:var(--serif-display); font-weight:900; font-size:32px; letter-spacing:.01em; color:var(--ink); }
-  .preview-masthead p { font-family:var(--sans); font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--ink-soft); margin-top:4px; }
+  /* Editable elements */
+  [contenteditable="true"] { outline: none; transition: background 0.2s, box-shadow 0.2s; border-radius: 4px; }
+  [contenteditable="true"]:hover { background: rgba(0,0,0,0.03); box-shadow: 0 0 0 4px rgba(0,0,0,0.03); cursor: text; }
+  [contenteditable="true"]:focus { background: rgba(255, 255, 255, 0.7); box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.7), 0 0 0 1px var(--rule); }
+  [contenteditable="true"]:empty:before { content: attr(data-placeholder); color: var(--ink-soft); font-style: italic; opacity: 0.6; pointer-events: none; display: block; }
+
+  /* Hero Article */
+  .newspaper-editor .hero h2{
+    font-family:var(--serif-display); font-weight:900; font-size:clamp(26px,3vw,34px); line-height:1.12; margin-bottom:14px;
+    overflow-wrap:break-word; word-break:break-word; text-align:center;
+  }
+  .newspaper-editor .hero figure{margin-bottom:10px; position: relative;}
+  .newspaper-editor .hero .hero-image{ width:100%; aspect-ratio:16/9; overflow:hidden; border-radius:4px; box-shadow:0 4px 12px rgba(0,0,0,0.15); background:#e5e5e5; display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative; transition: filter 0.2s; }
+  .newspaper-editor .hero .hero-image:hover { filter: brightness(0.9); }
+  .newspaper-editor .hero .hero-image img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
+  .newspaper-editor .hero figure figcaption{font-family:var(--sans); font-size:10px; color:var(--ink-soft); margin-top:6px; font-style:italic; display:block;}
+  .newspaper-editor .hero .byline{ font-family:var(--sans); font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--rule); display:flex; gap:4px; align-items:center;}
+  .newspaper-editor .hero .byline b{color:var(--ink); font-weight:bold;}
   
-  .preview-hero h2 { font-family:var(--serif-display); font-weight:900; font-size:24px; line-height:1.2; margin-bottom:14px; }
-  .preview-byline { font-family:var(--sans); font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--rule); }
-  .preview-byline b { color:var(--ink); }
+  .newspaper-editor .body-columns{ columns:2; column-gap:22px; font-size:13px; line-height:1.62; color:var(--ink); min-height:200px; padding-bottom: 20px; }
+  .newspaper-editor .body-columns p{ margin-bottom:10px; }
+  .newspaper-editor .body-columns p:first-of-type::first-letter{ font-family:var(--serif-display); font-size:46px; font-weight:900; float:left; line-height:.82; padding:4px 6px 0 0; color:var(--red); }
+
+  /* Sidebars (Dummy) */
+  .newspaper-editor .rail-title{ font-family:var(--sans); font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--red); border-bottom:2px solid var(--rule-dark); padding-bottom:6px; margin-bottom:14px; }
+  .newspaper-editor .aside-feature h4{font-family:var(--serif-display); font-size:19px; font-weight:700; line-height:1.22; margin-bottom:6px; margin-top:10px;}
+  .newspaper-editor .aside-feature p{font-size:11.5px; color:var(--ink-soft); line-height:1.55; margin-bottom:7px;}
   
-  .preview-body { font-size:13px; line-height:1.62; color:var(--ink); }
-  .preview-body p { margin-bottom: 12px; }
-  .preview-body p:first-of-type::first-letter { font-family:var(--serif-display); font-size:38px; font-weight:900; float:left; line-height:.8; padding:4px 6px 0 0; color:var(--red); }
-  
-  .preview-meta { margin-top: 20px; padding-top: 10px; border-top: 1px solid var(--rule); font-family:var(--sans); font-size: 11px; display: flex; justify-content: space-between; }
-  .preview-tag { color: var(--red); font-weight: bold; text-transform: uppercase; letter-spacing: .08em; }
+  .newspaper-editor .latest-box h4{ font-family:var(--sans); font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px; padding-bottom:8px; border-bottom:2px solid var(--rule-dark); color:var(--ink); }
+  .newspaper-editor .latest-box ul{list-style:none; padding:0; margin:0;}
+  .newspaper-editor .latest-box li{display:flex; flex-direction:column; gap:6px; padding:12px 0; border-bottom:1px dotted var(--rule);}
+  .newspaper-editor .latest-box li a{font-family:var(--sans); font-size:13px; font-weight:600; color:var(--ink); line-height:1.3;}
+
+  @media (max-width:960px){
+    .newspaper-editor .main-grid{grid-template-columns:1fr;}
+    .newspaper-editor .body-columns{columns:1;}
+  }
+
+  /* Floating Toolbar */
+  .floating-toolbar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    z-index: 100;
+  }
 </style>
-@endpush
 
-<div class="space-y-6" x-data="newsForm()">
-    {{-- Page Header --}}
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Tulis Berita Baru</h1>
-            <p class="text-gray-500 dark:text-gray-400 mt-1">Buat artikel berita dan pratinjau dalam layout koran.</p>
-        </div>
-        <a href="{{ route('admin.berita.index') }}" class="btn-secondary">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7-7-7M14 18a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            <span>Kembali</span>
-        </a>
-    </div>
+<div x-data="inlineEditor()" class="-m-6">
+  
+  
+  @if ($errors->any())
+      <div class="fixed top-4 right-4 bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-lg z-[100] max-w-md">
+          <p class="font-bold mb-1">Gagal Menyimpan:</p>
+          <ul class="list-disc pl-5 text-sm">
+              @foreach ($errors->all() as $error)
+                  <li>{{ $error }}</li>
+              @endforeach
+          </ul>
+      </div>
+  @endif
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+  
+  <form id="newsForm" action="{{ route('admin.berita.store') }}" method="POST" enctype="multipart/form-data" class="hidden">
+      @csrf
+      
+      <input type="hidden" name="title" :value="form.judul">
+      <input type="hidden" name="content" :value="form.konten">
+      <input type="hidden" name="author" :value="form.penulis">
+      <input type="hidden" name="tag" :value="form.tag">
+      <input type="hidden" name="caption" :value="form.caption">
+      <input type="hidden" name="status" :value="form.status">
+      <input type="file" name="image" id="imageInput" accept="image/*" @change="handleImageUpload">
+  </form>
+
+  
+  <div class="newspaper-editor">
+    <div class="page">
+      
+      <div class="masthead">
+        <h1>FORMAT NEWS</h1>
+        <p class="tagline">Sumber Berita dan Informasi Mahasiswa UNESA</p>
+      </div>
+
+      <div class="issue-bar">
+        <span>FORMAT-R UNESA</span>
+        <span class="text-red-600 font-bold tracking-wider">MODE EDITING</span>
+        <span>EDISI SPESIAL</span>
+      </div>
+
+      <div class="main-grid">
         
-        {{-- Editor Form --}}
-        <div class="lg:col-span-5 space-y-6">
-            <form action="{{ route('admin.berita.store') }}" method="POST" enctype="multipart/form-data" @submit="isSubmitting = true" class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
-                @csrf
+        <aside class="hidden lg:block opacity-50 select-none pointer-events-none">
+          <div class="aside-feature">
+            <div class="rail-title">Baca Juga</div>
+            <figure class="bg-gray-200 h-32 w-full rounded flex items-center justify-center mb-2"><span class="text-xs text-gray-500">Gambar</span></figure>
+            <h4>Contoh Berita Sebelumnya</h4>
+            <p>Ini adalah contoh area sidebar untuk memberikan konteks visual bagaimana koran terlihat saat diterbitkan.</p>
+          </div>
+        </aside>
 
-                @if ($errors->any())
-                    <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-6">
-                        <ul class="list-disc pl-5">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-                
-                <input type="hidden" name="status" x-model="form.status">
-                
-                <div class="form-group mb-5">
-                    <label class="form-label">Judul Berita <span class="text-red-500">*</span></label>
-                    <input type="text" name="title" x-model="form.judul" required class="form-input" placeholder="Masukkan judul berita yang menarik" value="{{ old('title') }}">
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4 mb-5">
-                    <div class="form-group">
-                        <label class="form-label">Penulis</label>
-                        <input type="text" x-model="form.penulis" class="form-input" placeholder="Contoh: Rian Hidayat">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Kategori / Tag</label>
-                        <input type="text" x-model="form.tag" class="form-input" placeholder="Contoh: Kabar FORMAT">
-                    </div>
-                </div>
+        
+        <article class="hero">
+          
+          <h2 contenteditable="true" 
+              data-placeholder="Ketikkan Judul Berita Di Sini..."
+              x-init="$el.innerText = form.judul"
+              @input="form.judul = $el.innerText"
+              @paste="handlePaste($event)"
+              @keydown.enter.prevent="$event.target.blur()"></h2>
 
-
-
-                <div class="form-group mb-5">
-                    <label class="form-label">Foto Utama</label>
-                    <div class="flex items-center gap-4">
-                        <div class="flex-shrink-0 w-24 h-16 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden border border-gray-300 dark:border-gray-600 flex items-center justify-center">
-                            <template x-if="form.fotoPreview">
-                                <img :src="form.fotoPreview" class="w-full h-full object-cover">
-                            </template>
-                            <template x-if="!form.fotoPreview">
-                                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            </template>
-                        </div>
-                        <div class="flex-1">
-                            <input type="file" name="image" @change="handleFileUpload" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group mb-5">
-                    <label class="form-label">Keterangan Foto (Caption)</label>
-                    <input type="text" x-model="form.caption" class="form-input" placeholder="Contoh: Suasana kegiatan pelatihan desain grafis...">
-                </div>
-                
-                <div class="form-group mb-6">
-                    <label class="form-label">Konten Artikel <span class="text-red-500">*</span></label>
-                    <textarea name="content" x-model="form.konten" required class="form-textarea" rows="12" placeholder="Tuliskan isi berita di sini. Paragraf pertama akan otomatis mendapatkan efek Drop Cap khas koran...">{{ old('content') }}</textarea>
-                    <p class="text-xs text-gray-500 mt-2">Gunakan spasi (enter) ganda untuk membuat paragraf baru.</p>
-                </div>
-
-                <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
-                    <button type="submit" class="btn-secondary" @click="form.status = 'draft'">Simpan Draft</button>
-                    <button type="submit" class="btn-primary" @click="form.status = 'published'">
-                        <span x-show="!isSubmitting">Publikasikan Berita</span>
-                        <span x-show="isSubmitting" class="flex items-center gap-2">
-                            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            Menyimpan...
-                        </span>
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        {{-- Live Preview --}}
-        <div class="lg:col-span-7">
-            <div class="sticky top-6">
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Live Preview (Format Koran)</h3>
-                    <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded dark:bg-blue-900/30 dark:text-blue-400">Pembaruan Waktu Nyata</span>
-                </div>
-                
-                <div class="preview-wrapper">
-                    <div class="preview-page">
-                        <div class="preview-masthead">
-                            <h1>FORMAT NEWS</h1>
-                            <p>Sumber Berita dan Informasi Mahasiswa UNESA</p>
-                        </div>
-                        
-                        <article class="preview-hero">
-                            <h2 x-text="form.judul || 'Judul Berita Akan Tampil Di Sini'"></h2>
-                            
-                            <template x-if="form.fotoPreview">
-                                <figure style="margin-bottom: 14px;">
-                                    <img :src="form.fotoPreview" alt="Foto Berita" style="width:100%; display:block; filter:grayscale(1) contrast(1.1) sepia(0.1);">
-                                    <figcaption style="font-family:var(--sans); font-size:10px; color:var(--ink-soft); margin-top:6px; font-style:italic;" x-text="form.caption || 'Keterangan foto...'"></figcaption>
-                                </figure>
-                            </template>
-                            
-                            <div class="preview-byline">
-                                Oleh <b x-text="form.penulis || 'Nama Penulis'"></b> &middot; Jurnalis
-                            </div>
-                            
-                            <div class="preview-body" x-html="formatKonten(form.konten)">
-                            </div>
-                            
-                            <div class="preview-meta pb-6">
-                                <span class="preview-tag" x-text="form.tag || 'KATEGORI'"></span>
-                                <span>Waktu Baca: <span x-text="form.menit || '0'"></span> Menit</span>
-                            </div>
-                        </article>
-                    </div>
-                </div>
+          
+          <figure>
+            <div class="hero-image" @click="document.getElementById('imageInput').click()">
+              <template x-if="form.fotoPreview">
+                  <img :src="form.fotoPreview" alt="Preview">
+              </template>
+              <template x-if="!form.fotoPreview">
+                  <div class="text-center p-6 flex flex-col items-center justify-center text-gray-400">
+                      <svg class="w-12 h-12 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                      <span class="font-sans text-sm tracking-wide">Klik untuk Upload Foto Utama</span>
+                  </div>
+              </template>
             </div>
-        </div>
+            
+            <figcaption contenteditable="true"
+                        data-placeholder="Tulis keterangan foto (caption) di sini..."
+                        x-init="$el.innerText = form.caption"
+                        @input="form.caption = $el.innerText"
+                        @paste="handlePaste($event)"
+                        @keydown.enter.prevent="$event.target.blur()"></figcaption>
+          </figure>
+
+          
+          <div class="byline">
+            <span class="text-gray-400">Oleh</span>
+            <b contenteditable="true" 
+               data-placeholder="Nama Penulis" 
+               x-init="$el.innerText = form.penulis"
+               @input="form.penulis = $el.innerText"
+               @paste="handlePaste($event)"
+               @keydown.enter.prevent="$event.target.blur()"
+               class="min-w-[100px] border-b border-dashed border-gray-300"></b> 
+            &middot; Koresponden FORMAT-R
+          </div>
+
+          
+          <div class="body-columns" 
+               contenteditable="true"
+               data-placeholder="Mulai ketikkan isi berita di sini. Paragraf pertama akan otomatis menggunakan efek Drop Cap khas koran. Tekan Enter dua kali untuk paragraf baru."
+               x-init="$el.innerHTML = form.konten"
+               @input="form.konten = $el.innerHTML"
+               @paste="handleContentPaste($event)">
+          </div>
+        </article>
+
+        
+        <aside class="hidden lg:block opacity-50 select-none pointer-events-none">
+          <div class="latest-box">
+            <h4>Berita Lainnya</h4>
+            <ul>
+              <li><a href="#">Judul Berita Lainnya Pertama</a><span class="text-[10px] text-[var(--red)] font-bold tracking-wider">FORMAT NEWS</span></li>
+              <li><a href="#">Judul Berita Lainnya Kedua</a><span class="text-[10px] text-[var(--red)] font-bold tracking-wider">FORMAT NEWS</span></li>
+              <li><a href="#">Judul Berita Lainnya Ketiga</a><span class="text-[10px] text-[var(--red)] font-bold tracking-wider">FORMAT NEWS</span></li>
+            </ul>
+          </div>
+        </aside>
+      </div>
 
     </div>
+  </div>
+
+  
+  <div class="floating-toolbar">
+      <a href="{{ route('admin.berita.index') }}" class="text-gray-500 hover:text-gray-800 p-2 rounded-full hover:bg-gray-100 transition" title="Batal & Kembali">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7-7-7M14 18a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+      </a>
+      
+      <div class="h-8 w-px bg-gray-200 mx-2"></div>
+
+      <div class="flex flex-col">
+          <label class="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1">Kategori/Tag</label>
+          <input type="text" x-model="form.tag" placeholder="Kabar FORMAT" class="text-sm border-0 bg-gray-50 rounded px-3 py-1.5 focus:ring-2 focus:ring-blue-100 w-40 outline-none">
+      </div>
+
+      <div class="h-8 w-px bg-gray-200 mx-2"></div>
+
+      <div class="flex items-center gap-3">
+          <button type="button" @click="submitForm('draft')" class="px-5 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-full hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-all">
+              Simpan Draft
+          </button>
+          
+          <button type="button" @click="submitForm('published')" :disabled="isSubmitting" class="px-6 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-md transition-all flex items-center gap-2">
+              <span x-show="!isSubmitting">Publikasikan</span>
+              <span x-show="isSubmitting">
+                  <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+              </span>
+          </button>
+      </div>
+  </div>
+
 </div>
 @endsection
 
 @push('scripts')
 <script>
-function newsForm() {
+const oldTitle = {!! json_encode(old('title', '')) !!};
+const oldContent = {!! json_encode(old('content', '')) !!};
+
+function inlineEditor() {
     return {
         form: {
-            judul: '',
+            judul: oldTitle,
             penulis: 'Redaksi',
             tag: 'Kabar FORMAT',
-            menit: 3,
-            fotoPreview: '',
             caption: '',
-            konten: '',
+            fotoPreview: '',
+            konten: oldContent,
             status: 'published'
         },
         isSubmitting: false,
-        
-        handleFileUpload(event) {
+
+        handleImageUpload(event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
@@ -220,11 +278,41 @@ function newsForm() {
                 reader.readAsDataURL(file);
             }
         },
-        
-        formatKonten(text) {
-            if (!text) return '<p>Mulai ketikkan isi berita di kolom sebelah kiri untuk melihat hasil pratinjaunya di sini.</p>';
-            // Simple newline to <p> conversion
-            return text.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+
+        handlePaste(e) {
+            e.preventDefault();
+            const text = e.clipboardData.getData('text/plain');
+            document.execCommand('insertText', false, text);
+        },
+
+        handleContentPaste(e) {
+            e.preventDefault();
+            // Get plain text to avoid weird inline styles and HTML structures
+            let text = e.clipboardData.getData('text/plain');
+            
+            // Convert double newlines to paragraphs
+            let paragraphs = text.split(/\n\s*\n/);
+            let html = paragraphs.map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+            
+            document.execCommand('insertHTML', false, html);
+        },
+
+        submitForm(status) {
+            this.form.status = status;
+            
+            // Basic validation
+            if (!this.form.judul || this.form.judul.trim() === '') {
+                alert('Judul berita tidak boleh kosong!');
+                return;
+            }
+            
+            if (!this.form.konten || this.form.konten.trim() === '') {
+                alert('Konten berita tidak boleh kosong!');
+                return;
+            }
+
+            this.isSubmitting = true;
+            document.getElementById('newsForm').submit();
         }
     }
 }

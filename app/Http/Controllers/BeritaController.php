@@ -30,12 +30,20 @@ class BeritaController extends Controller
             ->take(3)
             ->get();
 
-        // Ambil berita untuk preview sebelah kiri
+        // Ambil berita untuk preview sebelah kiri (Baca Juga) - ambil 2
         $nextBerita = News::where('slug', '!=', $slug)
             ->where('status', 'published')
             ->inRandomOrder()
+            ->take(2)
+            ->get();
+
+        // Ambil berita untuk bagian bawah sidebar kanan
+        $rightFeatured = News::where('slug', '!=', $slug)
+            ->where('status', 'published')
+            ->whereNotIn('id', $nextBerita->pluck('id'))
+            ->inRandomOrder()
             ->first();
 
-        return view('berita.show', compact('berita', 'latestBerita', 'weeklyBerita', 'nextBerita'));
+        return view('berita.show', compact('berita', 'latestBerita', 'weeklyBerita', 'nextBerita', 'rightFeatured'));
     }
 }
