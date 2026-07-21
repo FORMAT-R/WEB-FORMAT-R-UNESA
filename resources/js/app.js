@@ -8,15 +8,17 @@ import './scroll-animations.js';
     'use strict';
 
     /* ========== Dark Mode ========== */
-    const darkToggle = document.getElementById('darkToggle');
-    if (darkToggle) {
+    const darkToggles = document.querySelectorAll('#darkToggle, #darkToggleMobile');
+    if (darkToggles.length > 0) {
         // Restore saved preference
         if (localStorage.getItem('darkMode') === 'true') {
             document.body.classList.add('dark');
         }
-        darkToggle.addEventListener('click', function () {
-            document.body.classList.toggle('dark');
-            localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+        darkToggles.forEach(toggle => {
+            toggle.addEventListener('click', function () {
+                document.body.classList.toggle('dark');
+                localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+            });
         });
     }
 

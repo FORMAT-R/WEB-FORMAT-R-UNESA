@@ -54,7 +54,7 @@
         </ul>
 
         <div class="nav-tools">
-            <button class="icon-btn" id="darkToggle" aria-label="Ganti tema gelap/terang">
+            <button class="icon-btn hide-mobile" id="darkToggle" aria-label="Ganti tema gelap/terang">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
                     <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
                 </svg>
@@ -72,7 +72,15 @@
 {{-- ===== MOBILE MENU ===== --}}
 <div class="mobile-menu" id="mobileMenu">
     <div class="mobile-panel">
-        <button class="mobile-close" id="mobileClose" aria-label="Tutup menu">✕</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--line);">
+            <button class="icon-btn" id="darkToggleMobile" aria-label="Ganti tema gelap/terang" style="width:100%; justify-content:flex-start; border:none; padding:0; height:auto; color:var(--ink);">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" style="margin-right:8px;">
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                </svg>
+                Tema Gelap
+            </button>
+            <button class="mobile-close" id="mobileClose" aria-label="Tutup menu" style="margin-bottom:0;">✕</button>
+        </div>
         <a href="{{ route('home') }}">Beranda</a>
         <a href="{{ route('home') }}#tentang">Tentang</a>
         <a href="{{ route('home') }}#visimisi">Visi &amp; Misi</a>

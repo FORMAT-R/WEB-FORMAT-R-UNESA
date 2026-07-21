@@ -271,6 +271,10 @@ footer { padding: 60px 0 30px; }
     .mobile-menu { display: block; }
     .foot-grid { grid-template-columns: 1fr 1fr; }
 }
+@media (max-width: 600px) {
+    .nav-cta { display: none; }
+    .hide-mobile { display: none !important; }
+}
 @media (max-width: 560px) {
     section { padding: 64px 0; }
     .foot-grid { grid-template-columns: 1fr; }
