@@ -51,7 +51,7 @@ import './scroll-animations.js';
     const progress = document.getElementById('scrollProgress');
     const navWrap  = document.getElementById('navWrap');
     const toTop    = document.getElementById('toTop');
-    const hasGsapHome = !!document.querySelector('#home .stack-section, #home.stack-section, .stack-section');
+    const hasGsapHome = window.innerWidth >= 768 && !!document.querySelector('#home .stack-section, #home.stack-section, .stack-section');
 
     function onScroll() {
         const h          = document.documentElement;

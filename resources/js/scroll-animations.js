@@ -194,6 +194,11 @@ export function initHomepageAnimations() {
   const isHome = document.querySelector('#home');
   if (!isHome) return;
 
+  // MATIKAN ANIMASI GSAP DI HP UNTUK MENCEGAH LEMOT DAN BERANTAKAN
+  if (window.innerWidth < 768) {
+      return;
+  }
+
   initStackScroll();
 
   // 4. ScrollSpy — single source of truth for active nav state
