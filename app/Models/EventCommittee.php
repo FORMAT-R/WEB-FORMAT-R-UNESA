@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class EventCommittee extends Model
+{
+    protected $fillable = ['event_id', 'name', 'role', 'photo'];
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
+    }
+}

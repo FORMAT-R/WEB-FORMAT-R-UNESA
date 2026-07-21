@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Program Kerja — Untuk Perubahan yang Nyata</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Nunito+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #EEF3FB;
+    --bg-card: #FFFFFF;
+    --navy: #0E2340;
+    --navy-soft: #3C5372;
+    --blue: #2A5CDB;
+    --blue-dark: #1B3E9E;
+    --sky: #D9E5FA;
+    --sky-line: #A9C2EF;
+    --line: rgba(14,35,64,0.12);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--navy);
+    font-family:'Nunito Sans', sans-serif;
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    color:var(--navy);
+    letter-spacing:-0.01em;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px;}
+  a{text-decoration:none;color:inherit;}
+
+  /* ===== decorative divider (signature element) ===== */
+  .wheat-divider{
+    display:flex;align-items:center;justify-content:center;gap:14px;
+    margin:0 auto 18px;
+  }
+  .wheat-divider svg{width:34px;height:34px;color:var(--blue);}
+  .wheat-divider .stem{width:64px;height:1px;background:var(--line);}
+
+  /* ===== EVENT HEADER (paling atas, menyatu dengan hero) ===== */
+  .event-hero{
+    padding:36px 0 90px;
+    background:
+      radial-gradient(ellipse 900px 500px at 15% 0%, rgba(42,92,219,0.16), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 10%, rgba(27,62,158,0.14), transparent 55%),
+      var(--bg);
+  }
+  .breadcrumb{
+    font-size:13px;color:var(--navy-soft);margin-bottom:22px;
+  }
+  .breadcrumb a{color:var(--blue-dark);font-weight:600;}
+  .breadcrumb .sep{margin:0 6px;color:var(--sky-line);}
+
+  .event-image{
+    position:relative;
+    height:360px;
+    border-radius:26px;
+    overflow:hidden;
+    margin-bottom:40px;
+    background:
+      radial-gradient(circle at 25% 20%, rgba(255,255,255,0.25), transparent 45%),
+      radial-gradient(circle at 80% 80%, rgba(13,28,58,0.35), transparent 55%),
+      linear-gradient(150deg, #4C7EF0 0%, #1B3E9E 55%, #0E2340 100%);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 30px 60px -28px rgba(14,35,64,0.4);
+  }
+  .event-image .icon-sym{
+    width:110px;height:110px;color:rgba(255,255,255,0.28);
+  }
+  .badge-pill{
+    position:absolute;top:22px;right:22px;
+    display:inline-flex;align-items:center;gap:7px;
+    background:#0E2340;color:#EAF1FE;
+    padding:9px 16px 9px 12px;
+    border-radius:999px;
+    font-size:12.5px;font-weight:700;
+    box-shadow:0 12px 22px -10px rgba(6,15,28,0.5);
+  }
+  .badge-pill svg{width:15px;height:15px;}
+  .event-image .cap{
+    position:absolute;left:0;right:0;bottom:0;
+    padding:22px 26px 24px;
+    background:linear-gradient(0deg, rgba(6,15,28,0.72), transparent);
+    color:#F4F8FF;
+  }
+  .event-image .cap .eb{
+    font-size:11px;letter-spacing:0.16em;text-transform:uppercase;
+    color:#BFD3F7;font-weight:700;margin-bottom:6px;
+  }
+  .event-image .cap .ti{
+    font-family:'Fraunces',serif;font-weight:600;font-size:22px;
+  }
+
+  .event-content{
+    display:grid;grid-template-columns:1.1fr 1fr;
+    gap:56px;align-items:start;
+  }
+  .event-content h1{
+    font-size:clamp(30px,4vw,42px);
+    line-height:1.08;margin-bottom:18px;
+  }
+  .event-content h1 em{font-style:italic;color:var(--blue);}
+  .event-content .lede{
+    color:var(--navy-soft);font-size:15.5px;max-width:440px;margin-bottom:28px;
+  }
+
+  .info-list{display:flex;flex-direction:column;}
+  .info-item{
+    display:flex;align-items:center;gap:14px;
+    padding:15px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .info-item:first-child{padding-top:0;}
+  .info-item:last-child{border-bottom:none;}
+  .info-icon{
+    width:20px;height:20px;flex:none;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--blue-dark);
+  }
+  .info-icon svg{width:20px;height:20px;}
+  .info-icon.status-closed{color:#C43B2F;}
+  .info-icon.status-open{color:#1F8A5F;}
+  .info-text{
+    display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
+  }
+  .info-text .lbl{
+    font-size:11px;letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--navy-soft);font-weight:700;
+    min-width:150px;
+  }
+  .info-text .val{
+    font-weight:700;font-size:14.5px;color:var(--blue-dark);
+  }
+  .info-text .val.muted{color:var(--navy);}
+  .info-text .val.closed{color:#C43B2F;}
+  .info-text .val.open{color:#1F8A5F;}
+
+  @media(max-width:900px){
+    .event-content{grid-template-columns:1fr;gap:34px;}
+  }
+  @media(max-width:600px){
+    .event-image{height:220px;margin-bottom:30px;}
+    .info-text{flex-direction:column;gap:2px;}
+    .info-text .lbl{min-width:0;}
+  }
+  .hero{
+    position:relative;
+    padding:64px 0 90px;
+    background:
+      radial-gradient(ellipse 900px 500px at 15% 0%, rgba(42,92,219,0.16), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 10%, rgba(27,62,158,0.14), transparent 55%),
+      var(--bg);
+  }
+  .hero-top{
+    display:flex;align-items:center;justify-content:center;gap:12px;
+    margin-bottom:44px;
+  }
+  .logo-mark{
+    display:flex;flex-direction:column;align-items:center;gap:2px;
+  }
+  .logo-mark .name{
+    font-family:'Fraunces',serif;font-size:26px;font-weight:700;
+    letter-spacing:0.14em;
+  }
+  .logo-mark .tag{
+    font-size:10.5px;letter-spacing:0.32em;color:var(--navy-soft);text-transform:uppercase;
+  }
+
+  .hero-grid{
+    display:grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap:40px;
+    align-items:center;
+  }
+  .hero-copy{position:relative;z-index:2;}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12.5px;letter-spacing:0.22em;text-transform:uppercase;
+    color:var(--blue-dark);font-weight:700;
+    margin-bottom:18px;
+  }
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--blue-dark);}
+  .hero-copy h1{
+    font-size:clamp(40px,5.6vw,64px);
+    line-height:1.04;
+    margin-bottom:22px;
+  }
+  .hero-copy h1 em{
+    font-style:italic;color:var(--blue);
+  }
+  .hero-copy p{
+    max-width:440px;
+    color:var(--navy-soft);
+    font-size:16.5px;
+    margin-bottom:32px;
+  }
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;
+    background:var(--blue);color:#F4F8FF;
+    padding:16px 32px;
+    border-radius:999px;
+    font-weight:700;font-size:14.5px;letter-spacing:0.03em;
+    border:none;cursor:pointer;
+    box-shadow:0 14px 26px -12px rgba(27,62,158,0.5);
+    transition:transform .25s ease, box-shadow .25s ease, background .25s ease;
+  }
+  .btn:hover{transform:translateY(-3px);box-shadow:0 20px 32px -14px rgba(27,62,158,0.55);background:var(--blue-dark);}
+  .btn.ghost{
+    background:transparent;color:var(--blue-dark);
+    border:1.5px solid var(--blue-dark);
+    box-shadow:none;
+  }
+  .btn.ghost:hover{background:var(--blue-dark);color:#fff;}
+
+  /* hero illustration: one large activity photo */
+  .hero-art{
+    position:relative;
+    height:460px;
+  }
+  .hero-photo{
+    position:relative;
+    width:100%;height:100%;
+    border-radius:28px;
+    overflow:hidden;
+    background:
+      radial-gradient(circle at 25% 20%, rgba(255,255,255,0.22), transparent 45%),
+      radial-gradient(circle at 80% 75%, rgba(13,28,58,0.35), transparent 55%),
+      linear-gradient(150deg, #4C7EF0 0%, #1B3E9E 55%, #0E2340 100%);
+    box-shadow:0 30px 60px -26px rgba(14,35,64,0.45);
+  }
+  .hero-photo .icon-sym{
+    position:absolute;top:50%;left:50%;
+    width:120px;height:120px;
+    transform:translate(-50%,-50%);
+    color:rgba(255,255,255,0.28);
+  }
+  .hero-photo .cap{
+    position:absolute;left:0;right:0;bottom:0;
+    padding:22px 26px 24px;
+    background:linear-gradient(0deg, rgba(6,15,28,0.72), transparent);
+    color:#F4F8FF;
+  }
+  .hero-photo .cap .eb{
+    font-size:11px;letter-spacing:0.16em;text-transform:uppercase;
+    color:#BFD3F7;font-weight:700;margin-bottom:6px;
+  }
+  .hero-photo .cap .ti{
+    font-family:'Fraunces',serif;font-weight:600;font-size:20px;
+  }
+  .float-badge{
+    position:absolute;top:-18px;right:-18px;width:104px;height:104px;
+    border-radius:50%;background:#FFFFFF;
+    display:flex;align-items:center;justify-content:center;flex-direction:column;
+    box-shadow:0 20px 34px -18px rgba(14,35,64,0.35);
+    animation:bob 4.5s ease-in-out infinite;
+  }
+  .float-badge .num{font-family:'Fraunces',serif;font-weight:700;font-size:24px;color:var(--blue-dark);}
+  .float-badge .lbl{font-size:9px;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy-soft);}
+  @keyframes bob{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-10px);}
+  }
+  @media(prefers-reduced-motion: reduce){
+    .float-badge{animation:none;}
+  }
+
+  /* ===== OUTPUT PROKER ===== */
+  .stat-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:24px;
+  }
+  .stat-card{
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    border-radius:22px;
+    padding:30px 26px;
+    transition:transform .3s ease, box-shadow .3s ease;
+  }
+  .stat-card:hover{transform:translateY(-5px);box-shadow:0 24px 36px -24px rgba(14,35,64,0.3);}
+  .stat-card .stat-num{
+    font-family:'Fraunces',serif;font-weight:700;
+    font-size:38px;color:var(--blue-dark);line-height:1;margin-bottom:10px;
+  }
+  .stat-card .stat-lbl{
+    font-weight:700;font-size:14.5px;margin-bottom:6px;color:var(--navy);
+  }
+  .stat-card .stat-desc{
+    font-size:13px;color:var(--navy-soft);
+  }
+
+  /* ===== WHY / PILLARS ===== */
+  .section{padding:96px 0;}
+  .section-head{text-align:center;max-width:600px;margin:0 auto 56px;}
+  .section-head .eyebrow{justify-content:center;}
+  .section-head .eyebrow::before{display:none;}
+  .section-head h2{font-size:clamp(30px,3.8vw,42px);margin-bottom:14px;}
+  .section-head p{color:var(--navy-soft);font-size:16px;}
+
+  .cards{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:28px;
+  }
+  .card{
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    border-radius:22px;
+    padding:36px 30px 32px;
+    transition:transform .3s ease, box-shadow .3s ease;
+  }
+  .card:hover{transform:translateY(-6px);box-shadow:0 26px 40px -26px rgba(14,35,64,0.28);}
+  .card-icon{
+    width:56px;height:56px;border-radius:16px;
+    background:linear-gradient(150deg, #6E93E8, var(--blue));
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:22px;
+    color:#fff;
+  }
+  .card h3{font-size:21px;margin-bottom:10px;}
+  .card p{color:var(--navy-soft);font-size:14.5px;margin-bottom:22px;}
+  .card .link{
+    font-weight:700;font-size:13.5px;color:var(--blue-dark);
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .card .link svg{width:14px;height:14px;transition:transform .25s;}
+  .card:hover .link svg{transform:translateX(4px);}
+
+  /* ===== IKUT SERTA ===== */
+  .visit{
+    background:var(--sky);
+    border-radius:32px;
+    padding:64px;
+    display:grid;grid-template-columns:1fr 1fr;
+    gap:48px;
+    align-items:center;
+  }
+  .visit-copy .eyebrow::before{display:none;}
+  .visit-copy h2{font-size:clamp(28px,3.4vw,38px);margin-bottom:16px;font-style:italic;}
+  .visit-copy p{color:var(--navy-soft);margin-bottom:14px;max-width:460px;font-size:15px;}
+  .hours{
+    list-style:none;margin:22px 0 30px;
+    font-size:14.5px;
+  }
+  .hours li{
+    display:flex;justify-content:space-between;
+    padding:8px 0;border-bottom:1px dashed var(--sky-line);
+    max-width:340px;
+  }
+  .hours li span:last-child{font-weight:700;color:var(--blue-dark);}
+
+  .visit-art{
+    display:grid;grid-template-columns:1fr 1fr;gap:16px;
+  }
+  .swatch{
+    border-radius:18px;
+    aspect-ratio:1/1;
+    box-shadow:0 18px 32px -18px rgba(14,35,64,0.35);
+  }
+  .swatch.a{background:radial-gradient(circle at 30% 25%, #4C7EF0, #1B3E9E 75%);}
+  .swatch.b{background:radial-gradient(circle at 65% 35%, #C4D7F8, #4C7EF0 75%);align-self:end;}
+  .swatch.c{background:radial-gradient(circle at 40% 30%, #EAF1FE, #6E93E8 80%);}
+  .swatch.d{background:radial-gradient(circle at 60% 40%, #8FB2F5, #123071 80%);align-self:end;}
+
+  /* ===== RATING PROKER ===== */
+  .rate-select{
+    width:100%;max-width:400px;
+    padding:13px 16px;border-radius:12px;
+    border:1.5px solid var(--sky-line);
+    background:#fff;color:var(--navy);
+    font-family:'Nunito Sans',sans-serif;font-size:14.5px;font-weight:600;
+    margin-bottom:20px;cursor:pointer;
+  }
+  .star-input{display:flex;gap:8px;margin-bottom:22px;}
+  .star-input button{
+    background:none;border:none;cursor:pointer;padding:0;line-height:0;
+  }
+  .star-input svg{width:34px;height:34px;color:#B9CAEA;transition:color .15s, transform .15s;}
+  .star-input button:hover svg,.star-input svg.active{color:var(--blue);}
+  .star-input button:hover svg{transform:scale(1.1);}
+  .rate-note{font-size:13px;color:var(--navy-soft);margin-top:-8px;margin-bottom:20px;}
+
+  .rating-card{
+    background:#fff;border-radius:22px;
+    padding:30px 28px 26px;
+    box-shadow:0 20px 40px -26px rgba(14,35,64,0.3);
+  }
+  .rating-card .r-title{
+    font-size:12px;letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--navy-soft);font-weight:700;margin-bottom:12px;
+  }
+  .rating-top{display:flex;align-items:flex-end;gap:14px;margin-bottom:6px;}
+  .rating-score{
+    font-family:'Fraunces',serif;font-weight:700;font-size:46px;color:var(--blue-dark);line-height:1;
+  }
+  .stars-display{display:flex;gap:3px;margin-bottom:4px;}
+  .stars-display svg{width:18px;height:18px;color:var(--blue);}
+  .rating-count{font-size:13px;color:var(--navy-soft);margin-bottom:20px;}
+  .bar-row{display:flex;align-items:center;gap:10px;font-size:12.5px;margin-bottom:8px;color:var(--navy-soft);}
+  .bar-row .bl{width:38px;flex:none;font-weight:700;color:var(--navy);}
+  .bar-track{flex:1;height:8px;background:var(--sky);border-radius:999px;overflow:hidden;}
+  .bar-fill{height:100%;background:var(--blue);border-radius:999px;transition:width .4s ease;}
+  .bar-row .bc{width:28px;text-align:right;flex:none;}
+
+  /* ===== SUSUNAN PANITIA ===== */
+  .team-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:26px;
+  }
+  .team-card{
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    border-radius:24px;
+    padding:36px 24px 30px;
+    text-align:center;
+    transition:transform .3s ease, box-shadow .3s ease;
+  }
+  .team-card:hover{transform:translateY(-5px);box-shadow:0 22px 34px -24px rgba(14,35,64,0.3);}
+  .team-card.lead{
+    background:linear-gradient(160deg, var(--blue-dark), var(--navy));
+    border-color:transparent;
+  }
+  .team-card.lead .team-role{color:#BFD3F7;}
+  .team-card.lead .team-name{color:#F4F8FF;}
+  .avatar{
+    width:104px;height:104px;border-radius:50%;
+    margin:0 auto 18px;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(150deg, #8FB2F5, var(--blue));
+    color:#fff;font-family:'Fraunces',serif;font-weight:700;font-size:30px;
+    overflow:hidden;
+  }
+  .avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+  .team-card.lead .avatar{background:rgba(255,255,255,0.14);color:#F4F8FF;}
+  .team-role{
+    font-size:12px;letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--blue-dark);font-weight:700;margin-bottom:6px;
+  }
+  .team-name{
+    font-family:'Fraunces',serif;font-size:18px;font-weight:600;color:var(--navy);
+  }
+
+  /* ===== GALLERY / DOKUMENTASI ===== */
+  .gallery-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px;flex-wrap:wrap;gap:20px;}
+  .gallery-head h2{font-size:clamp(28px,3.4vw,38px);}
+  .gallery{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    grid-auto-rows:150px;
+    gap:16px;
+  }
+  .g{
+    border-radius:18px;position:relative;overflow:hidden;
+    display:flex;align-items:flex-end;padding:16px;
+    color:#F4F8FF;font-weight:700;font-size:13px;
+    box-shadow:inset 0 -60px 50px -30px rgba(6,15,28,0.55);
+  }
+  .g span{position:relative;z-index:2;letter-spacing:0.02em;}
+  .g.g1{grid-column:span 2;grid-row:span 2;background:radial-gradient(circle at 30% 20%, #4C7EF0, #10233F 85%);}
+  .g.g2{grid-column:span 2;background:radial-gradient(circle at 60% 20%, #C4D7F8, #2A5CDB 85%);}
+  .g.g3{background:radial-gradient(circle at 40% 30%, #8FB2F5, #1B3E9E 85%);}
+  .g.g4{background:radial-gradient(circle at 50% 25%, #EAF1FE, #4C7EF0 85%);}
+  .g.g5{grid-column:span 2;background:radial-gradient(circle at 55% 30%, #6E93E8, #123071 85%);}
+  .g.g6{grid-column:span 2;grid-row:span 1;background:radial-gradient(circle at 40% 25%, #A9C2EF, #23428A 85%);}
+
+  /* ===== CTA STRIP ===== */
+  .cta-strip{
+    background:var(--navy);
+    color:#EAF1FE;
+    border-radius:32px;
+    padding:56px;
+    text-align:center;
+    margin-bottom:80px;
+  }
+  .cta-strip h2{color:#F4F8FF;font-size:clamp(26px,3.4vw,36px);margin-bottom:14px;}
+  .cta-strip p{color:#B9C9E6;max-width:480px;margin:0 auto 28px;font-size:15px;}
+  .cta-strip .btn{background:var(--blue);}
+
+  footer{
+    text-align:center;padding:30px 0 50px;
+    font-size:13px;color:var(--navy-soft);
+  }
+
+  @media(max-width:900px){
+    .hero-grid{grid-template-columns:1fr;}
+    .hero-art{height:340px;margin-top:20px;}
+    .cards{grid-template-columns:1fr;}
+    .visit{grid-template-columns:1fr;padding:40px 26px;border-radius:24px;}
+    .gallery{grid-template-columns:repeat(2,1fr);}
+    .g.g1,.g.g2,.g.g5,.g.g6{grid-column:span 2;}
+    .cta-strip{padding:40px 24px;border-radius:24px;}
+    .team-grid{grid-template-columns:repeat(2,1fr);}
+    .stat-grid{grid-template-columns:repeat(2,1fr);}
+  }
+  @media(min-width:901px) and (max-width:1150px){
+    .team-grid{grid-template-columns:repeat(3,1fr);}
+  }
+</style>
+</head>
+<body>
+
+  <!-- EVENT HEADER + HERO (menyatu, paling atas) -->
+  <section class="event-hero">
+    <div class="wrap">
+      <div class="breadcrumb">
+        <a href="#">Beranda</a><span class="sep">/</span><a href="#">Program Kerja</a><span class="sep">/</span>Rapat Koordinasi Panitia
+      </div>
+
+      <div class="event-image">
+        <svg class="icon-sym" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M17 20v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M9 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM23 20v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <div class="badge-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          Akan Datang
+        </div>
+        <div class="cap">
+          <div class="eb">Program Kerja 2026 – 2028</div>
+          <div class="ti">Bekerja Nyata, untuk Perubahan</div>
+        </div>
+      </div>
+
+      <div class="event-content">
+        <div>
+          <h1>Rapat Koordinasi <em>Panitia</em></h1>
+          <p class="lede">Rangkaian program kerja yang disusun secara terukur, transparan, dan berkelanjutan demi kemajuan bersama.</p>
+          <div style="display:flex;gap:14px;flex-wrap:wrap;">
+            <a href="#" class="btn">Lihat Program</a>
+            <a href="#rating" class="btn ghost">Beri Rating</a>
+          </div>
+        </div>
+
+        <div class="info-list">
+          <div class="info-item">
+            <div class="info-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            </div>
+            <div class="info-text">
+              <span class="lbl">Tanggal</span>
+              <span class="val">Senin, 17 Agustus 2026</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div class="info-text">
+              <span class="lbl">Lokasi</span>
+              <span class="val">Balai Pertemuan Cendoro</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 20v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M9 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM23 20v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="info-text">
+              <span class="lbl">Penyelenggara</span>
+              <span class="val">Panitia Program Kerja</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            </div>
+            <div class="info-text">
+              <span class="lbl">Status Event</span>
+              <span class="val">Segera Hadir</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon status-closed">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            </div>
+            <div class="info-text">
+              <span class="lbl">Status Pendaftaran</span>
+              <span class="val closed">Ditutup</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OUTPUT PROKER -->
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="wheat-divider">
+          <div class="stem"></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+          <div class="stem"></div>
+        </div>
+        <div class="eyebrow">Hasil yang Terukur</div>
+        <h2>Output Program Kerja</h2>
+        <p>Capaian nyata dari seluruh program kerja yang telah dan sedang berjalan sepanjang periode ini.</p>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-num">12</div>
+          <div class="stat-lbl">Program Terlaksana</div>
+          <div class="stat-desc">Dari total 15 program yang direncanakan pada periode ini.</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">850+</div>
+          <div class="stat-lbl">Peserta &amp; Penerima Manfaat</div>
+          <div class="stat-desc">Warga dan anggota yang terlibat langsung dalam kegiatan.</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">8</div>
+          <div class="stat-lbl">Desa &amp; Wilayah Terjangkau</div>
+          <div class="stat-desc">Lokasi pelaksanaan program di berbagai wilayah dampingan.</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">92%</div>
+          <div class="stat-lbl">Target Tercapai</div>
+          <div class="stat-desc">Rata-rata capaian indikator keberhasilan seluruh program.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOKUMENTASI (posisi 3) -->
+  <section class="section" style="padding-top:0;">
+    <div class="wrap">
+      <div class="gallery-head">
+        <div>
+          <div class="eyebrow">Rekam Jejak</div>
+          <h2>Dokumentasi Kegiatan</h2>
+        </div>
+        <a href="#" class="btn ghost">Lihat Semua</a>
+      </div>
+      <div class="gallery">
+        <div class="g g1"><span>Pelatihan Kewirausahaan</span></div>
+        <div class="g g2"><span>Bakti Sosial Kesehatan</span></div>
+        <div class="g g3"><span>Penanaman Pohon</span></div>
+        <div class="g g4"><span>Pembagian Beasiswa</span></div>
+        <div class="g g5"><span>Perbaikan Jalan Desa</span></div>
+        <div class="g g6"><span>Rapat Koordinasi</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUSUNAN PANITIA -->
+  <section class="section" style="padding-top:0;">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="wheat-divider">
+          <div class="stem"></div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 20v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M9 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM23 20v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <div class="stem"></div>
+        </div>
+        <div class="eyebrow">Di Balik Layar</div>
+        <h2>Susunan Panitia</h2>
+        <p>Tim yang menjalankan setiap program kerja, dari perencanaan hingga pelaksanaan di lapangan.</p>
+      </div>
+
+      <div class="team-grid">
+        <div class="team-card lead">
+          <div class="avatar">KP</div>
+          <div class="team-role">Ketua Pelaksana</div>
+          <div class="team-name">Nama Lengkap</div>
+        </div>
+        <div class="team-card lead">
+          <div class="avatar">WK</div>
+          <div class="team-role">Wakil Ketua</div>
+          <div class="team-name">Nama Lengkap</div>
+        </div>
+        <div class="team-card">
+          <div class="avatar">SK</div>
+          <div class="team-role">Sekretaris</div>
+          <div class="team-name">Nama Lengkap</div>
+        </div>
+        <div class="team-card">
+          <div class="avatar">BD</div>
+          <div class="team-role">Bendahara</div>
+          <div class="team-name">Nama Lengkap</div>
+        </div>
+        <div class="team-card">
+          <div class="avatar">KL</div>
+          <div class="team-role">Korlap</div>
+          <div class="team-name">Nama Lengkap</div>
+        </div>
+        <div class="team-card">
+          <div class="avatar">SA</div>
+          <div class="team-role">Sie Acara</div>
+          <div class="team-name">Nama Lengkap</div>
+        </div>
+        <div class="team-card">
+          <div class="avatar">SP</div>
+          <div class="team-role">Sie Perlengkapan</div>
+          <div class="team-name">Nama Lengkap</div>
+        </div>
+        <div class="team-card">
+          <div class="avatar">PD</div>
+          <div class="team-role">Sie PDD</div>
+          <div class="team-name">Nama Lengkap</div>
+        </div>
+        <div class="team-card">
+          <div class="avatar">SK</div>
+          <div class="team-role">Sie Konsumsi</div>
+          <div class="team-name">Nama Lengkap</div>
+        </div>
+        <div class="team-card">
+          <div class="avatar">HK</div>
+          <div class="team-role">Sie Humas &amp; Keamanan</div>
+          <div class="team-name">Nama Lengkap</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RATING PROKER -->
+  <section class="section" id="rating" style="padding-top:0;">
+    <div class="wrap">
+      <div class="visit">
+        <div class="visit-copy">
+          <div class="eyebrow">Beri Penilaian</div>
+          <h2>Rating Program Kerja</h2>
+          <p>Panitia maupun peserta bisa memberi rating untuk setiap program kerja yang sudah terlaksana, sebagai bahan evaluasi ke depan.</p>
+
+          <select class="rate-select" id="programSelect">
+            <option value="pelatihan">Pelatihan Kewirausahaan</option>
+            <option value="baksos">Bakti Sosial Kesehatan</option>
+            <option value="tanam">Penanaman Pohon</option>
+            <option value="beasiswa">Pembagian Beasiswa</option>
+            <option value="jalan">Perbaikan Jalan Desa</option>
+            <option value="rapat">Rapat Koordinasi</option>
+          </select>
+
+          <div class="star-input" id="starInput">
+            <button type="button" data-star="1" aria-label="1 bintang"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button>
+            <button type="button" data-star="2" aria-label="2 bintang"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button>
+            <button type="button" data-star="3" aria-label="3 bintang"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button>
+            <button type="button" data-star="4" aria-label="4 bintang"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button>
+            <button type="button" data-star="5" aria-label="5 bintang"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></button>
+          </div>
+          <p class="rate-note" id="rateNote">Pilih bintang sesuai penilaian Anda, lalu kirim.</p>
+          <a href="#" class="btn" id="submitRating">Kirim Rating</a>
+        </div>
+
+        <div class="rating-card">
+          <div class="r-title">Ringkasan Rating</div>
+          <div class="rating-top">
+            <div class="rating-score" id="avgScore">0.0</div>
+            <div>
+              <div class="stars-display" id="avgStars"></div>
+              <div class="rating-count" id="ratingCount" style="margin-bottom:0;">0 penilaian</div>
+            </div>
+          </div>
+          <div style="margin-top:20px;">
+            <div class="bar-row"><span class="bl">5 ★</span><div class="bar-track"><div class="bar-fill" id="bar5" style="width:0%;"></div></div><span class="bc" id="cnt5">0</span></div>
+            <div class="bar-row"><span class="bl">4 ★</span><div class="bar-track"><div class="bar-fill" id="bar4" style="width:0%;"></div></div><span class="bc" id="cnt4">0</span></div>
+            <div class="bar-row"><span class="bl">3 ★</span><div class="bar-track"><div class="bar-fill" id="bar3" style="width:0%;"></div></div><span class="bc" id="cnt3">0</span></div>
+            <div class="bar-row"><span class="bl">2 ★</span><div class="bar-track"><div class="bar-fill" id="bar2" style="width:0%;"></div></div><span class="bc" id="cnt2">0</span></div>
+            <div class="bar-row"><span class="bl">1 ★</span><div class="bar-track"><div class="bar-fill" id="bar1" style="width:0%;"></div></div><span class="bc" id="cnt1">0</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+  (function(){
+    var defaults = {
+      pelatihan:{1:0,2:1,3:3,4:9,5:14},
+      baksos:{1:0,2:0,3:2,4:8,5:19},
+      tanam:{1:0,2:1,3:4,4:10,5:11},
+      beasiswa:{1:0,2:0,3:1,4:6,5:22},
+      jalan:{1:1,2:2,3:5,4:9,5:9},
+      rapat:{1:0,2:1,3:6,4:12,5:7}
+    };
+    var STORAGE_KEY = 'prokerRatings';
+    var data;
+    try{
+      var saved = localStorage.getItem(STORAGE_KEY);
+      data = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaults));
+    }catch(e){
+      data = JSON.parse(JSON.stringify(defaults));
+    }
+
+    var select = document.getElementById('programSelect');
+    var starButtons = document.querySelectorAll('#starInput button');
+    var note = document.getElementById('rateNote');
+    var submitBtn = document.getElementById('submitRating');
+    var selectedStar = 0;
+
+    function starIconsFull(n){
+      var s = '';
+      for(var i=0;i<5;i++){
+        s += '<svg viewBox="0 0 24 24" fill="'+(i<n?'currentColor':'none')+'" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+      }
+      return s;
+    }
+
+    function render(){
+      var key = select.value;
+      var dist = data[key] || {1:0,2:0,3:0,4:0,5:0};
+      var total = 0, sum = 0;
+      for(var i=1;i<=5;i++){ total += dist[i]; sum += dist[i]*i; }
+      var avg = total ? (sum/total) : 0;
+
+      document.getElementById('avgScore').textContent = avg.toFixed(1);
+      document.getElementById('ratingCount').textContent = total + (total===1 ? ' penilaian' : ' penilaian');
+      document.getElementById('avgStars').innerHTML = starIconsFull(Math.round(avg));
+
+      for(var s=1;s<=5;s++){
+        var pct = total ? Math.round((dist[s]/total)*100) : 0;
+        document.getElementById('bar'+s).style.width = pct + '%';
+        document.getElementById('cnt'+s).textContent = dist[s];
+      }
+    }
+
+    starButtons.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        selectedStar = parseInt(btn.getAttribute('data-star'), 10);
+        starButtons.forEach(function(b){
+          var val = parseInt(b.getAttribute('data-star'),10);
+          b.querySelector('svg').classList.toggle('active', val <= selectedStar);
+        });
+        note.textContent = 'Anda memilih ' + selectedStar + ' bintang. Klik "Kirim Rating" untuk mengirim.';
+      });
+    });
+
+    select.addEventListener('change', function(){
+      selectedStar = 0;
+      starButtons.forEach(function(b){ b.querySelector('svg').classList.remove('active'); });
+      note.textContent = 'Pilih bintang sesuai penilaian Anda, lalu kirim.';
+      render();
+    });
+
+    submitBtn.addEventListener('click', function(e){
+      e.preventDefault();
+      if(!selectedStar){
+        note.textContent = 'Silakan pilih bintang terlebih dahulu.';
+        return;
+      }
+      var key = select.value;
+      if(!data[key]) data[key] = {1:0,2:0,3:0,4:0,5:0};
+      data[key][selectedStar] += 1;
+      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){}
+
+      note.textContent = 'Terima kasih! Rating ' + selectedStar + ' bintang berhasil dikirim.';
+      selectedStar = 0;
+      starButtons.forEach(function(b){ b.querySelector('svg').classList.remove('active'); });
+      render();
+    });
+
+    render();
+  })();
+  </script>
+
+  <!-- CTA -->
+  <section class="wrap">
+    <div class="cta-strip">
+      <h2>Mari Berkontribusi Bersama.</h2>
+      <p>Dukung program kerja kami dengan menjadi relawan, mitra, atau menyampaikan aspirasi Anda.</p>
+      <a href="#" class="btn">Hubungi Kami</a>
+    </div>
+  </section>
+
+  <footer>
+    © 2026 Program Kerja. Bekerja untuk kepentingan bersama.
+  </footer>
+
+</body>
+</html>
