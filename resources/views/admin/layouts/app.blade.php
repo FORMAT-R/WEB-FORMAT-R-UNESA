@@ -32,6 +32,19 @@
         /* Base styles */
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
 
+        /* Form Input borders */
+        input:not([type="radio"]):not([type="checkbox"]):not([type="file"]), 
+        select, 
+        textarea {
+            border-color: #000000 !important;
+            border-width: 1px !important;
+        }
+        .dark input:not([type="radio"]):not([type="checkbox"]):not([type="file"]), 
+        .dark select, 
+        .dark textarea {
+            border-color: #9CA3AF !important; /* Terang sedikit untuk mode gelap agar tetap terlihat */
+        }
+
         /* Custom scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }

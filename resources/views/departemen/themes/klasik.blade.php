@@ -1,7 +1,42 @@
+@php
+  if(isset($dept['bg_pattern']) && str_contains($dept['bg_pattern'], 'linear-gradient(var(--mat-green-line)')) {
+      $themePattern = 'radial-gradient(circle at center, rgba(76,47,122,0.1) 0%, transparent 70%), linear-gradient(135deg, var(--mat-green), #1a251e)';
+      $themeBgSize = 'cover';
+      $themeFontUrl = "https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap";
+      $themeHeadingFont = "'Caveat', cursive";
+      $ornamentsIcons = ['★'];
+      $isLucide = false;
+  } else {
+      $themePattern = $dept['bg_pattern'] ?? 'linear-gradient(var(--mat-green-line) 1px, transparent 1px), linear-gradient(90deg, var(--mat-green-line) 1px, transparent 1px)';
+      $themeBgSize = '30px 30px';
+      $themeFontUrl = "https://fonts.googleapis.com/css2?family=Inter:wght@600;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap";
+      $themeHeadingFont = "'Inter', sans-serif";
+      $ornamentsIcons = ['camera', 'code', 'monitor-play', 'pen-tool', 'video'];
+      $isLucide = true;
+  }
+  
+  $scatterPositions = [
+      ['top' => '5%', 'left' => '6%', 'size' => '80px', 'rotate' => '-15deg'],
+      ['top' => '12%', 'right' => '8%', 'size' => '110px', 'rotate' => '22deg'],
+      ['top' => '20%', 'left' => '15%', 'size' => '60px', 'rotate' => '45deg'],
+      ['top' => '28%', 'right' => '4%', 'size' => '90px', 'rotate' => '-10deg'],
+      ['top' => '36%', 'left' => '8%', 'size' => '120px', 'rotate' => '15deg'],
+      ['top' => '44%', 'right' => '12%', 'size' => '70px', 'rotate' => '-30deg'],
+      ['top' => '52%', 'left' => '4%', 'size' => '100px', 'rotate' => '10deg'],
+      ['top' => '60%', 'right' => '6%', 'size' => '80px', 'rotate' => '-20deg'],
+      ['top' => '68%', 'left' => '12%', 'size' => '110px', 'rotate' => '25deg'],
+      ['top' => '76%', 'right' => '4%', 'size' => '90px', 'rotate' => '-15deg'],
+      ['top' => '84%', 'left' => '6%', 'size' => '75px', 'rotate' => '35deg'],
+      ['top' => '92%', 'right' => '10%', 'size' => '130px', 'rotate' => '-10deg'],
+      ['top' => '97%', 'left' => '14%', 'size' => '85px', 'rotate' => '15deg'],
+  ];
+@endphp
+
 @extends('layouts.dept-base')
 
 @section('theme-fonts')
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="{!! $themeFontUrl !!}" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
 @endsection
 
 @section('theme-styles')
@@ -18,8 +53,8 @@
 
   body {
     background: var(--mat-green) !important;
-    background-image: {!! $dept['bg_pattern'] ?? 'linear-gradient(var(--mat-green-line) 1px, transparent 1px), linear-gradient(90deg, var(--mat-green-line) 1px, transparent 1px)' !!} !important;
-    background-size: 28px 28px !important;
+    background-image: {!! $themePattern !!} !important;
+    background-size: {!! $themeBgSize !!} !important;
     font-family: 'Space Grotesk', sans-serif !important;
     color: var(--cream) !important;
   }
@@ -35,6 +70,16 @@
   #globalFooter { background: transparent; border-top:none; padding-top: 0; color: var(--cream-dark); font-family: 'JetBrains Mono', monospace; }
   
   /* Shared: ribbon */
+  
+  .global-ornaments-wrapper {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    overflow: hidden; z-index: 0; pointer-events: none;
+  }
+  .bg-ornament {
+    position: absolute; color: var(--gold); opacity: 0.12;
+  }
+  .bg-ornament svg, .bg-ornament i { width: 100%; height: 100%; display: block; }
+  
   .ribbon {
     position: relative; display: inline-block;
     background: linear-gradient(135deg, var(--purple), var(--purple-dark));
@@ -88,8 +133,8 @@
     box-shadow: 0 3px 8px rgba(0,0,0,0.3); margin-bottom: 26px;
   }
   .hero h1 {
-    font-family: 'Caveat', cursive; font-weight: 700;
-    font-size: clamp(2.5rem, 7.5vw, 5.5rem); line-height: 0.95;
+    font-family: {!! $themeHeadingFont !!}; font-weight: 700;
+    font-size: clamp(2rem, 5.5vw, 4rem); line-height: 1.1;
     color: var(--white-tape); text-shadow: 0 6px 0 rgba(0,0,0,0.25);
     transform: rotate(-2deg);
   }
@@ -104,13 +149,15 @@
     color: var(--blue); font-family: 'JetBrains Mono', monospace; font-size: 0.62rem;
     text-align: center; letter-spacing: 0.08em; transform: rotate(14deg); opacity: 0.9;
   }
-  .polaroid-stack { position: relative; margin-top: 64px; width: 520px; height: 360px; max-width: 88vw; }
+  .polaroid-stack { display: flex; justify-content: center; position: relative; margin-top: 64px; width: 100%; height: 480px; max-width: 95vw; z-index: 2; }
   .polaroid {
-    position: absolute; inset: 0; background: var(--white-tape);
-    padding: 22px 22px 54px; box-shadow: 0 20px 38px rgba(0,0,0,0.45);
+    position: absolute; width: 480px; max-width: 85vw; background: var(--white-tape);
+    padding: 20px 20px 56px; box-shadow: 0 14px 35px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 4px;
+    transition: all .4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: pointer;
   }
   .polaroid .frame-img {
-    width: 100%; height: 250px; background: linear-gradient(135deg, var(--navy), var(--navy-light));
+    width: 100%; height: 280px; background: linear-gradient(135deg, var(--navy), var(--navy-light));
     display: flex; align-items: center; justify-content: center; overflow: hidden;
     font-family: 'JetBrains Mono', monospace; color: var(--gold); font-size: 0.85rem; letter-spacing: 0.08em;
   }
@@ -118,10 +165,17 @@
     width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;
   }
   .polaroid .cap {
-    color: var(--ink); font-family: 'Caveat', cursive; font-size: 1.5rem; text-align: center; margin-top: 12px;
+    position: absolute; bottom: 16px; left: 0; width: 100%; text-align: center;
+    color: var(--ink); font-family: 'Caveat', cursive; font-size: 1.6rem;
   }
-  .p1 { transform: rotate(-6deg); z-index: 1; }
-  .p2 { transform: rotate(4deg) translate(40px,18px); z-index: 2; }
+  .p1 { transform: rotate(-5deg) translateX(-50px); z-index: 1; }
+  .p2 { transform: rotate(4deg) translateX(50px) translateY(15px); z-index: 2; }
+  
+  .polaroid:hover {
+    z-index: 10 !important;
+    transform: rotate(0deg) scale(1.08) translateY(-10px) !important;
+    box-shadow: 0 25px 45px rgba(0,0,0,0.45);
+  }
   
   .scroll-cue {
     margin-top: 60px; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
@@ -144,7 +198,7 @@
     content: ""; position: absolute; top: -14px; left: 36px; width: 70px; height: 26px;
     background: rgba(227,189,93,0.55); transform: rotate(-4deg); box-shadow: 0 3px 6px rgba(0,0,0,0.2);
   }
-  .cardstock h3 { font-family: 'Caveat', cursive; font-size: 2rem; margin-bottom: 14px; color: var(--purple-dark); }
+  .cardstock h3 { font-family: {!! $themeHeadingFont !!}; font-size: 2rem; margin-bottom: 14px; color: var(--purple-dark); }
   .cardstock p { font-size: 0.95rem; line-height: 1.8; color: #3a2f22; }
   .stat-row { display: flex; gap: 26px; margin-top: 26px; flex-wrap: wrap; }
   .stat { font-family: 'JetBrains Mono', monospace; }
@@ -211,23 +265,40 @@
   .div-card { background: var(--navy-light); border: 1.5px dashed var(--gold); padding: 16px 20px; min-width: 170px; text-align: center; }
   .div-card.blue-accent { border-color: var(--blue); }
   .div-card.blue-accent .div-title { color: var(--blue); }
-  .div-card .div-title { font-family: 'Caveat', cursive; font-size: 1.35rem; color: var(--gold); }
+  .div-card .div-title { font-family: {!! $themeHeadingFont !!}; font-size: 1.35rem; color: var(--gold); font-weight: 600; }
   .div-card .div-people { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--cream-dark); margin-top: 6px; line-height: 1.6; }
 
   /* MEMBERS (Stacked Cards) */
   .team-top-row { display: flex; justify-content: center; gap: 34px; flex-wrap: wrap; margin-bottom: 70px; }
-  .team-top-row .team-card { width: calc(33.333% - 23px); min-width: 280px; max-width: 360px; }
+  .team-card-wrapper {
+    position: relative; isolation: isolate; cursor: pointer;
+    width: 100%; max-width: 360px; min-width: 0; margin: 0 auto;
+  }
+  .team-top-row .team-card-wrapper { width: calc(33.333% - 23px); min-width: 280px; }
   .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 64px 34px; max-width: 1180px; margin: 0 auto; }
-  
+  .team-grid .team-card-wrapper:nth-child(3n+2) { margin-top: 22px; }
+
   .team-card {
     position: relative; background: var(--white-tape); border-radius: 22px;
-    padding: 22px 20px 30px; isolation: isolate; box-shadow: 0 22px 40px rgba(0,0,0,0.42);
+    padding: 22px 20px 30px; box-shadow: 0 22px 40px rgba(0,0,0,0.42);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .team-card::before, .team-card::after {
-    content: ""; position: absolute; inset: 0; border-radius: 22px; background: var(--white-tape); z-index: -1;
+  
+  .team-card.shadow-card {
+    position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    transform: rotate(-3deg) translate(-5px, 6px);
+    background: var(--cream-dark);
   }
-  .team-card::before { transform: rotate(-2.2deg) translate(-3px,5px); background: var(--cream-dark); box-shadow: 0 10px 20px rgba(0,0,0,0.28); }
-  .team-card::after { transform: rotate(2.6deg) translate(4px,7px); background: var(--cream); box-shadow: 0 14px 24px rgba(0,0,0,0.3); }
+  .team-card.shadow-card .avatar-tile { filter: grayscale(40%) brightness(0.8); }
+  
+  .team-card-wrapper:hover .team-card.main-card {
+    transform: translateY(-8px); box-shadow: 0 30px 50px rgba(0,0,0,0.5);
+  }
+  .team-card-wrapper:hover .team-card.shadow-card {
+    transform: rotate(-8deg) translate(-18px, 10px);
+    background: var(--cream-dark); box-shadow: 0 15px 25px rgba(0,0,0,0.3);
+  }
+  
   .team-card:nth-child(3n+2) { margin-top: 22px; }
 
   .team-card-head { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
@@ -267,7 +338,7 @@
   }
   .team-label::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
 
-  .team-grid .team-card:hover { transform: translateY(-4px); transition: transform .25s ease; }
+
 
   /* RESPONSIVE */
   @media (max-width: 980px) {
@@ -325,12 +396,12 @@
 
   <div class="polaroid-stack">
     <div class="polaroid p1">
-      <div class="frame-img"><img src="{{ $dept['doc_image_1'] ?? asset('images/IMG_8310.JPG') }}" alt="Rapat Kerja"></div>
+      <div class="frame-img"><img src="{{ $dept['doc_image_1'] ?? ($dept['image'] ?? asset('images/logo_format.png')) }}" alt="Rapat Kerja"></div>
       <div class="cap">Rapat Kerja #01</div>
     </div>
     <div class="polaroid p2">
-      <div class="frame-img"><img src="{{ $dept['doc_image_2'] ?? asset('images/IMG_8312.JPG') }}" alt="Foto Tim"></div>
-      <div class="cap">{{ $dept['singkatan'] }}, 2026</div>
+      <div class="frame-img"><img src="{{ $dept['doc_image_2'] ?? ($dept['image'] ?? asset('images/logo_format.png')) }}" alt="Foto Tim"></div>
+      <div class="cap">{{ strtoupper($dept['singkatan']) }}, {{ $dept['periode'] ?? '2026/2027' }}</div>
     </div>
   </div>
 
@@ -351,7 +422,7 @@
       <div class="stat-row">
         <div class="stat"><div class="num">{{ count($dept['anggota']) }}</div><div class="lbl">Anggota Aktif</div></div>
         <div class="stat"><div class="num">{{ count($dept['divisi']) }}</div><div class="lbl">Divisi Kerja</div></div>
-        <div class="stat"><div class="num">2026</div><div class="lbl">Periode Kepengurusan</div></div>
+        <div class="stat"><div class="num">{{ $dept['periode'] ?? '2026/2027' }}</div><div class="lbl">Periode Kepengurusan</div></div>
       </div>
     </div>
 
@@ -509,64 +580,54 @@
     <div class="rule"></div>
   </div>
 
-  <div class="team-top-row" style="display: flex; justify-content: center; gap: 34px; flex-wrap: wrap; margin-bottom: {{ (isset($isBPH) && $isBPH) ? '34px' : '70px' }};">
-    @if($ketua)
-    <div class="team-card">
-      <div class="team-card-head">
-        <span class="dot"></span>
-        <span class="tag">{{ $ketua['nim'] ?? 'N/A' }}</span>
-        <span class="rule"></span>
+@php
+if (!function_exists('renderTeamCard')) {
+  function renderTeamCard($member, $role) {
+    if (!$member) return '';
+    $isDb = isset($member['is_db']) ? $member['is_db'] : false;
+    $foto = $member['foto'];
+    $imgSrc = $foto ? ($isDb ? $foto : asset('images/'.$foto)) : '';
+    $nama = $member['nama'];
+    $nim = $member['nim'] ?? 'N/A';
+    $jabatan = $member['jabatan'];
+    
+    $init = '';
+    if (!$foto) {
+       $words = explode(' ', $nama);
+       $init = strtoupper(substr($words[0], 0, 1));
+       if (isset($words[1])) $init .= strtoupper(substr($words[1], 0, 1));
+    }
+    
+    $imgHtml = $foto ? '<img src="'.e($imgSrc).'" alt="'.e($nama).'">' : '<div class="init">'.e($init).'</div>';
+    
+    return '
+    <div class="team-card-wrapper">
+      <div class="team-card shadow-card" aria-hidden="true">
+        <div class="team-card-head"><span class="dot"></span><span class="tag">'.e($nim).'</span><span class="rule"></span></div>
+        <div class="team-card-title">'.e($jabatan).'</div>
+        <div class="team-photos single"><div class="avatar-tile">'.$imgHtml.'</div></div>
+        <div class="team-label">'.e($role).'</div>
       </div>
-      <div class="team-card-title">{{ $ketua['jabatan'] }}</div>
-      <div class="team-photos single">
-        <div class="avatar-tile">
-          @if($ketua['foto']) <img src="{{ isset($ketua['is_db']) ? $ketua['foto'] : asset('images/'.$ketua['foto']) }}" alt="{{ $ketua['nama'] }}"> @else <div class="init">{{ getInitials($ketua['nama']) }}</div> @endif
-          <div class="name-strip">{{ $ketua['nama'] }}</div>
-        </div>
+      <div class="team-card main-card">
+        <div class="team-card-head"><span class="dot"></span><span class="tag">'.e($nim).'</span><span class="rule"></span></div>
+        <div class="team-card-title">'.e($jabatan).'</div>
+        <div class="team-photos single"><div class="avatar-tile">'.$imgHtml.'<div class="name-strip">'.e($nama).'</div></div></div>
+        <div class="team-label">'.e($role).'</div>
       </div>
-      <div class="team-label">Pimpinan</div>
-    </div>
-    @endif
+    </div>';
+  }
+}
+@endphp
 
-    @if($wakil)
-    <div class="team-card">
-      <div class="team-card-head">
-        <span class="dot"></span>
-        <span class="tag">{{ $wakil['nim'] ?? 'N/A' }}</span>
-        <span class="rule"></span>
-      </div>
-      <div class="team-card-title">{{ $wakil['jabatan'] }}</div>
-      <div class="team-photos single">
-        <div class="avatar-tile">
-          @if($wakil['foto']) <img src="{{ isset($wakil['is_db']) ? $wakil['foto'] : asset('images/'.$wakil['foto']) }}" alt="{{ $wakil['nama'] }}"> @else <div class="init">{{ getInitials($wakil['nama']) }}</div> @endif
-          <div class="name-strip">{{ $wakil['nama'] }}</div>
-        </div>
-      </div>
-      <div class="team-label">Pimpinan</div>
-    </div>
-    @endif
+  <div class="team-top-row" style="display: flex; justify-content: center; gap: 34px; flex-wrap: wrap; margin-bottom: {{ (isset($isBPH) && $isBPH) ? '34px' : '70px' }};">
+    @if($ketua) {!! renderTeamCard($ketua, 'Pimpinan') !!} @endif
+    @if($wakil) {!! renderTeamCard($wakil, 'Pimpinan') !!} @endif
   </div>
 
   @if(isset($isBPH) && $isBPH && (isset($sekretarisUmum) || isset($bendaharaUmum)))
   <div class="team-top-row" style="display: flex; justify-content: center; gap: 34px; flex-wrap: wrap; margin-bottom: {{ ($sekretarisLain->count() > 0 || $bendaharaLain->count() > 0) ? '34px' : '70px' }};">
     @foreach([$sekretarisUmum, $bendaharaUmum] as $l3)
-    @if($l3)
-    <div class="team-card">
-      <div class="team-card-head">
-        <span class="dot"></span>
-        <span class="tag">{{ $l3['nim'] ?? 'N/A' }}</span>
-        <span class="rule"></span>
-      </div>
-      <div class="team-card-title">{{ $l3['jabatan'] }}</div>
-      <div class="team-photos single">
-        <div class="avatar-tile">
-          @if($l3['foto']) <img src="{{ isset($l3['is_db']) ? $l3['foto'] : asset('images/'.$l3['foto']) }}" alt="{{ $l3['nama'] }}"> @else <div class="init">{{ getInitials($l3['nama']) }}</div> @endif
-          <div class="name-strip">{{ $l3['nama'] }}</div>
-        </div>
-      </div>
-      <div class="team-label">Pimpinan</div>
-    </div>
-    @endif
+      {!! renderTeamCard($l3, 'Pimpinan') !!}
     @endforeach
   </div>
   @endif
@@ -574,42 +635,14 @@
   @if(isset($isBPH) && $isBPH && ($sekretarisLain->count() > 0 || $bendaharaLain->count() > 0))
   <div class="team-top-row" style="display: flex; justify-content: center; gap: 34px; flex-wrap: wrap; margin-bottom: 70px;">
     @foreach($sekretarisLain->merge($bendaharaLain) as $l4)
-    <div class="team-card">
-      <div class="team-card-head">
-        <span class="dot"></span>
-        <span class="tag">{{ $l4['nim'] ?? 'N/A' }}</span>
-        <span class="rule"></span>
-      </div>
-      <div class="team-card-title">{{ $l4['jabatan'] }}</div>
-      <div class="team-photos single">
-        <div class="avatar-tile">
-          @if($l4['foto']) <img src="{{ isset($l4['is_db']) ? $l4['foto'] : asset('images/'.$l4['foto']) }}" alt="{{ $l4['nama'] }}"> @else <div class="init">{{ getInitials($l4['nama']) }}</div> @endif
-          <div class="name-strip">{{ $l4['nama'] }}</div>
-        </div>
-      </div>
-      <div class="team-label">Pimpinan</div>
-    </div>
+      {!! renderTeamCard($l4, 'Pimpinan') !!}
     @endforeach
   </div>
   @endif
 
   <div class="team-grid">
     @foreach($others as $s)
-    <div class="team-card">
-      <div class="team-card-head">
-        <span class="dot"></span>
-        <span class="tag">{{ $s['nim'] ?? 'N/A' }}</span>
-        <span class="rule"></span>
-      </div>
-      <div class="team-card-title">{{ $s['jabatan'] }}</div>
-      <div class="team-photos single">
-        <div class="avatar-tile">
-          @if($s['foto']) <img src="{{ isset($s['is_db']) ? $s['foto'] : asset('images/'.$s['foto']) }}" alt="{{ $s['nama'] }}"> @else <div class="init">{{ getInitials($s['nama']) }}</div> @endif
-          <div class="name-strip">{{ $s['nama'] }}</div>
-        </div>
-      </div>
-      <div class="team-label">Staf</div>
-    </div>
+      {!! renderTeamCard($s, 'Staf') !!}
     @endforeach
   </div>
 </section>

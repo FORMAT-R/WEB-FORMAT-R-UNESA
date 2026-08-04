@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Departemen - FORMAT-R UNESA')
 
@@ -100,7 +100,7 @@
         @endphp
         <h1>{{ $firstWord }} @if($rest)<span class="hl">{{ $rest }}</span>@endif</h1>
         <p class="tagline">
-            Tujuh departemen, satu tujuan. Bersama kami membangun mahasiswa UNESA yang berdaya, berkarakter, dan berdampak.
+            BPH dan enam departemen, satu tujuan. Bersama kami membangun mahasiswa UNESA yang berdaya, berkarakter, dan berdampak.
         </p>
     </div>
 </section>

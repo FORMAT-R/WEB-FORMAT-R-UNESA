@@ -231,11 +231,15 @@ class DepartemenController extends Controller
         $db = \App\Models\Department::with('members')->where('slug', $slug)->firstOrFail();
         $static = collect($this->getAllDepartemen())->firstWhere('slug', $slug) ?? [];
         
+        $activeCabinet = \App\Models\Cabinet::where('is_active', true)->first();
+        $periodeActive = $activeCabinet ? $activeCabinet->period : '2026/2027';
+        
         $dept = array_merge([
             'proker' => [],
             'divisi' => [],
             'anggota' => [],
             'singkatan' => strtoupper($db->slug),
+            'periode' => $periodeActive,
         ], $static, [
             'nama' => $db->name,
             'deskripsi' => $db->description,
