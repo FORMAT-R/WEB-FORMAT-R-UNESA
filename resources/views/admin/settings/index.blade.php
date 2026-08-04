@@ -93,36 +93,6 @@
                     <textarea rows="4" name="aboutFormat"
                         class="w-full rounded-xl border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white">{{ $settings['aboutFormat'] ?? 'FORMAT-R adalah organisasi mahasiswa tingkat program studi yang menaungi seluruh mahasiswa di lingkup jurusan.' }}</textarea>
                 </div>
-                <hr class="border-gray-200 dark:border-gray-700">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nama Kabinet</label>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Nama kabinet ini akan muncul di halaman Homepage dan Departemen.</p>
-                    <input type="text" name="cabinetName" value="{{ $settings['cabinetName'] ?? 'Kolaborasi Asa' }}"
-                        class="w-full md:w-1/2 rounded-xl border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Logo Kabinet</label>
-                    <div class="mt-1 flex items-center gap-4">
-                        <div class="h-20 w-20 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center border border-gray-200 dark:border-gray-600 overflow-hidden">
-                            @if(isset($settings['cabinetLogo']))
-                                <img src="{{ Storage::url($settings['cabinetLogo']) }}" alt="Logo Kabinet" class="w-full h-full object-contain">
-                            @else
-                                <span class="text-xs text-gray-500 text-center">Logo Kabinet</span>
-                            @endif
-                        </div>
-                        <input type="file" name="cabinet_logo" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-300">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Visi Kabinet</label>
-                    <textarea rows="3" name="cabinetVision"
-                        class="w-full rounded-xl border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white">{{ $settings['cabinetVision'] ?? '' }}</textarea>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Misi Kabinet (Pisahkan dengan baris baru / enter)</label>
-                    <textarea rows="5" name="cabinetMission"
-                        class="w-full rounded-xl border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white">{{ $settings['cabinetMission'] ?? '' }}</textarea>
-                </div>
             </div>
         </section>
         @endcan

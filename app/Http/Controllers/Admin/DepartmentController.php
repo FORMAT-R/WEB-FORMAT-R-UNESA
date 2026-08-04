@@ -63,10 +63,25 @@ class DepartmentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
-        $department = Department::with('members')->findOrFail($id);
-        return view('admin.departments.show', compact('department'));
+        $cabinets = \App\Models\Cabinet::orderBy('start_year', 'desc')->get();
+        $selectedCabinetId = $request->query('cabinet_id');
+        
+        if (!$selectedCabinetId) {
+            $activeCabinet = $cabinets->where('is_active', true)->first();
+            $selectedCabinetId = $activeCabinet ? $activeCabinet->id : null;
+        }
+
+        $department = Department::with(['members' => function($q) use ($selectedCabinetId) {
+            if ($selectedCabinetId) {
+                $q->where('cabinet_id', $selectedCabinetId);
+            }
+        }])->findOrFail($id);
+
+        $selectedCabinet = $cabinets->where('id', $selectedCabinetId)->first();
+
+        return view('admin.departments.show', compact('department', 'cabinets', 'selectedCabinetId', 'selectedCabinet'));
     }
 
     /**

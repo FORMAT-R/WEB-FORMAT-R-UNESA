@@ -18,9 +18,9 @@ class MemberController extends Controller
     {
         $validated = $request->validate([
             'department_id' => 'required|exists:departments,id',
+            'cabinet_id' => 'required|exists:cabinets,id',
             'name' => 'required|string|max:255',
             'position' => 'required|string|max:255',
-            'birth_date' => 'nullable|date',
             'photo' => 'nullable|image|max:10240',
         ]);
 
@@ -42,9 +42,9 @@ class MemberController extends Controller
 
         $validated = $request->validate([
             'department_id' => 'required|exists:departments,id',
+            'cabinet_id' => 'required|exists:cabinets,id',
             'name' => 'required|string|max:255',
             'position' => 'required|string|max:255',
-            'birth_date' => 'nullable|date',
             'photo' => 'nullable|image|max:10240',
         ]);
 

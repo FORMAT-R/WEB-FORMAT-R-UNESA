@@ -112,6 +112,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('index');
             Route::post('/', [App\Http\Controllers\Admin\SettingController::class, 'update'])->name('update');
         });
+
+        // Riwayat Kabinet
+        Route::resource('cabinets', App\Http\Controllers\Admin\CabinetController::class)->except(['create', 'edit']);
+        Route::patch('cabinets/{cabinet}/toggle', [App\Http\Controllers\Admin\CabinetController::class, 'toggleActive'])->name('cabinets.toggle');
+
+        // Notifikasi Email
+        Route::get('notifications/send', [App\Http\Controllers\Admin\NotificationController::class, 'send'])->name('notifications.send');
     });
 });
 

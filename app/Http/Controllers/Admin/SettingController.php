@@ -17,7 +17,7 @@ class SettingController extends Controller
 
     public function update(Request $request)
     {
-        $data = $request->except(['_token', 'logo', 'cabinet_logo']);
+        $data = $request->except(['_token', 'logo']);
 
         // Only superadmin can update general and system settings
         if (auth()->user()->role !== 'superadmin') {
@@ -33,10 +33,6 @@ class SettingController extends Controller
             if ($request->hasFile('logo')) {
                 $path = $request->file('logo')->store('settings', 'public');
                 Setting::updateOrCreate(['key' => 'siteLogo'], ['value' => $path]);
-            }
-            if ($request->hasFile('cabinet_logo')) {
-                $path = $request->file('cabinet_logo')->store('settings', 'public');
-                Setting::updateOrCreate(['key' => 'cabinetLogo'], ['value' => $path]);
             }
         }
 

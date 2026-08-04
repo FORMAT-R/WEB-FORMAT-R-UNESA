@@ -188,6 +188,14 @@
                     <span>Departemen</span>
                 </a>
 
+                <a href="{{ route('admin.cabinets.index') }}" class="sidebar-link {{ request()->routeIs('admin.cabinets.*') ? 'active' : '' }}">
+                    <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 100-16 8 8 0 000 16z"/>
+                    </svg>
+                    <span>Riwayat Kabinet</span>
+                </a>
+
                 <a href="{{ route('admin.penghargaan.index') }}" class="sidebar-link {{ request()->routeIs('admin.penghargaan.*') ? 'active' : '' }}">
                     <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <circle cx="12" cy="8" r="6"/>
@@ -264,7 +272,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.73 21a2 2 0 01-3.46 0" />
                             </svg>
-                            <span class="absolute top-1 right-1 w-4 h-4 bg-red-500 rounded-full text-xs text-white font-medium flex items-center justify-center">3</span>
+                            <span class="absolute top-1 right-1 w-4 h-4 {{ $headerNotifications->count() > 0 ? 'bg-red-500' : 'bg-gray-400' }} rounded-full text-xs text-white font-medium flex items-center justify-center">{{ $headerNotifications->count() }}</span>
                         </button>
 
                         <div x-show="showNotifications" @click.outside="showNotifications = false" x-transition:origin.top.right.opacity class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
@@ -272,21 +280,20 @@
                                 <h3 class="font-semibold text-gray-900 dark:text-white">Notifikasi</h3>
                             </div>
                             <div class="max-h-64 overflow-y-auto">
-                                <a href="#" class="block px-4 py-3 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">
-                                    <p class="text-sm font-medium text-gray-900 dark:text-white">Event baru ditambahkan</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">5 menit yang lalu</p>
-                                </a>
-                                <a href="#" class="block px-4 py-3 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">
-                                    <p class="text-sm font-medium text-gray-900 dark:text-white">Berita baru dipublikasikan</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">15 menit yang lalu</p>
-                                </a>
-                                <a href="#" class="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800">
-                                    <p class="text-sm font-medium text-gray-900 dark:text-white">Pengingat: Event besok</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">1 jam yang lalu</p>
-                                </a>
+                                @forelse($headerNotifications as $notif)
+                                    <a href="{{ $notif['link'] }}" class="block px-4 py-3 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">
+                                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $notif['title'] }}</p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ $notif['desc'] }}</p>
+                                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">{{ $notif['time'] }}</p>
+                                    </a>
+                                @empty
+                                    <div class="px-4 py-3 text-sm text-gray-500 text-center">
+                                        Tidak ada notifikasi
+                                    </div>
+                                @endforelse
                             </div>
-                            <div class="px-4 py-3 border-t border-gray-100 dark:border-gray-700">
-                                <a href="#" class="block text-center text-sm text-blue-600 hover:text-blue-700 font-medium">Lihat semua notifikasi</a>
+                            <div class="px-4 py-3 border-t border-gray-100 dark:border-gray-700 flex justify-between gap-2">
+                                <a href="{{ route('admin.notifications.send') }}" class="w-full text-center px-2 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition-colors" onclick="return confirm('Kirim email pengingat ini ke seluruh pengguna?');">Kirim Notifikasi via Email</a>
                             </div>
                         </div>
                     </div>

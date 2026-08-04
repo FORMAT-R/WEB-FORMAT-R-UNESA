@@ -60,24 +60,7 @@
     </style>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 flex items-center justify-center min-h-screen p-4 selection:bg-primary-500 selection:text-white transition-colors duration-200"
-      x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" 
-      x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val))" 
-      :class="{ 'dark': darkMode }">
-
-    <!-- Dark Mode Toggle Absolute Top Right -->
-    <button @click="darkMode = !darkMode" class="absolute top-6 right-6 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 bg-white dark:bg-gray-800 rounded-full shadow-sm border border-gray-200 dark:border-gray-700 transition-colors">
-        <template x-if="!darkMode">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 006.627-7.657z" />
-            </svg>
-        </template>
-        <template x-if="darkMode">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707.707M6.343 6.343L17.657 17.657M6.343 17.657L17.657 6.343" />
-            </svg>
-        </template>
-    </button>
+<body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 flex items-center justify-center min-h-screen p-4 selection:bg-primary-500 selection:text-white transition-colors duration-200">
 
     <div class="glass w-full max-w-md rounded-2xl p-8 relative z-10">
         
