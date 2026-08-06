@@ -53,11 +53,11 @@ $app = require_once __DIR__.'/../bootstrap/app.php';
 $app = require_once __DIR__.'/../formatr_core/bootstrap/app.php';
 ```
 
-## 5. Penyesuaian File Konfigurasi (`.env`)
+## 5. Penyesuaian File Konfigurasi (`.env`) & Setting SMTP (Email)
 
 1. Buka folder `formatr_core`.
 2. Edit file `.env`.
-3. Sesuaikan dengan pengaturan cPanel Anda:
+3. Sesuaikan dengan pengaturan Database dan URL domain cPanel Anda:
 ```env
 APP_ENV=production
 APP_DEBUG=false
@@ -70,6 +70,26 @@ DB_PASSWORD="PasswordYangDibuatTadi"
 # Ubah driver queue agar bisa dijalankan manual via cron
 QUEUE_CONNECTION=database
 ```
+
+**Konfigurasi SMTP (Untuk Fitur Notifikasi Email):**
+Untuk mengirim email otomatis (seperti jadwal acara jam 08:00 pagi), Anda perlu memasukkan kredensial email. Sangat disarankan menggunakan akun Gmail khusus.
+
+1. Buka akun Google/Gmail organisasi Anda.
+2. Pastikan fitur "Verifikasi 2 Langkah" aktif.
+3. Cari menu **Sandi Aplikasi (App Passwords)** di setelan keamanan akun Google.
+4. Buat sandi khusus, lalu salin 16 karakter sandi yang diberikan Google.
+5. Edit bagian email di dalam `.env` cPanel Anda:
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=465
+MAIL_USERNAME="email_organisasi@gmail.com"
+MAIL_PASSWORD="kode_sandi_aplikasi_16_digit_tanpa_spasi"
+MAIL_ENCRYPTION=ssl
+MAIL_FROM_ADDRESS="email_organisasi@gmail.com"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+*(Catatan: Jika port 465 dengan SSL gagal, coba gunakan `MAIL_PORT=587` dengan `MAIL_ENCRYPTION=tls`)*.
 
 ## 6. Mengatasi Fitur Auto Remove Background AI di cPanel
 
