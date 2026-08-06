@@ -28,40 +28,74 @@ Sistem ini dirancang untuk **Estetika Otomatis**, di mana unggahan foto pengguna
 
 ## 2. Detail Fitur, Data, & Alur (SRS Features)
 
-Bagian ini mendeskripsikan secara rinci fitur-fitur yang ada, baik di *Frontend* (Halaman Publik) maupun di *Backend* (Panel Admin), serta data apa saja yang ditarik dari *database*.
+Sistem ini dibagi menjadi dua modul utama: **A. Modul Frontend (Halaman Publik)** dan **B. Modul Backend (Panel Admin)**. Sistem berjalan secara dinamis di mana Modul A sepenuhnya digerakkan oleh data yang diinput dari Modul B.
 
-### A. Fitur Halaman Beranda (Home Page - Publik)
-Halaman depan portal organisasi (`HomeController@index`).
-*   **Data Statistik:** Menampilkan jumlah Anggota terdaftar dan Departemen yang aktif yang dihitung secara *real-time* dari *database*.
-*   **Berita Terbaru:** Menarik 3 data tabel `news` terbaru yang berstatus *published*.
-*   **Kalender Acara (Event):** Menarik 3 data `events` yang berstatus *upcoming* (akan datang) atau *ongoing* (sedang berlangsung).
-*   **Apresiasi & Penghargaan:** 
-    *   **Pengurus Terbaik (Best Officers):** Menarik 3 data dari tabel `best_officers` bulan ini (ditambah riwayat bulan lalu jika data baru sudah melebihi 30 hari). Menampilkan nama, departemen, dan alasan penghargaan.
-    *   **Ulang Tahun (Birthdays):** Menarik data dari tabel `birthdays` dan mencocokkannya dengan bulan/tanggal server saat ini. Jika ada anggota yang berulang tahun hari ini, akan dimunculkan dengan ucapan selamat (kolom `message`).
-*   **Arsip Dokumentasi:** Menarik data `events` yang berstatus *completed* beserta foto unggulan.
+### A. MODUL FRONTEND (Halaman Publik)
+Modul ini diakses oleh pengunjung umum tanpa perlu login.
 
-### B. Fitur Halaman Profil Departemen (Publik)
-Halaman rincian biro/departemen (`DepartemenController@show`).
-*   **Identitas & Dokumentasi:** Mengambil `image`, `description`, serta dua gambar polaroid dokumentasi (`doc_image_1`, `doc_image_2`) dari tabel `departments`.
-*   **Struktur Organisasi & Tim Kami:** 
-    *   Sistem mem-filter anggota (`members`) berdasarkan kabinet yang *is_active* = 1.
-    *   Sistem membaca kolom `position` (jabatan) untuk menyusun pohon struktur (Ketua di atas, staf di bawah).
-    *   **Sorotan Pengurus (Spotlight 3D):** Menggunakan foto transparan (`photo_nobg`) hasil potongan AI.
-    *   **Tim Kami:** Menggunakan pas foto asli dengan background (`photo`).
-*   **Program Kerja (Proker):** Me-*looping* data dari tabel `programs` yang terelasi dengan departemen tersebut.
+**1. Halaman Beranda (`HomeController@index`)**
+- **Data Statistik:** Menghitung total `departments` dan `members` secara *real-time*.
+- **Berita Terbaru:** Menarik 3 data dari tabel `news` dengan urutan terbaru (`latest`) yang memiliki status `published`.
+- **Kalender Acara (Event):** Menarik 3 data dari tabel `events` yang statusnya `upcoming` (akan datang) atau `ongoing` (berlangsung), diurutkan berdasarkan `start_date`.
+- **Apresiasi (Pengurus Terbaik & Ulang Tahun):**
+  - Menarik data `best_officers` bulan ini, berelasi dengan tabel `members` dan `departments`.
+  - Menarik data `birthdays` yang `birth_date`-nya cocok dengan tanggal server hari ini.
+- **Arsip Singkat:** Mengambil cuplikan 4 `events` berstatus `completed`.
 
-### C. Fitur Katalog Acara & Sistem Ulasan (Publik)
-Menampilkan rincian acara secara mandiri.
-*   **Detail Acara:** Menampilkan data dari tabel `events` (tanggal, penyelenggara, target peserta).
-*   **Galeri & Panitia:** Menarik data relasi `event_documentations` (kumpulan foto) dan `event_committees` (daftar kepanitiaan).
-*   **Sistem Rating:** Jika acara sudah selesai (*completed*), pengunjung bisa mengisi *form* ulasan. Data disimpan ke `event_ratings` dan dimunculkan sebagai kolom bintang di halaman acara.
+**2. Halaman Departemen (`DepartemenController@show`)**
+- **Profil & Dokumentasi:** Menarik data `name`, `description`, `image` (logo), dan `doc_image_1 & 2` dari tabel `departments`.
+- **Sorotan Pengurus (Spotlight 3D):** 
+  - Data ditarik dari tabel `members` yang jabatannya mengandung kata kunci pimpinan (BPH/Ketua/Wakil). 
+  - Data ini secara eksklusif menggunakan foto `photo_nobg` (hasil remove background AI).
+- **Tim Kami (Anggota):** 
+  - Menarik sisa data staf dari `members`.
+  - Menggunakan foto asli (`photo`) yang memiliki background.
+  - **Filter Kritis:** Semua anggota yang dirender di sini difilter otomatis berdasarkan relasi `cabinet_id` yang statusnya `is_active = true` pada tabel `cabinets`.
+- **Program Kerja:** Me-looping data dinamis dari tabel `programs` milik departemen terkait.
 
-### D. Panel Admin (Dashboard & Backend)
-Akses tertutup khusus pengurus.
-*   **Manajemen Departemen & Proker:** Admin bisa menambah departemen baru. Di halaman *create/edit*, tersedia form dinamis dengan tombol "+ Tambah Proker" untuk mengisi banyak program kerja sekaligus.
-*   **Upload Anggota & Auto-Remove BG:** Form input untuk menambah orang. Saat disimpan, gambar dipotong otomatis oleh AI dan disimpan di server. Alur detailnya dibahas di Bab 6.
-*   **Riwayat Kabinet (Cabinet Management):** Memungkinkan admin mendefinisikan tahun periode (misal 2026/2027). Pengurus lama tidak perlu dihapus; admin hanya perlu membuat Kabinet baru dan mematikannya (nonaktifkan `is_active` kabinet lama). Otomatis seluruh halaman publik akan kosong bersiap diisi struktur orang-orang di kabinet baru.
-*   **Push Notifikasi Manual:** Pada halaman utama dasbor admin, terdapat tombol "Kirim Notifikasi". Jika diklik, sistem mengeksekusi `NotificationController` untuk mem-blast email pengingat *event* ke semua admin yang terdaftar.
+**3. Halaman Berita (`BeritaController@show`)**
+- **Baca Artikel:** Menampilkan konten dari tabel `news` (`title`, `content`, `image`, `published_at`).
+- **Rekomendasi (Sidebar):** Menarik berita lain dengan pengurutan `latest` (terbaru), `weekly` (minggu ini), dan `random` (acak) untuk meningkatkan engagement pembaca.
+
+**4. Halaman Event & Sistem Ulasan (`EventController@show` & `rate`)**
+- **Detail Acara:** Membaca data `events` (penyelenggara, lokasi, deskripsi).
+- **Panitia & Galeri:** Melakukan query relasi ke tabel `event_committees` (daftar panitia) dan `event_documentations` (kumpulan foto galeri acara).
+- **Rating/Ulasan (Interaktif):** Jika event berstatus `completed`, pengunjung dapat memberikan rating (1-5). Sistem akan menyimpannya ke tabel `event_ratings` beserta IP Address pengunjung untuk mencegah spam rating ganda.
+
+### B. MODUL BACKEND (Panel Admin)
+Modul ini hanya dapat diakses melalui rute `/admin` dan dijaga oleh sistem autentikasi (Middleware Auth).
+
+**1. Manajemen Departemen (`DepartmentController`)**
+- **Fitur:** Menambah, mengedit, dan menghapus biro/departemen.
+- **Manajemen Proker (Dynamic Input):** Di dalam form departemen, admin dapat menambah kolom program kerja berkali-kali menggunakan tombol "+ Tambah Proker" (Alpine.js). Data disimpan secara looping ke tabel `programs`.
+
+**2. Manajemen Anggota & AI Integration (`MemberController`)**
+- **Fitur:** Pendaftaran staf/pengurus ke departemen tertentu.
+- **Alur Data & AI:** Saat admin mengunggah foto, foto asli disimpan di tabel `members` kolom `photo`. Sistem lalu memicu Background Job (`ProcessMemberPhotoBackground`) yang memerintahkan Python (`rembg`) untuk menghapus background, memotong pinggir kosong (auto-trim), memotong rasio jika foto berupa full-body (batas pinggang), lalu menyimpannya di kolom `photo_nobg`.
+
+**3. Manajemen Arsip Kabinet (`CabinetController`)**
+- **Fitur:** Sistem regenerasi pengurus tahunan tanpa menghapus database lama.
+- **Alur Data:** Admin membuat nama kabinet baru (misal "Kolaborasi Asa 2026"), lalu mengaktifkan tombol `is_active`. Sistem akan mematikan kabinet tahun sebelumnya. Halaman departemen publik akan otomatis membaca pengaturan ini dan hanya menampilkan anggota dari kabinet yang sedang aktif.
+
+**4. Manajemen Event (`Admin\EventController`)**
+- **Fitur:** Mengontrol status acara (`upcoming`, `ongoing`, `completed`).
+- **Manajemen Relasi:** Dalam satu form, admin dapat mengunggah banyak foto panitia (`event_committees`) dan banyak foto dokumentasi (`event_documentations`) sekaligus.
+
+**5. Manajemen Apresiasi (`PenghargaanController` & `UltahController`)**
+- **Fitur:** Menentukan siapa 'Best Officer' bulan ini dengan mencari nama dari tabel `members` dan menyematkan deskripsi/alasan kemenangannya. Mengelola daftar ulang tahun dan pesan ucapannya.
+
+**6. Manajemen Berita (`NewsController`)**
+- **Fitur:** Menulis rilis pers/berita dengan sistem status (`draft` / `published`).
+
+**7. Sistem Notifikasi Email Manual & Otomatis (`NotificationController` & `Console/Commands`)**
+- **Manual:** Admin dapat menekan tombol Kirim Notifikasi di Dashboard. Sistem akan membaca acara yang overdue (lewat batas waktu) atau acara 7 hari ke depan, lalu mem-blast email pengingat kepada seluruh user di tabel `users`.
+- **Otomatis:** Task Scheduler berjalan via Linux Cron Job setiap jam 08:00 pagi mengeksekusi logika yang sama persis tanpa campur tangan admin.
+
+**8. Pengaturan Web (`SettingController`)**
+- **Fitur:** Mengubah properti global website (Nama Organisasi, Link Sosial Media, Logo) yang disimpan dalam format key-value di tabel `settings`.
+
+**9. Manajemen Akses (`UserController`)**
+- **Fitur:** Membuat akun admin baru. Dilengkapi pembatasan akses (Gate/Middleware), di mana hanya akun dengan Role Superadmin yang bisa menghapus atau menambah akun admin lainnya.
 
 ---
 
