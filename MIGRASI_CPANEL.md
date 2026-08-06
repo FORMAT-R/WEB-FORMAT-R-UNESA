@@ -37,14 +37,14 @@ Laravel memiliki sistem keamanan di mana hanya folder `public` yang boleh diakse
 ## 4. Penyesuaian Path di `index.php`
 
 Karena file publik dan inti (*core*) Laravel sekarang terpisah, Anda harus mengarahkan ulang kodenya.
-1. Masuk ke folder `public_html`.
+1. Masuk ke folder `public_html` (atau folder yang diarahkan oleh domain/subdomain Anda).
 2. Edit file `index.php`.
 3. Ubah bagian baris `require` menjadi seperti ini (sesuaikan dengan nama folder `formatr_core` tadi):
 
 ```php
 // Cari baris ini:
 require __DIR__.'/../vendor/autoload.php';
-// Ubah menjadi:
+// Ubah menjadi (tambahkan ../ jika formatr_core berada 1 tingkat di luar public_html):
 require __DIR__.'/../formatr_core/vendor/autoload.php';
 
 // Cari baris ini:
@@ -52,6 +52,8 @@ $app = require_once __DIR__.'/../bootstrap/app.php';
 // Ubah menjadi:
 $app = require_once __DIR__.'/../formatr_core/bootstrap/app.php';
 ```
+
+*(Catatan Pemasangan Domain: Secara default, domain utama di cPanel selalu membaca isi folder `public_html`. Jika Anda ingin memasang di sub-domain seperti `formatr.namakampus.ac.id`, pastikan Anda membuat sub-domain tersebut terlebih dahulu dari menu cPanel, arahkan "Document Root" sub-domain tersebut ke folder kosong baru, lalu pindahkan isi folder `public` milik Laravel ke folder baru tersebut, dan pindahkan `formatr_core` ke lokasi terpisah yang sejajar).*
 
 ## 5. Penyesuaian File Konfigurasi (`.env`) & Setting SMTP (Email)
 
