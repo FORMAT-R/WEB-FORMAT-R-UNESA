@@ -44,24 +44,43 @@ Proyek ini mengikuti pola standar arsitektur Laravel (MVC - *Model View Controll
 ```text
 📁 FORMAT-R UNESA/
 ├── 📁 app/
-│   ├── 📁 Console/Commands/  ➔ Berisi command kustom (misal: SendEventNotifications.php untuk email cron)
-│   ├── 📁 Http/Controllers/  ➔ Logika utama. Folder 'Admin/' untuk backend, root untuk frontend publik.
-│   ├── 📁 Jobs/              ➔ Proses Latar Belakang (misal: ProcessMemberPhotoBackground.php untuk AI)
-│   ├── 📁 Models/            ➔ Definisi struktur tabel dan relasi ORM Eloquent.
-│   └── 📁 Traits/            ➔ Kumpulan fungsi yang bisa dipakai berulang (contoh: ImageUploadTrait.php memegang logika AI dan konversi gambar).
+│   ├── 📁 Console/
+│   │   └── 📁 Commands/
+│   │       └── 📄 SendEventNotifications.php ➔ (Sistem Pengingat) Skrip untuk memindai jadwal acara dari database lalu mengirimkan notifikasi peringatan via email ke seluruh pengguna.
+│   ├── 📁 Http/
+│   │   ├── 📁 Controllers/
+│   │   │   ├── 📁 Admin/            ➔ Backend. Berisi controller panel manajemen (seperti CabinetController.php, DepartmentController.php, UserController.php, dll). Mengontrol input, tambah, hapus (CRUD) ke database.
+│   │   │   ├── 📁 Auth/             ➔ Mengurusi login, register, forgot password, & reset password admin.
+│   │   │   └── 📄 *Controller Publik* ➔ Controller frontend (seperti HomeController.php, DepartemenController.php, BeritaController.php). Mengambil data dari database (Read Only) untuk ditampilkan di halaman publik/pengunjung.
+│   │   └── 📁 Middleware/           ➔ Lapisan filter keamanan (misal: verifikasi apakah user sudah login sebelum bisa masuk ke /admin).
+│   ├── 📁 Jobs/
+│   │   └── 📄 ProcessMemberPhotoBackground.php ➔ (Sistem Pekerja). File krusial tempat "Antrean / Queue" dikerjakan. Tugasnya adalah menerima foto anggota, menunggu tanpa mengganggu halaman website, lalu memerintahkan Python untuk memotong background.
+│   ├── 📁 Mail/
+│   │   └── 📄 EventNotificationMail.php ➔ Kerangka penyusunan subjek dan struktur badan email otomatis.
+│   ├── 📁 Models/
+│   │   └── 📄 *.php                 ➔ File representasi Database (ORM Eloquent). Setiap tabel diwakili 1 model (misal Member.php untuk tabel members). Digunakan untuk mendefinisikan relasi antar tabel (seperti 1 departemen punya banyak member).
+│   └── 📁 Traits/
+│       └── 📄 ImageUploadTrait.php  ➔ (Alat Eksekusi). Tempat di mana fungsi `autoCropTransparent()` (memotong ruang sisa) dan `removeBackgroundAndSaveWebp()` (eksekusi python `rembg`) ditulis secara sentral agar bisa dipakai oleh controller mana saja.
 ├── 📁 database/
-│   ├── 📁 migrations/        ➔ Blueprint seluruh tabel database (history struktur).
-│   └── 📁 seeders/           ➔ Data awal (dummy/admin) untuk instalasi baru.
-├── 📁 public/                ➔ Aset yang bisa diakses publik (CSS, JS hasil build Vite, gambar statis).
+│   ├── 📁 migrations/               ➔ Catatan sejarah database. Setiap ada tambah kolom/tabel baru (misal tabel programs), file PHP ini akan mengatur struktur databasenya.
+│   └── 📁 seeders/                  ➔ Skrip untuk mengisi database dengan data dummy awal.
+├── 📁 public/
+│   ├── 📁 build/                    ➔ File CSS dan JS statis hasil compile Vite (TailwindCSS). Jangan diedit secara manual.
+│   ├── 📁 images/                   ➔ Aset gambar statis bawaan sistem (seperti logo web/dummy foto).
+│   └── 📁 storage/                  ➔ Symlink (jalan pintas) rahasia yang menghubungkan ke folder `storage/app/public` sehingga file upload dari admin (foto pengurus, berita) bisa diakses publik secara aman.
 ├── 📁 resources/
-│   └── 📁 views/             ➔ Tampilan HTML.
-│       ├── 📁 admin/         ➔ Antarmuka panel kontrol admin.
-│       ├── 📁 departemen/    ➔ Frontend departemen, perhatikan folder 'themes/klasik.blade.php' tempat keajaiban UI 3D berada.
-│       └── 📁 emails/        ➔ Template email notifikasi yang akan di-blast ke pengurus.
+│   └── 📁 views/                    ➔ Folder UI / Tampilan HTML (menggunakan sistem templating Blade).
+│       ├── 📁 admin/                ➔ Kumpulan tampilan untuk Admin Dashboard, Form Input, dan Tabel Data (Auth, Awards, Departemen, Berita, dll).
+│       ├── 📁 departemen/
+│       │   └── 📁 themes/
+│       │       └── 📄 klasik.blade.php ➔ (Tema Utama). File super penting tempat desain "Sorotan Pengurus", algoritma Pop-Out 3D CSS, dan algoritma *random looping* hiasan ornamen (*svg*) ditulis.
+│       ├── 📁 event/, 📁 berita/    ➔ Tampilan halaman baca artikel & rincian acara.
+│       └── 📁 emails/               ➔ Tampilan visual dari HTML email yang masuk ke kotak masuk (inbox) Google/Yahoo pengunjung.
 ├── 📁 routes/
-│   ├── web.php               ➔ Tempat mendaftarkan semua URL dan akses halaman.
-│   └── console.php           ➔ Tempat menjadwalkan Cron Job (seperti kirim email tiap jam 8 pagi).
-└── 📄 MIGRASI_VPS.md         ➔ Panduan khusus cara hosting website ini ke server asli (VPS).
+│   ├── 📄 web.php                   ➔ Peta jalan. Jika URL-nya '/departemen', arahkan ke Controller A, jika '/admin/login', arahkan ke Controller B.
+│   └── 📄 console.php               ➔ Peta waktu. Mendaftarkan jadwal (scheduler) "jam 8 pagi jalankan SendEventNotifications.php".
+├── 📄 .env                          ➔ (TIDAK ADA DI GITHUB) File rahasia tempat menyimpan kredensial Database, Username Email SMTP, dan Kunci Keamanan Laravel.
+└── 📄 MIGRASI_VPS.md                ➔ Panduan spesifik cara hosting website ini ke server (VPS).
 ```
 
 ---
