@@ -7,13 +7,14 @@ Dokumen ini disusun menyerupai *Software Requirements Specification* (SRS) seder
 
 ## 📋 DAFTAR ISI
 1. [Pendahuluan & Konsep Sistem](#1-pendahuluan--konsep-sistem)
-2. [Stack Teknologi & Kebutuhan (Tech Stack)](#2-stack-teknologi--kebutuhan)
-3. [Struktur Folder Utama](#3-struktur-folder-utama)
-4. [Skema & Relasi Database (ERD Deskriptif)](#4-skema--relasi-database)
-5. [Alur Kerja Sistem (System Flow)](#5-alur-kerja-sistem-system-flow)
-6. [Fitur-Fitur Khusus & Kustomisasi](#6-fitur-fitur-khusus--kustomisasi)
-7. [Panduan Instalasi & Pengembangan Lokal](#7-panduan-instalasi--pengembangan-lokal)
-8. [Deployment ke VPS](#8-deployment-ke-vps)
+2. [Detail Fitur, Data, & Alur (SRS Features)](#2-detail-fitur-data--alur-srs-features)
+3. [Stack Teknologi & Kebutuhan (Tech Stack)](#3-stack-teknologi--kebutuhan-tech-stack)
+4. [Struktur Folder Utama](#4-struktur-folder-utama)
+5. [Skema & Relasi Database (ERD Deskriptif)](#5-skema--relasi-database-erd-deskriptif)
+6. [Alur Kerja Sistem (System Flow)](#6-alur-kerja-sistem-system-flow)
+7. [Fitur-Fitur Khusus & Kustomisasi](#7-fitur-fitur-khusus--kustomisasi)
+8. [Panduan Instalasi & Pengembangan Lokal](#8-panduan-instalasi--pengembangan-lokal)
+9. [Deployment ke VPS](#9-deployment-ke-vps)
 
 ---
 
@@ -25,7 +26,46 @@ Sistem ini dirancang untuk **Estetika Otomatis**, di mana unggahan foto pengguna
 
 ---
 
-## 2. Stack Teknologi & Kebutuhan
+## 2. Detail Fitur, Data, & Alur (SRS Features)
+
+Bagian ini mendeskripsikan secara rinci fitur-fitur yang ada, baik di *Frontend* (Halaman Publik) maupun di *Backend* (Panel Admin), serta data apa saja yang ditarik dari *database*.
+
+### A. Fitur Halaman Beranda (Home Page - Publik)
+Halaman depan portal organisasi (`HomeController@index`).
+*   **Data Statistik:** Menampilkan jumlah Anggota terdaftar dan Departemen yang aktif yang dihitung secara *real-time* dari *database*.
+*   **Berita Terbaru:** Menarik 3 data tabel `news` terbaru yang berstatus *published*.
+*   **Kalender Acara (Event):** Menarik 3 data `events` yang berstatus *upcoming* (akan datang) atau *ongoing* (sedang berlangsung).
+*   **Apresiasi & Penghargaan:** 
+    *   **Pengurus Terbaik (Best Officers):** Menarik 3 data dari tabel `best_officers` bulan ini (ditambah riwayat bulan lalu jika data baru sudah melebihi 30 hari). Menampilkan nama, departemen, dan alasan penghargaan.
+    *   **Ulang Tahun (Birthdays):** Menarik data dari tabel `birthdays` dan mencocokkannya dengan bulan/tanggal server saat ini. Jika ada anggota yang berulang tahun hari ini, akan dimunculkan dengan ucapan selamat (kolom `message`).
+*   **Arsip Dokumentasi:** Menarik data `events` yang berstatus *completed* beserta foto unggulan.
+
+### B. Fitur Halaman Profil Departemen (Publik)
+Halaman rincian biro/departemen (`DepartemenController@show`).
+*   **Identitas & Dokumentasi:** Mengambil `image`, `description`, serta dua gambar polaroid dokumentasi (`doc_image_1`, `doc_image_2`) dari tabel `departments`.
+*   **Struktur Organisasi & Tim Kami:** 
+    *   Sistem mem-filter anggota (`members`) berdasarkan kabinet yang *is_active* = 1.
+    *   Sistem membaca kolom `position` (jabatan) untuk menyusun pohon struktur (Ketua di atas, staf di bawah).
+    *   **Sorotan Pengurus (Spotlight 3D):** Menggunakan foto transparan (`photo_nobg`) hasil potongan AI.
+    *   **Tim Kami:** Menggunakan pas foto asli dengan background (`photo`).
+*   **Program Kerja (Proker):** Me-*looping* data dari tabel `programs` yang terelasi dengan departemen tersebut.
+
+### C. Fitur Katalog Acara & Sistem Ulasan (Publik)
+Menampilkan rincian acara secara mandiri.
+*   **Detail Acara:** Menampilkan data dari tabel `events` (tanggal, penyelenggara, target peserta).
+*   **Galeri & Panitia:** Menarik data relasi `event_documentations` (kumpulan foto) dan `event_committees` (daftar kepanitiaan).
+*   **Sistem Rating:** Jika acara sudah selesai (*completed*), pengunjung bisa mengisi *form* ulasan. Data disimpan ke `event_ratings` dan dimunculkan sebagai kolom bintang di halaman acara.
+
+### D. Panel Admin (Dashboard & Backend)
+Akses tertutup khusus pengurus.
+*   **Manajemen Departemen & Proker:** Admin bisa menambah departemen baru. Di halaman *create/edit*, tersedia form dinamis dengan tombol "+ Tambah Proker" untuk mengisi banyak program kerja sekaligus.
+*   **Upload Anggota & Auto-Remove BG:** Form input untuk menambah orang. Saat disimpan, gambar dipotong otomatis oleh AI dan disimpan di server. Alur detailnya dibahas di Bab 6.
+*   **Riwayat Kabinet (Cabinet Management):** Memungkinkan admin mendefinisikan tahun periode (misal 2026/2027). Pengurus lama tidak perlu dihapus; admin hanya perlu membuat Kabinet baru dan mematikannya (nonaktifkan `is_active` kabinet lama). Otomatis seluruh halaman publik akan kosong bersiap diisi struktur orang-orang di kabinet baru.
+*   **Push Notifikasi Manual:** Pada halaman utama dasbor admin, terdapat tombol "Kirim Notifikasi". Jika diklik, sistem mengeksekusi `NotificationController` untuk mem-blast email pengingat *event* ke semua admin yang terdaftar.
+
+---
+
+## 3. Stack Teknologi & Kebutuhan (Tech Stack)
 
 - **Bahasa Pemrograman Utama:** PHP 8.3 & JavaScript
 - **Framework Utama:** Laravel (v11/13)
@@ -37,7 +77,7 @@ Sistem ini dirancang untuk **Estetika Otomatis**, di mana unggahan foto pengguna
 
 ---
 
-## 3. Struktur Folder Utama
+## 4. Struktur Folder Utama
 
 Proyek ini mengikuti pola standar arsitektur Laravel (MVC - *Model View Controller*), dengan beberapa direktori kustom yang wajib diperhatikan:
 
@@ -49,35 +89,67 @@ Proyek ini mengikuti pola standar arsitektur Laravel (MVC - *Model View Controll
 │   │       └── 📄 SendEventNotifications.php ➔ (Sistem Pengingat) Skrip untuk memindai jadwal acara dari database lalu mengirimkan notifikasi peringatan via email ke seluruh pengguna.
 │   ├── 📁 Http/
 │   │   ├── 📁 Controllers/
-│   │   │   ├── 📁 Admin/            ➔ Backend. Berisi controller panel manajemen (seperti CabinetController.php, DepartmentController.php, UserController.php, dll). Mengontrol input, tambah, hapus (CRUD) ke database.
-│   │   │   ├── 📁 Auth/             ➔ Mengurusi login, register, forgot password, & reset password admin.
-│   │   │   └── 📄 *Controller Publik* ➔ Controller frontend (seperti HomeController.php, DepartemenController.php, BeritaController.php). Mengambil data dari database (Read Only) untuk ditampilkan di halaman publik/pengunjung.
+│   │   │   ├── 📁 Admin/            ➔ Kumpulan logika backend/dashboard panel admin.
+│   │   │   │   ├── 📄 CabinetController.php ➔ Mengelola pergantian kabinet dan mengaktifkan/nonaktifkan status periode (Arsip).
+│   │   │   │   ├── 📄 DashboardController.php ➔ Mengelola ringkasan statistik yang tampil di halaman depan dashboard admin.
+│   │   │   │   ├── 📄 DepartmentController.php ➔ Mengurus aksi Tambah, Edit, Hapus departemen dan Program Kerjanya.
+│   │   │   │   ├── 📄 EventController.php ➔ Mengurus pembuatan acara, panitia acara, galeri dokumentasi, dan review pengunjung.
+│   │   │   │   ├── 📄 MemberController.php ➔ Menangani unggahan data anggota. Controller ini yang memerintahkan Python untuk memotong foto (AI).
+│   │   │   │   ├── 📄 NewsController.php ➔ Mengelola penulisan, draft, dan unggahan artikel berita.
+│   │   │   │   ├── 📄 NotificationController.php ➔ Mengatur fitur "Kirim Notifikasi Manual" ke email semua member.
+│   │   │   │   ├── 📄 PenghargaanController.php ➔ Mengelola daftar "Pengurus Terbaik" setiap bulannya.
+│   │   │   │   ├── 📄 SettingController.php ➔ Menangani pembaruan pengaturan nama web, sosial media, dsb.
+│   │   │   │   ├── 📄 UltahController.php ➔ Mengatur daftar anggota yang berulang tahun.
+│   │   │   │   └── 📄 UserController.php ➔ Manajemen hak akses (Role) administrator sistem.
+│   │   │   ├── 📁 Auth/             ➔ Mengurusi logika login, register, forgot password, & reset password admin.
+│   │   │   ├── 📄 BeritaController.php ➔ Controller publik pembaca artikel berita (`/berita`).
+│   │   │   ├── 📄 DepartemenController.php ➔ Menyatukan data anggota dengan data program kerja, merangkai *array* untuk halaman profil departemen publik.
+│   │   │   ├── 📄 EventController.php ➔ Memunculkan halaman kalender & rincian acara ke pengunjung umum.
+│   │   │   └── 📄 HomeController.php ➔ Otak dari halaman beranda (Landing Page). Mengambil data statistik, berita terbaru, penghargaan terkini, ultah bulan ini, dll.
 │   │   └── 📁 Middleware/           ➔ Lapisan filter keamanan (misal: verifikasi apakah user sudah login sebelum bisa masuk ke /admin).
 │   ├── 📁 Jobs/
-│   │   └── 📄 ProcessMemberPhotoBackground.php ➔ (Sistem Pekerja). File krusial tempat "Antrean / Queue" dikerjakan. Tugasnya adalah menerima foto anggota, menunggu tanpa mengganggu halaman website, lalu memerintahkan Python untuk memotong background.
+│   │   └── 📄 ProcessMemberPhotoBackground.php ➔ (Sistem Pekerja). File krusial tempat "Antrean / Queue" dikerjakan. Tugasnya menerima perintah dari MemberController untuk memotong background tanpa mengganggu loading website.
 │   ├── 📁 Mail/
-│   │   └── 📄 EventNotificationMail.php ➔ Kerangka penyusunan subjek dan struktur badan email otomatis.
-│   ├── 📁 Models/
-│   │   └── 📄 *.php                 ➔ File representasi Database (ORM Eloquent). Setiap tabel diwakili 1 model (misal Member.php untuk tabel members). Digunakan untuk mendefinisikan relasi antar tabel (seperti 1 departemen punya banyak member).
+│   │   └── 📄 EventNotificationMail.php ➔ Menyambungkan data dari sistem ke tampilan HTML template Email sebelum di-blast.
+│   ├── 📁 Models/                   ➔ Definisi struktur tabel Database (ORM Eloquent).
+│   │   ├── 📄 BestOfficer.php (Penghargaan bulanan)
+│   │   ├── 📄 Birthday.php (Data Ultah anggota)
+│   │   ├── 📄 Cabinet.php (Periode kepengurusan)
+│   │   ├── 📄 Department.php (Data Induk Departemen)
+│   │   ├── 📄 Event.php, EventCommittee.php, EventDocumentation.php, EventRating.php (Ekosistem Acara)
+│   │   ├── 📄 Member.php (Anggota organisasi)
+│   │   ├── 📄 News.php (Artikel Berita)
+│   │   ├── 📄 Program.php (Program Kerja)
+│   │   ├── 📄 Setting.php (Pengaturan global situs)
+│   │   └── 📄 User.php (Admin)
 │   └── 📁 Traits/
-│       └── 📄 ImageUploadTrait.php  ➔ (Alat Eksekusi). Tempat di mana fungsi `autoCropTransparent()` (memotong ruang sisa) dan `removeBackgroundAndSaveWebp()` (eksekusi python `rembg`) ditulis secara sentral agar bisa dipakai oleh controller mana saja.
+│       └── 📄 ImageUploadTrait.php  ➔ (Alat Eksekusi). Tempat di mana fungsi `autoCropTransparent()` (memotong ruang sisa) dan `removeBackgroundAndSaveWebp()` (eksekusi python `rembg`) ditulis secara sentral agar bisa dipanggil berulang kali.
 ├── 📁 database/
-│   ├── 📁 migrations/               ➔ Catatan sejarah database. Setiap ada tambah kolom/tabel baru (misal tabel programs), file PHP ini akan mengatur struktur databasenya.
-│   └── 📁 seeders/                  ➔ Skrip untuk mengisi database dengan data dummy awal.
+│   ├── 📁 migrations/               ➔ Catatan sejarah dan skema kolom tabel database.
+│   └── 📁 seeders/                  ➔ Skrip untuk mengisi database dengan data dummy awal (admin pertama).
 ├── 📁 public/
 │   ├── 📁 build/                    ➔ File CSS dan JS statis hasil compile Vite (TailwindCSS). Jangan diedit secara manual.
 │   ├── 📁 images/                   ➔ Aset gambar statis bawaan sistem (seperti logo web/dummy foto).
-│   └── 📁 storage/                  ➔ Symlink (jalan pintas) rahasia yang menghubungkan ke folder `storage/app/public` sehingga file upload dari admin (foto pengurus, berita) bisa diakses publik secara aman.
+│   └── 📁 storage/                  ➔ Symlink (jalan pintas) rahasia yang menghubungkan ke folder `storage/app/public` sehingga file upload dari admin bisa diakses publik secara aman.
 ├── 📁 resources/
-│   └── 📁 views/                    ➔ Folder UI / Tampilan HTML (menggunakan sistem templating Blade).
-│       ├── 📁 admin/                ➔ Kumpulan tampilan untuk Admin Dashboard, Form Input, dan Tabel Data (Auth, Awards, Departemen, Berita, dll).
+│   └── 📁 views/                    ➔ Folder UI / Tampilan HTML Front-end (menggunakan sistem templating Blade).
+│       ├── 📁 admin/                ➔ UI Dashboard Backend.
+│       │   ├── 📁 awards/, 📁 birthdays/, 📁 cabinets/, 📁 departments/, 📁 events/, 📁 news/, 📁 settings/, 📁 users/ ➔ Tempat HTML Form tambah/edit dan tabel data setiap fitur berada.
 │       ├── 📁 departemen/
 │       │   └── 📁 themes/
-│       │       └── 📄 klasik.blade.php ➔ (Tema Utama). File super penting tempat desain "Sorotan Pengurus", algoritma Pop-Out 3D CSS, dan algoritma *random looping* hiasan ornamen (*svg*) ditulis.
-│       ├── 📁 event/, 📁 berita/    ➔ Tampilan halaman baca artikel & rincian acara.
-│       └── 📁 emails/               ➔ Tampilan visual dari HTML email yang masuk ke kotak masuk (inbox) Google/Yahoo pengunjung.
+│       │       └── 📄 klasik.blade.php ➔ (UI Super Penting). File antarmuka departemen di mana letak desain "Sorotan Pengurus" 3D Pop-Out, dan rendering ornamen SVG disebarkan secara *random loop*.
+│       ├── 📁 berita/
+│       │   └── 📄 show.blade.php    ➔ Antarmuka saat seseorang sedang membaca artikel berita.
+│       ├── 📁 event/
+│       │   ├── 📄 index.blade.php   ➔ Halaman katalog daftar agenda (kalender).
+│       │   └── 📄 show.blade.php    ➔ Halaman rincian acara, foto dokumentasi, panitia, & tempat memberi ulasan (rating 1-5).
+│       ├── 📁 home/
+│       │   └── 📄 index.blade.php   ➔ Antarmuka halaman Beranda (Halaman Pembuka Website FORMAT-R UNESA).
+│       └── 📁 emails/
+│           └── 📁 events/
+│               └── 📄 notification.blade.php ➔ HTML visual email otomatis yang akan dikirim ke Inbox/Gmail anggota.
 ├── 📁 routes/
-│   ├── 📄 web.php                   ➔ Peta jalan. Jika URL-nya '/departemen', arahkan ke Controller A, jika '/admin/login', arahkan ke Controller B.
+│   ├── 📄 web.php                   ➔ Peta jalan website (Routing). Pendaftar semua URL (misal: /admin/login).
 │   └── 📄 console.php               ➔ Peta waktu. Mendaftarkan jadwal (scheduler) "jam 8 pagi jalankan SendEventNotifications.php".
 ├── 📄 .env                          ➔ (TIDAK ADA DI GITHUB) File rahasia tempat menyimpan kredensial Database, Username Email SMTP, dan Kunci Keamanan Laravel.
 └── 📄 MIGRASI_VPS.md                ➔ Panduan spesifik cara hosting website ini ke server (VPS).
@@ -85,7 +157,7 @@ Proyek ini mengikuti pola standar arsitektur Laravel (MVC - *Model View Controll
 
 ---
 
-## 4. Skema & Relasi Database
+## 5. Skema & Relasi Database (ERD Deskriptif)
 
 Berikut adalah pemetaan seluruh tabel (13 tabel utama) dalam sistem ini (sebagai representasi ERD - *Entity Relationship Diagram*):
 
@@ -170,7 +242,7 @@ Tabel-tabel ini merupakan penggerak utama mesin Laravel (Framework). Secara stru
 
 ---
 
-## 5. Alur Kerja Sistem (System Flow)
+## 6. Alur Kerja Sistem (System Flow)
 
 ### Flow 1: Upload Foto & Pemotongan Latar Belakang (AI Processing)
 Karena AI berat untuk diproses seketika, alurnya menggunakan skema **Asynchronous (Pekerja Latar Belakang)**.
@@ -203,7 +275,7 @@ Karena AI berat untuk diproses seketika, alurnya menggunakan skema **Asynchronou
 
 ---
 
-## 6. Fitur-Fitur Khusus & Kustomisasi
+## 7. Fitur-Fitur Khusus & Kustomisasi
 
 Jika Anda (pengembang selanjutnya) ingin memodifikasi tampilan *Frontend*, perhatikan file `resources/views/departemen/themes/klasik.blade.php`:
 
@@ -215,7 +287,7 @@ Jika Anda (pengembang selanjutnya) ingin memodifikasi tampilan *Frontend*, perha
 
 ---
 
-## 7. Panduan Instalasi & Pengembangan Lokal
+## 8. Panduan Instalasi & Pengembangan Lokal
 
 Bagi Developer baru yang ingin melanjutkan proyek ini di laptop lokal:
 
@@ -250,7 +322,7 @@ Bagi Developer baru yang ingin melanjutkan proyek ini di laptop lokal:
 
 ---
 
-## 8. Deployment ke VPS (Produksi Asli)
+## 9. Deployment ke VPS (Produksi Asli)
 
 Sistem ini **TIDAK MENDUKUNG** cPanel / Shared Hosting biasa. Alasannya jelas: Anda tidak memiliki akses terminal root di Shared Hosting untuk menginstal Python (`rembg`), mengunci Supervisor 24 jam, maupun mengaktifkan Cron Job tingkat lanjut.
 
