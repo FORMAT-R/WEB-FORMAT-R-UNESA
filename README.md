@@ -1,58 +1,245 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📑 DOKUMEN SPESIFIKASI & PANDUAN PENGEMBANG (SRS-Like Documentation)
+**Sistem Informasi Akademik & Dokumentasi FORMAT-R UNESA**
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Dokumen ini disusun menyerupai *Software Requirements Specification* (SRS) sederhana yang memuat penjelasan teknis mendalam mengenai struktur kode, database, alur kerja (flow), hingga panduan pengembangan. Dokumen ini dibuat agar **Pengurus/Developer selanjutnya** dapat memahami jeroan sistem tanpa harus menebak-nebak alur kode yang ditinggalkan.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📋 DAFTAR ISI
+1. [Pendahuluan & Konsep Sistem](#1-pendahuluan--konsep-sistem)
+2. [Stack Teknologi & Kebutuhan (Tech Stack)](#2-stack-teknologi--kebutuhan)
+3. [Struktur Folder Utama](#3-struktur-folder-utama)
+4. [Skema & Relasi Database (ERD Deskriptif)](#4-skema--relasi-database)
+5. [Alur Kerja Sistem (System Flow)](#5-alur-kerja-sistem-system-flow)
+6. [Fitur-Fitur Khusus & Kustomisasi](#6-fitur-fitur-khusus--kustomisasi)
+7. [Panduan Instalasi & Pengembangan Lokal](#7-panduan-instalasi--pengembangan-lokal)
+8. [Deployment ke VPS](#8-deployment-ke-vps)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 1. Pendahuluan & Konsep Sistem
 
-## Learning Laravel
+Sistem ini adalah portal profil organisasi yang interaktif. Alih-alih hanya menampilkan halaman statis, sistem ini dibangun secara **Data-Driven**. Artinya, penambahan divisi, anggota pengurus, program kerja, berita, dan *event* dilakukan seluruhnya melalui Panel Admin dan akan langsung mengubah tampilan *Frontend* (Halaman Publik).
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Sistem ini dirancang untuk **Estetika Otomatis**, di mana unggahan foto pengguna akan diproses oleh Kecerdasan Buatan (AI) secara mandiri untuk menghapus latar belakang (*background*), merapikan potongan *trim*, dan menerapkan tata letak CSS 3D *Pop-Out* di halaman utama departemen.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## 2. Stack Teknologi & Kebutuhan
 
-## Agentic Development
+- **Bahasa Pemrograman Utama:** PHP 8.3 & JavaScript
+- **Framework Utama:** Laravel (v11/13)
+- **Frontend / Styling:** Tailwind CSS v4, Alpine.js, Blade Templating
+- **Database:** MySQL / MariaDB
+- **Pemrosesan Asinkronus (Queue):** Database Queue bawaan Laravel
+- **Artificial Intelligence (AI):** Python 3.10+ dengan library `rembg[cpu]` (untuk Computer Vision / Background Removal).
+- **Environment:** Node.js (untuk kompilasi *Vite/Tailwind*), Composer.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+---
 
-```bash
-composer require laravel/boost --dev
+## 3. Struktur Folder Utama
 
-php artisan boost:install
+Proyek ini mengikuti pola standar arsitektur Laravel (MVC - *Model View Controller*), dengan beberapa direktori kustom yang wajib diperhatikan:
+
+```text
+📁 FORMAT-R UNESA/
+├── 📁 app/
+│   ├── 📁 Console/Commands/  ➔ Berisi command kustom (misal: SendEventNotifications.php untuk email cron)
+│   ├── 📁 Http/Controllers/  ➔ Logika utama. Folder 'Admin/' untuk backend, root untuk frontend publik.
+│   ├── 📁 Jobs/              ➔ Proses Latar Belakang (misal: ProcessMemberPhotoBackground.php untuk AI)
+│   ├── 📁 Models/            ➔ Definisi struktur tabel dan relasi ORM Eloquent.
+│   └── 📁 Traits/            ➔ Kumpulan fungsi yang bisa dipakai berulang (contoh: ImageUploadTrait.php memegang logika AI dan konversi gambar).
+├── 📁 database/
+│   ├── 📁 migrations/        ➔ Blueprint seluruh tabel database (history struktur).
+│   └── 📁 seeders/           ➔ Data awal (dummy/admin) untuk instalasi baru.
+├── 📁 public/                ➔ Aset yang bisa diakses publik (CSS, JS hasil build Vite, gambar statis).
+├── 📁 resources/
+│   └── 📁 views/             ➔ Tampilan HTML.
+│       ├── 📁 admin/         ➔ Antarmuka panel kontrol admin.
+│       ├── 📁 departemen/    ➔ Frontend departemen, perhatikan folder 'themes/klasik.blade.php' tempat keajaiban UI 3D berada.
+│       └── 📁 emails/        ➔ Template email notifikasi yang akan di-blast ke pengurus.
+├── 📁 routes/
+│   ├── web.php               ➔ Tempat mendaftarkan semua URL dan akses halaman.
+│   └── console.php           ➔ Tempat menjadwalkan Cron Job (seperti kirim email tiap jam 8 pagi).
+└── 📄 MIGRASI_VPS.md         ➔ Panduan khusus cara hosting website ini ke server asli (VPS).
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+## 4. Skema & Relasi Database
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Berikut adalah pemetaan seluruh tabel (13 tabel utama) dalam sistem ini (sebagai representasi ERD - *Entity Relationship Diagram*):
 
-## Code of Conduct
+### A. Tabel `users` (Pengguna/Admin)
+Data otentikasi login admin sistem.
+- `id`, `name`, `email`, `password`
+- `role` (superadmin/admin)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### B. Tabel `departments` (Departemen)
+Menyimpan profil induk departemen/biro.
+- `id` (PK)
+- `name`, `abbreviation`, `slug`
+- `description`, `image` (Logo Utama)
+- `doc_image_1`, `doc_image_2` (Foto Dokumentasi polaroid)
+- **Relasi:** `1:N` ke `members`, `1:N` ke `programs`
 
-## Security Vulnerabilities
+### C. Tabel `members` (Pengurus/Anggota)
+Data setiap orang di organisasi.
+- `id` (PK)
+- `department_id` (FK ke departments)
+- `cabinet_id` (FK ke cabinets - untuk membedakan pengurus tahun lalu dan sekarang)
+- `name`, `position`
+- `photo` (Menyimpan foto asli hasil upload)
+- `photo_nobg` (Menyimpan foto transparan hasil tebasan AI Python `rembg`)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### D. Tabel `programs` (Program Kerja)
+Program kerja dinamis per departemen.
+- `id` (PK)
+- `department_id` (FK ke departments)
+- `no` (Nomor urut proker, misal "01")
+- `name`, `description`
 
-## License
+### E. Tabel Manajemen *Events* (Acara)
+Menyimpan detail kegiatan, panitia, hingga *feedback* peserta.
+1. **`events`** (Tabel Utama)
+   - `id`, `title`, `slug`, `description`, `organizer`
+   - `status` (upcoming, ongoing, completed)
+   - `start_date`, `end_date`
+   - `participant_count`
+2. **`event_committees`** (Panitia event)
+   - FK ke `event_id`. Menyimpan `name`, `role`, dan `photo` panitia.
+3. **`event_documentations`** (Dokumentasi event)
+   - FK ke `event_id`. Menyimpan kumpulan `photo` pasca-acara.
+4. **`event_ratings`** (Ulasan/Rating)
+   - FK ke `event_id`. Menyimpan `name_reviewer`, `rating` (1-5 bintang), dan `review`.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### F. Tabel `news` (Berita / Artikel)
+Sistem publikasi pers organisasi.
+- `id`, `title`, `slug`, `content`
+- `image`, `published_at`
+
+### G. Tabel Apresiasi (Penghargaan & Ultah)
+Sistem *reward* dan peringatan hari lahir anggota.
+1. **`best_officers`** (Pengurus Terbaik)
+   - `member_id`, `month`, `year`, `reason`
+2. **`birthdays`** (Ulang Tahun)
+   - `member_id`, `birth_date`, `message`
+
+### H. Tabel `cabinets` (Kabinet/Periode)
+Sistem arsip. Saat ganti tahun, admin cukup membuat kabinet baru tanpa menghapus data departemen yang lama.
+- `id`, `name` (Nama kabinet, misal: "Kolaborasi Asa")
+- `period` (Tahun, misal: "2026/2027"), `vision`, `mission`, `logo`
+- `is_active` (Boolean, hanya boleh 1 yang aktif. Pengurus yang tampil di halaman publik otomatis ter-filter berdasar kabinet ini).
+
+### I. Tabel `settings` (Pengaturan Web)
+- Menyimpan konfigurasi dinamis situs yang bisa diubah via Admin Panel.
+- `key`, `value`
+
+### J. Tabel Sistem Bawaan (Laravel Core)
+Tabel-tabel ini merupakan penggerak utama mesin Laravel (Framework). Secara struktural tidak memiliki *Foreign Key* (relasi) ke tabel bisnis di atas karena dikendalikan langsung oleh *core engine* sistem. **Dilarang keras untuk menghapus tabel ini.**
+
+1. **`cache` & `cache_locks`**
+   - **Fungsi:** Menyimpan data memori jangka pendek (*cache*) untuk mempercepat waktu muat (loading) halaman web. Ini mencegah server memproses data yang sama berulang-ulang dari awal.
+2. **`jobs`**
+   - **Fungsi:** Menampung tugas-tugas antrean (Queue) di belakang layar. Di sistem ini, tabel `jobs` menampung "Perintah Memotong Background Foto via AI" dan "Perintah Mengirim Email Otomatis" agar dikerjakan satu per satu tanpa memberatkan sistem utama.
+3. **`failed_jobs` & `job_batches`**
+   - **Fungsi:** Menyimpan rekam jejak apabila tugas di belakang layar (dari tabel `jobs` di atas) gagal dieksekusi (misalnya AI error atau email tertolak), sehingga admin atau developer bisa menelusuri penyebab gagalnya tugas tersebut.
+4. **`sessions`** *(Jika ada)*
+   - **Fungsi:** Menyimpan status login pengguna (sesi), sehingga jika pengunjung me-refresh halaman, mereka tidak tiba-tiba ter-logout.
+5. **`migrations`**
+   - **Fungsi:** Tabel mutlak milik Laravel untuk mencatat file migrasi database mana saja yang sudah dieksekusi, sehingga menghindarkan duplikasi tabel.
+
+---
+
+## 5. Alur Kerja Sistem (System Flow)
+
+### Flow 1: Upload Foto & Pemotongan Latar Belakang (AI Processing)
+Karena AI berat untuk diproses seketika, alurnya menggunakan skema **Asynchronous (Pekerja Latar Belakang)**.
+
+1. **User (Admin)** mengisi form tambah/edit anggota dan mengunggah foto.
+2. **Controller (`MemberController@store`)** menyimpan data anggota ke database dan menyimpan *foto asli* ke *storage*.
+3. **Queue Dispatch:** Controller memerintahkan Laravel Queue (`ProcessMemberPhotoBackground::dispatch()`) lalu segera mengarahkan (redirect) admin kembali ke halaman sukses tanpa perlu menunggu AI bekerja.
+4. **Queue Worker (`php artisan queue:work`)** di terminal/server mengambil tugas tersebut secara diam-diam.
+5. **Python (`rembg`) & GD Execution (di `ImageUploadTrait`):**
+   - File dibaca, lalu dilempar ke sistem command line: `rembg i foto_asli.jpg foto_temp.png`.
+   - AI menyeleksi objek manusia dan menghapus latar belakang.
+   - PHP memanggil fungsi kustom `autoCropTransparent()` untuk membuang sisa kanvas kosong agar proporsinya ketat di pinggiran tubuh orang.
+   - PHP mengecek rasio gambar. Jika gambar adalah "foto full kaki/badan", PHP memotong bagian kaki hingga sebatas pinggang secara paksa (rasio 1:1.5).
+   - PHP mengonversinya ke format `.webp` untuk kompresi maksimal.
+6. **Update Database:** Worker selesai, database `members.photo_nobg` diperbarui. Saat di-refresh, halaman web berubah menjadi transparan.
+
+### Flow 2: Rendering UI "Sorotan Pengurus" (Frontend)
+1. User publik mengakses halaman departemen.
+2. `DepartemenController@show` menarik data departemen, proker, dan mem-filter data anggota *hanya* dari kabinet yang sedang aktif.
+3. Di file `klasik.blade.php`, anggota *Board of Directors* (BPH/Ketua/Wakil) diidentifikasi menggunakan fungsi filter *(string contains)* pada jabatannya.
+4. Anggota tersebut akan dirender ke `.spotlight-card`. 
+5. Sistem me-render `photo_nobg` (hasil AI). Dengan kombinasi CSS `.spotlight-card::before` (tinggi mentok 250px) dan `.spotlight-foto` (tinggi 440px), bagian kepala subjek akan menembus atap card (efek *3D Pop-Out*).
+
+### Flow 3: Notifikasi Email Otomatis (Cron Job Schedule)
+1. Di `routes/console.php`, terdapat pendaftaran perintah `notify:events` setiap jam 08:00 pagi.
+2. Linux Server (Cron Job) yang disetel berjalan setiap menit (`* * * * *`) akan mendeteksi jadwal ini.
+3. Tepat jam 8 pagi, Cron Job menjalankan `App\Console\Commands\SendEventNotifications`.
+4. Kode menyeleksi event (Acara yang belum mulai, sedang berjalan tapi lewat waktu, atau H-7).
+5. Sistem me-*looping* seluruh pengguna (`users`) di database, dan mengirimkan email melalui konfigurasi SMTP Gmail.
+
+---
+
+## 6. Fitur-Fitur Khusus & Kustomisasi
+
+Jika Anda (pengembang selanjutnya) ingin memodifikasi tampilan *Frontend*, perhatikan file `resources/views/departemen/themes/klasik.blade.php`:
+
+- **Distribusi Ornamen (Hiasan):** 
+  Di dalam file ini, terdapat logika *looping* PHP `@for` yang secara otomatis menggandakan dan menyebarkan ornamen SVG. Ada konfigurasi acak (`rand()`) untuk menyebarkan posisi X dan Y, skala, dan rotasinya. Aturan ini terbagi dua: sebaran khusus *Hero area* (paling atas) dan *Content area* (menjuntai ke bawah).
+- **Penyesuaian Skala Pemotongan Kaki (Auto-Trim):**
+  Jika suatu saat Anda merasa potongan pinggang foto di web terlalu pendek atau terlalu panjang, carilah `ImageUploadTrait.php` baris ke `180` (komentar: `// --- STANDARISASI RASIO UNTUK MEMBUANG KAKI (FULL BODY) ---`). 
+  Ubah nilai pengali rasio `$idealHeight = (int)($newWidth * 1.5);` menjadi `1.2` (untuk potongan dada) atau `2.0` (untuk mempertahankan foto selutut).
+
+---
+
+## 7. Panduan Instalasi & Pengembangan Lokal
+
+Bagi Developer baru yang ingin melanjutkan proyek ini di laptop lokal:
+
+1. **Pastikan Komputer Anda Memiliki:** PHP 8.3, Composer, Node.js, MySQL, Python 3.10+, dan PIP.
+2. Kloning dan masuk ke folder proyek.
+3. Buka terminal 1 (Install Dependencies):
+   ```bash
+   composer install
+   npm install
+   npm run build
+   ```
+4. Salin `.env.example` ke `.env`, atur `DB_DATABASE` (buat database MySQL). Set `QUEUE_CONNECTION=database`.
+5. Install Python Modul (Untuk AI lokal):
+   ```bash
+   pip install "rembg[cpu]"
+   ```
+6. Setup Database:
+   ```bash
+   php artisan key:generate
+   php artisan migrate
+   php artisan storage:link
+   ```
+7. Jalankan Server:
+   ```bash
+   php artisan serve
+   ```
+8. **SANGAT PENTING (Jalankan Worker):**
+   Buka terminal ke-2, jalankan perintah ini agar proses *upload* foto dan penghapusan latar belakang bisa jalan saat di-test:
+   ```bash
+   php artisan queue:work --timeout=1800
+   ```
+
+---
+
+## 8. Deployment ke VPS (Produksi Asli)
+
+Sistem ini **TIDAK MENDUKUNG** cPanel / Shared Hosting biasa. Alasannya jelas: Anda tidak memiliki akses terminal root di Shared Hosting untuk menginstal Python (`rembg`), mengunci Supervisor 24 jam, maupun mengaktifkan Cron Job tingkat lanjut.
+
+Website ini **WAJIB** di-hosting di **Virtual Private Server (VPS)**.
+
+Untuk panduan mendirikan VPS dari 0 (kosong) hingga website *live* sempurna, silakan baca dokumentasi pendamping yang telah dibuat:
+👉 **[Buka Panduan MIGRASI VPS (MIGRASI_VPS.md)](./MIGRASI_VPS.md)**
+
+---
+
+*Terima kasih! Dokumentasi ini dibuat untuk menjaga keberlanjutan regenerasi divisi teknologi (IT) di FORMAT-R UNESA.*
