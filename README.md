@@ -132,22 +132,41 @@ Proyek ini mengikuti pola standar arsitektur Laravel (MVC - *Model View Controll
 │   ├── 📁 images/                   ➔ Aset gambar statis bawaan sistem (seperti logo web/dummy foto).
 │   └── 📁 storage/                  ➔ Symlink (jalan pintas) rahasia yang menghubungkan ke folder `storage/app/public` sehingga file upload dari admin bisa diakses publik secara aman.
 ├── 📁 resources/
-│   └── 📁 views/                    ➔ Folder UI / Tampilan HTML Front-end (menggunakan sistem templating Blade).
-│       ├── 📁 admin/                ➔ UI Dashboard Backend.
-│       │   ├── 📁 awards/, 📁 birthdays/, 📁 cabinets/, 📁 departments/, 📁 events/, 📁 news/, 📁 settings/, 📁 users/ ➔ Tempat HTML Form tambah/edit dan tabel data setiap fitur berada.
-│       ├── 📁 departemen/
-│       │   └── 📁 themes/
-│       │       └── 📄 klasik.blade.php ➔ (UI Super Penting). File antarmuka departemen di mana letak desain "Sorotan Pengurus" 3D Pop-Out, dan rendering ornamen SVG disebarkan secara *random loop*.
+│   └── 📁 views/                    ➔ Folder Induk UI / Tampilan HTML Front-end (Templating Blade).
+│       ├── 📁 admin/                ➔ (Modul Backend) Kumpulan tampilan Panel Dashboard Admin.
+│       │   ├── 📁 auth/             ➔ Halaman login, register, dan lupa password admin.
+│       │   ├── 📁 awards/           ➔ Form dan tabel data "Pengurus Terbaik".
+│       │   ├── 📁 birthdays/        ➔ Form dan tabel data "Ulang Tahun".
+│       │   ├── 📁 cabinets/         ➔ Pengaturan arsip periode kabinet.
+│       │   ├── 📁 dashboard/        ➔ Halaman utama setelah admin login (statistik admin).
+│       │   ├── 📁 departments/      ➔ Form dinamis input/edit departemen dan program kerja.
+│       │   ├── 📁 events/           ➔ Pengelolaan agenda, kepanitiaan, dan galeri acara.
+│       │   ├── 📁 layouts/          ➔ Template induk untuk antarmuka backend/admin (navbar & sidebar).
+│       │   ├── 📁 news/             ➔ Editor teks dan unggahan artikel berita.
+│       │   ├── 📁 settings/         ➔ Halaman konfigurasi identitas website.
+│       │   └── 📁 users/            ➔ Pengaturan akun *role* admin.
 │       ├── 📁 berita/
-│       │   └── 📄 show.blade.php    ➔ Antarmuka saat seseorang sedang membaca artikel berita.
-│       ├── 📁 event/
-│       │   ├── 📄 index.blade.php   ➔ Halaman katalog daftar agenda (kalender).
-│       │   └── 📄 show.blade.php    ➔ Halaman rincian acara, foto dokumentasi, panitia, & tempat memberi ulasan (rating 1-5).
+│       │   └── 📄 show.blade.php    ➔ Tampilan publik saat seseorang sedang membaca artikel berita.
+│       ├── 📁 components/
+│       │   └── 📄 opening.blade.php ➔ Komponen (potongan HTML) *reusable* untuk memunculkan efek animasi/transisi saat halaman baru saja dibuka.
+│       ├── 📁 departemen/           ➔ Tampilan direktori departemen publik.
+│       │   ├── 📄 index.blade.php   ➔ Halaman "Buku Direktori" yang melisting *card* dari semua departemen.
+│       │   ├── 📄 show.blade.php    ➔ Pembungkus (*wrapper*) untuk merender tema spesifik dari suatu departemen.
+│       │   └── 📁 themes/
+│       │       └── 📄 klasik.blade.php ➔ (Inti Tampilan). Template khusus halaman detail departemen yang memuat desain kartu "Sorotan Pengurus 3D Pop-Out", pemanggilan foto_nobg, serta algoritma perulangan ornamen (*SVG floating*) secara *random*.
+│       ├── 📁 emails/
+│       │   └── 📁 events/
+│       │       └── 📄 notification.blade.php ➔ Kerangka HTML visual untuk email otomatis yang dikirim ke Inbox/Gmail admin/anggota (Cron Job).
+│       ├── 📁 event/                ➔ (Modul Frontend) Tampilan agenda organisasi publik.
+│       │   ├── 📄 index.blade.php   ➔ Halaman katalog/kalender daftar seluruh acara.
+│       │   └── 📄 show.blade.php    ➔ Halaman rincian lengkap sebuah acara, menampilkan jadwal, foto galeri, panitia, serta *form popup* (bintang 1-5) untuk memberikan ulasan acara.
 │       ├── 📁 home/
-│       │   └── 📄 index.blade.php   ➔ Antarmuka halaman Beranda (Halaman Pembuka Website FORMAT-R UNESA).
-│       └── 📁 emails/
-│           └── 📁 events/
-│               └── 📄 notification.blade.php ➔ HTML visual email otomatis yang akan dikirim ke Inbox/Gmail anggota.
+│       │   └── 📄 index.blade.php   ➔ Otak tampilan "Beranda Utama / Landing Page". Memuat blok statistik, berita sekilas, pengurus terbaik bulan ini, dan FAQ.
+│       ├── 📁 layouts/              ➔ (Modul Frontend) Template kerangka induk halaman publik.
+│       │   ├── 📄 app.blade.php     ➔ Template induk utama (Header & Footer standar web).
+│       │   └── 📄 dept-base.blade.php ➔ Template khusus untuk mengakomodir gaya desain halaman departemen agar lebih *immersive* tanpa *navbar* biasa.
+│       ├── 📄 arsip.blade.php       ➔ Halaman publik khusus memajang kumpulan arsip (event/berkas) yang sudah berlalu.
+│       └── 📄 welcome.blade.php     ➔ *Fallback* halaman selamat datang (opsional).
 ├── 📁 routes/
 │   ├── 📄 web.php                   ➔ Peta jalan website (Routing). Pendaftar semua URL (misal: /admin/login).
 │   └── 📄 console.php               ➔ Peta waktu. Mendaftarkan jadwal (scheduler) "jam 8 pagi jalankan SendEventNotifications.php".
