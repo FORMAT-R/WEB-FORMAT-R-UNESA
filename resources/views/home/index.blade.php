@@ -778,22 +778,59 @@
             <h2>Berita Terbaru</h2>
             <p>Cerita, tips, dan informasi seputar dunia perkuliahan dan kegiatan FORMAT-R.</p>
         </div>
-        <div class="art-grid" data-stagger>
+        <div class="art-grid" id="beritaGrid" data-stagger>
             @forelse($berita as $b)
             <a href="{{ route('berita.show', $b->slug) }}" style="text-decoration:none; color:inherit; display:block; height:100%;">
                 <article class="art-card" data-stagger-child style="display:flex; flex-direction:column; height:100%;">
-                    <div class="art-thumb" style="height:200px; {{ $b->image ? 'background-image:url('.Storage::url($b->image).'); background-size:cover; background-position:center;' : '' }}"></div>
-                    <div class="art-body" style="padding:20px; flex:1; display:flex; flex-direction:column; justify-content:center; text-align:center;">
-                        <h4 style="margin:0; font-size:1.15rem;">{{ $b->title }}</h4>
+                    <div class="art-thumb" style="height:200px; {{ $b->image ? 'background-image:url('.Storage::url($b->image).'); background-size:cover; background-position:center;' : 'background-color: var(--surface-alt); display: flex; align-items: center; justify-content: center;' }}">
+                        @if(!$b->image)
+                        <svg style="width: 48px; height: 48px; color: var(--ink-soft); opacity: 0.5;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+                        @endif
+                    </div>
+                    <div class="art-body" style="padding:20px; flex:1; display:flex; flex-direction:column;">
+                        <div style="font-size: 0.8rem; color: var(--ink-soft); margin-bottom: 8px; font-weight: 500; letter-spacing: 0.5px;">
+                            {{ $b->published_at ? \Carbon\Carbon::parse($b->published_at)->translatedFormat('d M Y') : $b->created_at->translatedFormat('d M Y') }}
+                        </div>
+                        <h4 style="margin:0 0 10px 0; font-size:1.15rem; line-height: 1.4;">{{ $b->title }}</h4>
+                        <p style="font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 0; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; flex: 1;">
+                            {{ Str::limit(strip_tags($b->content), 120) }}
+                        </p>
+                        <div style="margin-top: 16px; font-size: 0.85rem; font-weight: 600; color: var(--blue); display: flex; align-items: center; gap: 4px;">
+                            Baca Selengkapnya
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                        </div>
                     </div>
                 </article>
             </a>
             @empty
-            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--ink-soft); border: 1px dashed var(--line); border-radius: 20px;">
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--ink-soft); border: 1px dashed var(--line); border-radius: 20px;" id="noBeritaMsg">
                 <p>Belum ada berita yang dipublikasikan.</p>
             </div>
             @endforelse
         </div>
+        
+        @if($berita->lastPage() > 1)
+        <div style="display: flex; justify-content: center; gap: 16px; margin-top: 40px;" data-reveal id="beritaPaginationControls">
+            <button id="btnPrevBerita" disabled class="btn" style="background: var(--surface); color: var(--ink); border: 1px solid var(--line); display: inline-flex; align-items: center; justify-content:center; gap: 8px; cursor: not-allowed; opacity: 0.5; width: 48px; padding: 0;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <a href="{{ route('berita.index') }}" class="btn" style="background: var(--surface); color: var(--ink); border: 1px solid var(--line); display: inline-flex; align-items: center; gap: 8px;">
+                Lihat Semua Berita
+            </a>
+            <button id="btnNextBerita" data-page="2" class="btn" style="background: var(--surface); color: var(--ink); border: 1px solid var(--line); display: inline-flex; align-items: center; justify-content:center; gap: 8px; width: 48px; padding: 0;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+        </div>
+        @else
+        @if(count($berita) > 0)
+        <div style="text-align: center; margin-top: 40px;" data-reveal>
+            <a href="{{ route('berita.index') }}" class="btn" style="background: var(--surface); color: var(--ink); border: 1px solid var(--line); display: inline-flex; align-items: center; gap: 8px;">
+                Lihat Semua Berita
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+            </a>
+        </div>
+        @endif
+        @endif
     </div>
 </section>
 
@@ -919,6 +956,83 @@
 
 @push('scripts')
 <script>
+    // AJAX Pagination untuk Berita
+    const btnPrevBerita = document.getElementById('btnPrevBerita');
+    const btnNextBerita = document.getElementById('btnNextBerita');
+    const beritaGrid = document.getElementById('beritaGrid');
+    
+    if (btnNextBerita) {
+        btnNextBerita.addEventListener('click', function() {
+            const page = this.getAttribute('data-page');
+            loadBerita(page);
+        });
+    }
+
+    if (btnPrevBerita) {
+        btnPrevBerita.addEventListener('click', function() {
+            const page = this.getAttribute('data-page');
+            if (page && page > 0) {
+                loadBerita(page);
+            }
+        });
+    }
+
+    function loadBerita(page) {
+        // Tampilkan loading state sederhana
+        beritaGrid.style.opacity = '0.5';
+        
+        fetch(`{{ route('api.berita.paginate') }}?page=${page}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.html) {
+                beritaGrid.innerHTML = data.html;
+                
+                // Trigger animasi masuk
+                setTimeout(() => {
+                    beritaGrid.style.opacity = '1';
+                    const newCards = beritaGrid.querySelectorAll('.ajax-art-card');
+                    newCards.forEach((card, index) => {
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0)';
+                        }, index * 100);
+                    });
+                }, 50);
+
+                // Update tombol pagination
+                if (data.current_page > 1) {
+                    btnPrevBerita.removeAttribute('disabled');
+                    btnPrevBerita.style.cursor = 'pointer';
+                    btnPrevBerita.style.opacity = '1';
+                    btnPrevBerita.setAttribute('data-page', data.current_page - 1);
+                } else {
+                    btnPrevBerita.setAttribute('disabled', 'disabled');
+                    btnPrevBerita.style.cursor = 'not-allowed';
+                    btnPrevBerita.style.opacity = '0.5';
+                }
+
+                if (data.has_more) {
+                    btnNextBerita.removeAttribute('disabled');
+                    btnNextBerita.style.cursor = 'pointer';
+                    btnNextBerita.style.opacity = '1';
+                    btnNextBerita.setAttribute('data-page', data.current_page + 1);
+                } else {
+                    btnNextBerita.setAttribute('disabled', 'disabled');
+                    btnNextBerita.style.cursor = 'not-allowed';
+                    btnNextBerita.style.opacity = '0.5';
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching berita:', error);
+            beritaGrid.style.opacity = '1';
+        });
+    }
+
     // Tab Apresiasi (Penghargaan vs Ultah)
     const apreTabs = document.querySelectorAll('.apresiasi-tab');
     const aprePanes = document.querySelectorAll('.apresiasi-pane');

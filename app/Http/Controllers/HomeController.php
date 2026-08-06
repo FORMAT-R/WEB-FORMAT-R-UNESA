@@ -9,6 +9,7 @@ use App\Models\News;
 use App\Models\BestOfficer;
 use App\Models\Birthday;
 use Illuminate\Support\Carbon;
+use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -20,7 +21,7 @@ class HomeController extends Controller
             ['value' => 30,  'label' => 'Program Kerja', 'suffix' => '+'],
         ];
 
-        $berita = News::with('author')->where('status', 'published')->latest()->take(3)->get();
+        $berita = News::with('author')->where('status', 'published')->latest()->paginate(3);
 
         $arsip = Event::where('status', 'completed')->latest('end_date')->take(4)->get();
 
@@ -98,5 +99,58 @@ class HomeController extends Controller
     {
         $arsip = Event::where('status', 'completed')->latest('end_date')->get();
         return view('arsip', compact('arsip'));
+    }
+
+    public function apiBeritaPaginate(Request $request)
+    {
+        $berita = News::with('author')
+            ->where('status', 'published')
+            ->latest()
+            ->paginate(3);
+
+        $html = '';
+        foreach ($berita as $b) {
+            $date = $b->published_at ? \Carbon\Carbon::parse($b->published_at)->translatedFormat('d M Y') : $b->created_at->translatedFormat('d M Y');
+            $imageHtml = '';
+            
+            if ($b->image) {
+                $imageUrl = \Storage::url($b->image);
+                $imageHtml = '<div class="art-thumb" style="height:200px; background-image:url('.$imageUrl.'); background-size:cover; background-position:center;"></div>';
+            } else {
+                $imageHtml = '<div class="art-thumb" style="height:200px; background-color: var(--surface-alt); display: flex; align-items: center; justify-content: center;">
+                                <svg style="width: 48px; height: 48px; color: var(--ink-soft); opacity: 0.5;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+                              </div>';
+            }
+
+            $excerpt = \Str::limit(strip_tags($b->content), 120);
+            $url = route('berita.show', $b->slug);
+
+            $html .= '
+            <a href="'.$url.'" style="text-decoration:none; color:inherit; display:block; height:100%; opacity:0; transform:translateY(20px); transition:all 0.5s ease;" class="ajax-art-card">
+                <article class="art-card" style="display:flex; flex-direction:column; height:100%;">
+                    '.$imageHtml.'
+                    <div class="art-body" style="padding:20px; flex:1; display:flex; flex-direction:column;">
+                        <div style="font-size: 0.8rem; color: var(--ink-soft); margin-bottom: 8px; font-weight: 500; letter-spacing: 0.5px;">
+                            '.$date.'
+                        </div>
+                        <h4 style="margin:0 0 10px 0; font-size:1.15rem; line-height: 1.4;">'.$b->title.'</h4>
+                        <p style="font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 0; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; flex: 1;">
+                            '.$excerpt.'
+                        </p>
+                        <div style="margin-top: 16px; font-size: 0.85rem; font-weight: 600; color: var(--blue); display: flex; align-items: center; gap: 4px;">
+                            Baca Selengkapnya
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                        </div>
+                    </div>
+                </article>
+            </a>';
+        }
+
+        return response()->json([
+            'html' => $html,
+            'has_more' => $berita->hasMorePages(),
+            'current_page' => $berita->currentPage(),
+            'last_page' => $berita->lastPage(),
+        ]);
     }
 }

@@ -87,7 +87,7 @@ trait ImageUploadTrait
     }
 
     /**
-     * Remove background from an image using python rembg, convert to WebP, and return the path.
+     * Remove background from an image using python rembg OR Remove.bg API, convert to WebP, and return the path.
      *
      * @param string $sourcePath Path of the local original file relative to storage/app/public
      * @param string $directory Target directory relative to storage/app/public
@@ -111,21 +111,62 @@ trait ImageUploadTrait
             mkdir($targetDir, 0755, true);
         }
 
-        // Simpan sementara sebagai PNG (karena rembg outputnya PNG transparent)
+        // Simpan sementara sebagai PNG
         $tempPngPath = sys_get_temp_dir() . '/' . Str::random(20) . '_temp.png';
 
-        // Panggil command python rembg
-        // Jalankan via cmd rembg langsung
-        $command = "rembg i " . escapeshellarg($absSource) . " " . escapeshellarg($tempPngPath) . " 2>&1";
+        // --- Coba gunakan Multi-Key Remove.bg API ---
+        $keys = [
+            env('REMOVE_BG_KEY_1'),
+            env('REMOVE_BG_KEY_2'),
+            env('REMOVE_BG_KEY_3'),
+        ];
         
-        // Memaksa menaikkan batasan limit PHP di dalam trait saat proses background jalan
-        set_time_limit(1800); // 30 menit
+        $keys = array_filter($keys); // Hapus key yang kosong
+        $apiSuccess = false;
 
-        exec($command, $output, $returnVar);
+        if (!empty($keys)) {
+            foreach ($keys as $key) {
+                $ch = curl_init();
+                curl_setopt_array($ch, [
+                    CURLOPT_URL => "https://api.remove.bg/v1.0/removebg",
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_POST => true,
+                    CURLOPT_HTTPHEADER => [
+                        "X-Api-Key: " . $key
+                    ],
+                    CURLOPT_POSTFIELDS => [
+                        'image_file' => new \CURLFile($absSource),
+                        'size' => 'auto'
+                    ],
+                ]);
 
-        if ($returnVar !== 0 || !file_exists($tempPngPath)) {
-            \Log::error("Rembg failed: " . implode("\n", $output));
-            return null;
+                $response = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+
+                if ($httpCode == 200) {
+                    file_put_contents($tempPngPath, $response);
+                    $apiSuccess = true;
+                    \Log::info("Remove.bg API success using a valid key.");
+                    break; // Berhenti mencari key jika sudah berhasil
+                } else {
+                    \Log::warning("Remove.bg API failed for a key. HTTP Code: $httpCode. Message: " . substr($response, 0, 100));
+                    // Jika 402/403 (kredit habis/invalid), loop akan lanjut ke key berikutnya
+                }
+            }
+        }
+
+        // --- Fallback ke Python Rembg Lokal jika API tidak disetel atau semua key gagal ---
+        if (!$apiSuccess) {
+            \Log::info("Falling back to local Python rembg...");
+            $command = "rembg i " . escapeshellarg($absSource) . " " . escapeshellarg($tempPngPath) . " 2>&1";
+            set_time_limit(1800); // 30 menit
+            exec($command, $output, $returnVar);
+
+            if ($returnVar !== 0 || !file_exists($tempPngPath)) {
+                \Log::error("Local Rembg failed: " . implode("\n", $output));
+                return null;
+            }
         }
 
         // Convert the temporary PNG to WebP with transparency

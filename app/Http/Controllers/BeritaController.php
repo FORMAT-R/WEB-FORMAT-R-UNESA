@@ -8,6 +8,16 @@ use App\Models\News;
 
 class BeritaController extends Controller
 {
+    public function index()
+    {
+        $semuaBerita = News::with('author')
+            ->where('status', 'published')
+            ->latest()
+            ->paginate(9);
+
+        return view('berita.index', compact('semuaBerita'));
+    }
+
     public function show($slug)
     {
         $berita = News::with('author')

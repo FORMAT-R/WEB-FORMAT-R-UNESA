@@ -37,7 +37,9 @@ Route::get('/departemen', [DepartemenController::class, 'index'])->name('departe
 Route::get('/departemen/{slug}', [DepartemenController::class, 'show'])->name('departemen.show');
 
 // Berita
+Route::get('/berita', [BeritaController::class, 'index'])->name('berita.index');
 Route::get('/berita/{slug}', [BeritaController::class, 'show'])->name('berita.show');
+Route::get('/api/berita/paginate', [HomeController::class, 'apiBeritaPaginate'])->name('api.berita.paginate');
 
 // Event
 Route::get('/event', [EventController::class, 'index'])->name('event.index');
