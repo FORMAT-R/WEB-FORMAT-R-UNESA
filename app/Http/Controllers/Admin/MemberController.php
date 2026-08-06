@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Member;
+use App\Jobs\ProcessMemberPhotoBackground;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -24,13 +25,22 @@ class MemberController extends Controller
             'photo' => 'nullable|image|max:10240',
         ]);
 
+        $hasNewPhoto = false;
+
         if ($request->hasFile('photo')) {
             $validated['photo'] = $this->uploadImageWebp($request->file('photo'), 'members');
+            $hasNewPhoto = true;
         }
 
-        Member::create($validated);
+        $member = Member::create($validated);
 
-        return redirect()->route('admin.departemen.show', $request->department_id)->with('success', 'Anggota berhasil ditambahkan.');
+        if ($hasNewPhoto) {
+            // Jalankan remove background di background task via Queue
+            ProcessMemberPhotoBackground::dispatch($member->id);
+        }
+
+        return redirect()->route('admin.departemen.show', $request->department_id)
+            ->with('success', 'Anggota berhasil ditambahkan. Foto sedang diproses AI di latar belakang.');
     }
 
     /**
@@ -48,16 +58,31 @@ class MemberController extends Controller
             'photo' => 'nullable|image|max:10240',
         ]);
 
+        $hasNewPhoto = false;
+
         if ($request->hasFile('photo')) {
             if ($member->photo) {
                 Storage::disk('public')->delete($member->photo);
             }
+            if ($member->photo_nobg) {
+                Storage::disk('public')->delete($member->photo_nobg);
+            }
+            
+            // Set ke null sementara saat diupdate sebelum di-generate baru oleh Queue
+            $validated['photo_nobg'] = null;
             $validated['photo'] = $this->uploadImageWebp($request->file('photo'), 'members');
+            $hasNewPhoto = true;
         }
 
         $member->update($validated);
 
-        return redirect()->route('admin.departemen.show', $request->department_id)->with('success', 'Anggota berhasil diperbarui.');
+        if ($hasNewPhoto) {
+            // Jalankan remove background di background task via Queue
+            ProcessMemberPhotoBackground::dispatch($member->id);
+        }
+
+        return redirect()->route('admin.departemen.show', $request->department_id)
+            ->with('success', 'Anggota berhasil diperbarui. Foto sedang diproses AI di latar belakang.');
     }
 
     /**
@@ -70,6 +95,9 @@ class MemberController extends Controller
         
         if ($member->photo) {
             Storage::disk('public')->delete($member->photo);
+        }
+        if ($member->photo_nobg) {
+            Storage::disk('public')->delete($member->photo_nobg);
         }
         $member->delete();
 

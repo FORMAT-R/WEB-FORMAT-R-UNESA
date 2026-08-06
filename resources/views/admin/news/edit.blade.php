@@ -131,9 +131,9 @@
       </div>
 
       <div class="issue-bar">
-        <span>FORMAT-R UNESA</span>
+        <span>Forum Mahasiswa Tuban Ronggolawe</span>
         <span class="text-red-600 font-bold tracking-wider">MODE EDITING</span>
-        <span>EDISI SPESIAL</span>
+        <span>Kolaborasi Asa</span>
       </div>
 
       <div class="main-grid">

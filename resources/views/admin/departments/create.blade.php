@@ -99,6 +99,63 @@
             </div>
         </section>
 
+        <!-- Program Kerja Departemen -->
+        <section class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 sm:p-8" x-data="{
+            prokers: [{ id: Date.now(), no: '01', name: '', description: '' }],
+            addProker() {
+                const newNo = (this.prokers.length + 1).toString().padStart(2, '0');
+                this.prokers.push({ id: Date.now(), no: newNo, name: '', description: '' });
+            },
+            removeProker(index) {
+                if (this.prokers.length > 1) {
+                    this.prokers.splice(index, 1);
+                    // Re-number
+                    this.prokers.forEach((p, i) => {
+                        p.no = (i + 1).toString().padStart(2, '0');
+                    });
+                }
+            }
+        }">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Program Kerja Departemen</h2>
+                <button type="button" @click="addProker" class="inline-flex items-center justify-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-50 border border-transparent rounded-lg hover:bg-blue-100 dark:text-blue-300 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Tambah Proker
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <template x-for="(proker, index) in prokers" :key="proker.id">
+                    <div class="p-4 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 relative">
+                        <div class="absolute top-4 right-4">
+                            <button type="button" @click="removeProker(index)" x-show="prokers.length > 1" class="text-red-500 hover:text-red-700 p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors" title="Hapus Proker">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 gap-4 pr-8">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-10 flex items-center justify-center bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-bold text-gray-500 dark:text-gray-400" x-text="proker.no"></div>
+                                <input type="hidden" :name="`prokers[${index}][no]`" :value="proker.no">
+                                
+                                <div class="flex-1">
+                                    <input type="text" :name="`prokers[${index}][name]`" x-model="proker.name" required
+                                        class="w-full rounded-lg border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                                        placeholder="Nama Program Kerja">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <textarea :name="`prokers[${index}][description]`" x-model="proker.description" rows="2"
+                                    class="w-full rounded-lg border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                                    placeholder="Deskripsi singkat..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </section>
+
         <!-- Actions -->
         <div class="flex items-center justify-end gap-4">
             <button type="button" @click="window.location.href = '{{ route('admin.departemen.index') }}'"

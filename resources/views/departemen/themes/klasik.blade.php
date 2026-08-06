@@ -1,34 +1,49 @@
 @php
-  if(isset($dept['bg_pattern']) && str_contains($dept['bg_pattern'], 'linear-gradient(var(--mat-green-line)')) {
-      $themePattern = 'radial-gradient(circle at center, rgba(76,47,122,0.1) 0%, transparent 70%), linear-gradient(135deg, var(--mat-green), #1a251e)';
+  // Deteksi font: jika bg_pattern mengandung mat-green (BPH default), pakai Caveat, sisanya Inter
+  $isCaveatTheme = isset($dept['theme']) && !isset($dept['bg_pattern']);
+
+  $themePattern = $dept['bg_pattern']
+      ?? 'linear-gradient(var(--mat-green-line) 1px, transparent 1px), linear-gradient(90deg, var(--mat-green-line) 1px, transparent 1px)';
+
+  // Ukuran background: deteksi otomatis berdasarkan jenis pattern
+  if (str_contains($themePattern, 'radial-gradient(var(--mat-green-line) 2px')) {
+      $themeBgSize = '28px 28px'; // dot grid
+  } elseif (str_contains($themePattern, 'repeating-radial-gradient')) {
+      $themeBgSize = '40px 40px';
+  } elseif (str_contains($themePattern, 'repeating-linear-gradient(0deg') || str_contains($themePattern, 'repeating-linear-gradient(45deg')) {
+      $themeBgSize = 'auto';
+  } elseif (str_contains($themePattern, 'radial-gradient(circle at center')) {
       $themeBgSize = 'cover';
-      $themeFontUrl = "https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap";
-      $themeHeadingFont = "'Caveat', cursive";
-      $ornamentsIcons = ['★'];
-      $isLucide = false;
   } else {
-      $themePattern = $dept['bg_pattern'] ?? 'linear-gradient(var(--mat-green-line) 1px, transparent 1px), linear-gradient(90deg, var(--mat-green-line) 1px, transparent 1px)';
-      $themeBgSize = '30px 30px';
-      $themeFontUrl = "https://fonts.googleapis.com/css2?family=Inter:wght@600;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap";
-      $themeHeadingFont = "'Inter', sans-serif";
-      $ornamentsIcons = ['camera', 'code', 'monitor-play', 'pen-tool', 'video'];
-      $isLucide = true;
+      // Cek manual jika grid dari BPH
+      if (str_contains(strtolower($dept['singkatan'] ?? $dept['nama']), 'bph')) {
+          $themeBgSize = '30px 30px'; // default grid BPH
+      } else {
+          $themeBgSize = '45px 45px'; // grid khusus departemen lain seperti POSDM
+      }
   }
+
+  // Khusus KOMINFO dan departemen lain yang sudah punya pola grid dengan warna yang berbeda,
+  // biar tidak timpa-timpa, kita pastikan pattern originalnya yang dipakai tanpa dimodifikasi oleh if dibawahnya.
   
+  // Font heading: semua departemen pakai Inter kecuali jika bg_pattern kosong (BPH default)
+  $themeFontUrl  = "https://fonts.googleapis.com/css2?family=Inter:wght@600;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap";
+  $themeHeadingFont = "'Inter', sans-serif";
+
   $scatterPositions = [
-      ['top' => '5%', 'left' => '6%', 'size' => '80px', 'rotate' => '-15deg'],
-      ['top' => '12%', 'right' => '8%', 'size' => '110px', 'rotate' => '22deg'],
-      ['top' => '20%', 'left' => '15%', 'size' => '60px', 'rotate' => '45deg'],
-      ['top' => '28%', 'right' => '4%', 'size' => '90px', 'rotate' => '-10deg'],
-      ['top' => '36%', 'left' => '8%', 'size' => '120px', 'rotate' => '15deg'],
-      ['top' => '44%', 'right' => '12%', 'size' => '70px', 'rotate' => '-30deg'],
-      ['top' => '52%', 'left' => '4%', 'size' => '100px', 'rotate' => '10deg'],
-      ['top' => '60%', 'right' => '6%', 'size' => '80px', 'rotate' => '-20deg'],
-      ['top' => '68%', 'left' => '12%', 'size' => '110px', 'rotate' => '25deg'],
-      ['top' => '76%', 'right' => '4%', 'size' => '90px', 'rotate' => '-15deg'],
-      ['top' => '84%', 'left' => '6%', 'size' => '75px', 'rotate' => '35deg'],
+      ['top' => '5%',  'left'  => '6%',  'size' => '80px',  'rotate' => '-15deg'],
+      ['top' => '12%', 'right' => '8%',  'size' => '110px', 'rotate' => '22deg'],
+      ['top' => '20%', 'left'  => '15%', 'size' => '60px',  'rotate' => '45deg'],
+      ['top' => '28%', 'right' => '4%',  'size' => '90px',  'rotate' => '-10deg'],
+      ['top' => '36%', 'left'  => '8%',  'size' => '120px', 'rotate' => '15deg'],
+      ['top' => '44%', 'right' => '12%', 'size' => '70px',  'rotate' => '-30deg'],
+      ['top' => '52%', 'left'  => '4%',  'size' => '100px', 'rotate' => '10deg'],
+      ['top' => '60%', 'right' => '6%',  'size' => '80px',  'rotate' => '-20deg'],
+      ['top' => '68%', 'left'  => '12%', 'size' => '110px', 'rotate' => '25deg'],
+      ['top' => '76%', 'right' => '4%',  'size' => '90px',  'rotate' => '-15deg'],
+      ['top' => '84%', 'left'  => '6%',  'size' => '75px',  'rotate' => '35deg'],
       ['top' => '92%', 'right' => '10%', 'size' => '130px', 'rotate' => '-10deg'],
-      ['top' => '97%', 'left' => '14%', 'size' => '85px', 'rotate' => '15deg'],
+      ['top' => '97%', 'left'  => '14%', 'size' => '85px',  'rotate' => '15deg'],
   ];
 @endphp
 
@@ -41,6 +56,11 @@
 
 @section('theme-styles')
 <style>
+  /* Pastikan parent / body mendukung absolute dari ujung atas sampai ujung bawah */
+  html, body {
+    position: relative; 
+  }
+  
   :root {
     --mat-green: {{ $dept['theme']['mat-green'] ?? '#28362b' }};
     --mat-green-line: {{ $dept['theme']['mat-green-line'] ?? '#33452f' }};
@@ -55,6 +75,7 @@
     background: var(--mat-green) !important;
     background-image: {!! $themePattern !!} !important;
     background-size: {!! $themeBgSize !!} !important;
+    background-attachment: fixed !important;
     font-family: 'Space Grotesk', sans-serif !important;
     color: var(--cream) !important;
   }
@@ -71,7 +92,7 @@
   
   /* Shared: ribbon */
   
-  .global-ornaments-wrapper {
+  .global-ornaments-wrapper-old {
     position: absolute; top: 0; left: 0; right: 0; bottom: 0;
     overflow: hidden; z-index: 0; pointer-events: none;
   }
@@ -103,7 +124,7 @@
   .hero {
     position: relative; min-height: 92vh;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; padding: 60px 6vw 80px; overflow: hidden;
+    text-align: center; padding: 60px 6vw 80px;
   }
   .hero::before {
     content: ""; position: absolute; inset: 0;
@@ -112,12 +133,35 @@
     pointer-events: none;
   }
   
-  /* Floating Ornaments */
+  /* Floating Ornaments — absolute, menempel pada body sehingga bergeser saat discroll */
+  .global-ornaments-wrapper {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 1; pointer-events: none;
+    overflow: hidden;
+  }
+  .dept-ornament-global {
+    position: absolute;
+    color: var(--gold);
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 1; /* Pastikan di belakang card yang z-index: 15 */
+    transition: opacity 0.3s;
+    width: 150px; height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .dept-ornament-global svg {
+    width: 100%; height: 100%;
+    max-width: 90px; max-height: 90px;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
+  }
+  /* Ornament lama di hero — tetap didukung */
   .dept-ornament {
     position: absolute;
     width: 60px; height: 60px;
     color: var(--gold);
-    opacity: 0.15; /* semi transparan menyatu dengan background */
+    opacity: 0.15;
     pointer-events: none;
     z-index: 0;
   }
@@ -183,7 +227,8 @@
   }
 
   /* SECTION SHELL */
-  section { position: relative; padding: 100px 6vw; }
+  section { position: relative; padding: 100px 6vw; z-index: 10; pointer-events: none; }
+  section > * { pointer-events: auto; } /* Kembalikan event klik untuk konten dalam section */
   .section-head { display: flex; align-items: center; gap: 18px; margin-bottom: 56px; flex-wrap: wrap; }
   .section-head .ribbon { font-family: 'Caveat', cursive; font-size: 2rem; font-weight: 700; }
   .section-head .rule { flex: 1; height: 0; border-top: 2px dashed rgba(244,236,216,0.35); min-width: 80px; }
@@ -193,6 +238,7 @@
   .cardstock {
     background: var(--cream); color: var(--ink); padding: 38px 34px; position: relative;
     box-shadow: 0 16px 30px rgba(0,0,0,0.35); transform: rotate(-1deg);
+    z-index: 15;
   }
   .cardstock::before {
     content: ""; position: absolute; top: -14px; left: 36px; width: 70px; height: 26px;
@@ -217,6 +263,7 @@
   .proker-card {
     background: var(--navy-light); border: 2px solid var(--gold); padding: 22px 22px 8px;
     color: var(--cream); transform: rotate(1.5deg); box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    z-index: 15;
   }
   .proker-card .id-title {
     color: var(--gold); letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.68rem;
@@ -232,6 +279,102 @@
   .proker-item .proker-body .proker-name { font-weight: 600; font-size: 0.85rem; color: var(--white-tape); }
   .proker-item .proker-body .proker-desc { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--cream-dark); margin-top: 3px; line-height: 1.5; }
 
+  /* SOROTAN (spotlight card besar) */
+  .spotlight-card {
+    position: relative; display: flex; align-items: stretch; gap: 0;
+    max-width: 900px; margin: 0 auto;
+    z-index: 15;
+    min-height: 250px;
+    align-items: flex-end; /* Memastikan konten bersandar di bawah */
+  }
+  
+  /* Pseudo-elemen sebagai background card yang memiliki radius */
+  .spotlight-card::before {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0;
+    height: 250px; /* Tinggi dikunci 250px di bawah, agar atasnya bolong (pop out) */
+    background: linear-gradient(120deg, var(--cream) 0%, var(--cream-dark) 100%);
+    border-radius: 22px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+    z-index: -1;
+  }
+  .spotlight-left {
+    flex: 1.1; padding: 24px 36px; display: flex; flex-direction: column; justify-content: center;
+    gap: 6px; z-index: 2; color: var(--ink);
+    height: 250px; /* Selaras dengan background kotak */
+  }
+  .spotlight-left .eyebrow-tape { margin-bottom: 18px; }
+  .spotlight-nama {
+    font-family: {!! $themeHeadingFont !!}; font-size: 1.9rem; font-weight: 700;
+    color: var(--purple-dark); transition: opacity 0.2s ease;
+  }
+  .spotlight-jabatan {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--blue-dark); font-weight: 600; transition: opacity 0.2s ease;
+  }
+  .spotlight-desc { font-size: 0.88rem; line-height: 1.7; color: #4a3f30; max-width: 320px; margin-top: 6px; }
+  .spotlight-btn {
+    margin-top: 16px; align-self: flex-start; border: none; background: var(--navy); color: var(--cream);
+    font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 10px 20px; border-radius: 999px; cursor: pointer; transition: transform 0.15s ease, background 0.2s ease;
+  }
+  .spotlight-btn:hover { background: var(--purple-dark); transform: translateY(-2px); }
+  .spotlight-right {
+    flex: 1.2; position: relative; display: flex; align-items: flex-end; justify-content: center;
+    padding: 0 24px 0;
+    /* Dihapus min-height pada kontainer kanan agar ia mengikuti tinggi gambar yang lebih besar */
+  }
+  .spotlight-orang {
+    position: relative; width: 240px; flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s ease;
+    transform-origin: bottom center; /* Penting untuk pop-out dari bawah */
+    margin-bottom: -1px; /* Rata bawah */
+  }
+  .spotlight-orang:hover { transform: translateY(-10px) scale(1.05); z-index: 20 !important; opacity: 1 !important; }
+  /* so-1: kiri */
+  .so-1 { margin-right: -80px; z-index: 2; opacity: 0.80; }
+  /* so-2: tengah / depan */
+  .so-2 { z-index: 10; }
+  /* so-3: kanan */
+  .so-3 { margin-left: -80px; z-index: 2; opacity: 0.80; }
+  /* Untuk grup 2 orang: keduanya sejajar tanpa overlap */
+  .spotlight-group.group-2 .so-1 { margin-right: 0; opacity: 1; }
+  .spotlight-group.group-2 .so-2 { z-index: 2; }
+
+  .spotlight-foto {
+    width: 250px; height: 420px;
+    object-fit: cover; object-position: top center; display: block;
+    filter: drop-shadow(0 15px 20px rgba(0,0,0,0.4));
+    transition: all 0.3s ease;
+    margin-bottom: 0;
+  }
+  .spotlight-orang.active { transform: translateY(-5px) scale(1.08); z-index: 25 !important; opacity: 1 !important; }
+  .spotlight-orang.active .spotlight-foto {
+    filter: drop-shadow(0 0 15px rgba(212,175,55,0.70)) drop-shadow(0 18px 25px rgba(0,0,0,0.45));
+  }
+  .spotlight-svg-fallback {
+    width: 250px; height: 420px; display: block;
+    filter: drop-shadow(0 10px 18px rgba(0,0,0,0.32));
+  }
+  .sp-fb-1 .kepala, .sp-fb-1 .badan { fill: var(--blue); }
+  .sp-fb-1 .rambut { fill: var(--navy); }
+  .sp-fb-2 .kepala, .sp-fb-2 .badan { fill: var(--gold); }
+  .sp-fb-2 .rambut { fill: var(--purple-dark); }
+  .sp-fb-3 .kepala, .sp-fb-3 .badan { fill: var(--purple); }
+  .sp-fb-3 .rambut { fill: var(--navy-light); }
+  .sp-fb-bayangan { fill: rgba(0,0,0,0.12); }
+  .spotlight-badge { display: none; } /* Badge dihilangkan sesuai request */
+
+  /* Multi-stack connector */
+  .sorotan-multi-stack {
+    display: flex; flex-direction: column; align-items: stretch; gap: 120px; /* Diperbesar agar ada ruang kosong untuk foto pop-out */
+    max-width: 900px; margin: 0 auto;
+    padding-top: 50px; /* Beri ruang pop-out untuk card baris pertama */
+  }
+  .spotlight-card-multi { margin: 0; }
+
+
   /* STRUCTURE */
   .org-tree { display: flex; flex-direction: column; align-items: center; gap: 0; }
   .org-node {
@@ -239,6 +382,7 @@
     font-size: 0.85rem; padding: 14px 16px; box-shadow: 0 8px 16px rgba(0,0,0,0.3);
     position: relative; text-align: center; display: flex; flex-direction: column; align-items: center;
     width: 180px; min-height: 145px; box-sizing: border-box; justify-content: flex-start;
+    z-index: 15;
   }
   .org-node .org-photo {
     position: relative; width: 56px; height: 56px; border-radius: 50%;
@@ -247,7 +391,7 @@
     border: 2px solid var(--gold); box-shadow: 0 4px 8px rgba(0,0,0,0.3); overflow: hidden;
     font-family: 'Space Grotesk', sans-serif; color: #fff; font-size: 18px; flex-shrink: 0;
   }
-  .org-node .org-photo img { width: 100%; height: 100%; object-fit: cover; }
+  .org-node .org-photo img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
   .org-node small {
     display: block; font-family: 'JetBrains Mono', monospace; font-weight: 400; font-size: 0.62rem;
     letter-spacing: 0.05em; color: var(--purple-dark); text-transform: uppercase; margin-bottom: 4px;
@@ -262,7 +406,10 @@
   .org-branch { display: flex; flex-direction: column; align-items: center; }
   .org-row3 { display: flex; gap: 20px; margin-top: 26px; flex-wrap: wrap; justify-content: center; }
   
-  .div-card { background: var(--navy-light); border: 1.5px dashed var(--gold); padding: 16px 20px; min-width: 170px; text-align: center; }
+  .div-card { 
+    background: var(--navy-light); border: 1.5px dashed var(--gold); padding: 16px 20px; 
+    min-width: 170px; text-align: center; position: relative; z-index: 15;
+  }
   .div-card.blue-accent { border-color: var(--blue); }
   .div-card.blue-accent .div-title { color: var(--blue); }
   .div-card .div-title { font-family: {!! $themeHeadingFont !!}; font-size: 1.35rem; color: var(--gold); font-weight: 600; }
@@ -282,6 +429,7 @@
     position: relative; background: var(--white-tape); border-radius: 22px;
     padding: 22px 20px 30px; box-shadow: 0 22px 40px rgba(0,0,0,0.42);
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 15; /* Diperkuat supaya card tidak tertembus ornament */
   }
   
   .team-card.shadow-card {
@@ -316,7 +464,7 @@
     position: relative; border-radius: 14px; overflow: hidden;
     background: linear-gradient(150deg, var(--navy), var(--purple-dark)); box-shadow: 0 6px 14px rgba(0,0,0,0.3);
   }
-  .avatar-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .avatar-tile img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
   .avatar-tile .init {
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 3rem; color: rgba(244,236,216,0.85);
@@ -346,6 +494,12 @@
     .about-wrap { grid-template-columns: 1fr; }
     .stamp { display: none; }
   }
+
+  @media (max-width: 720px) {
+    .spotlight-card { flex-direction: column; }
+    .spotlight-right { padding-top: 0; padding-bottom: 24px; }
+    .spotlight-desc { max-width: 100%; }
+  }
   @media (max-width: 560px) {
     .team-top-row { gap: 24px; }
     .team-top-row .team-card { width: 100%; max-width: 360px; min-width: unset; }
@@ -354,7 +508,76 @@
     .polaroid-stack { width: 280px; height: 280px; }
     .polaroid .frame-img { height: 180px; }
   }
+
 </style>
+@endsection
+
+@section('body-ornaments')
+@if(isset($dept['ornaments']) && count($dept['ornaments']) > 0)
+  <div class="global-ornaments-wrapper" style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; pointer-events: none; z-index: 1; overflow: hidden;">
+  @php
+    $ornaments = $dept['ornaments'];
+    $count = count($ornaments);
+    // Distribusi merata: kita pecah jadi array kiri dan kanan agar tidak menumpuk
+    // dan posisinya diset masuk ke area sedikit tengah agar kelihatan (bukan di ujung)
+    $totalPerSide = 8; // 8 di kiri, 8 di kanan (Total 16)
+  @endphp
+  
+  {{-- Tambahan Ekstra Khusus Bagian Atas (Hero Area) dengan Posisi Fix agar rapi dan proporsional --}}
+  @php
+    // Daftar koordinat (top, letak kiri/kanan, posisi X, rotasi, dan skala)
+    $heroPositions = [
+        ['top' => 3,  'side' => 'left',  'x' => 12, 'rotate' => -15, 'scale' => 1.0],
+        ['top' => 13, 'side' => 'left',  'x' => 5,  'rotate' => 20,  'scale' => 0.85],
+        ['top' => 8,  'side' => 'left',  'x' => 25, 'rotate' => 10,  'scale' => 1.1],
+        ['top' => 4,  'side' => 'right', 'x' => 10, 'rotate' => -20, 'scale' => 0.95],
+        ['top' => 14, 'side' => 'right', 'x' => 6,  'rotate' => 15,  'scale' => 1.0],
+        ['top' => 9,  'side' => 'right', 'x' => 24, 'rotate' => -10, 'scale' => 1.15],
+    ];
+  @endphp
+  
+  @foreach($heroPositions as $idx => $hp)
+    @php
+      $ornExtra = $ornaments[($idx + 3) % $count];
+      $sideStyle = $hp['side'] . ': ' . $hp['x'] . '%;';
+    @endphp
+    <div class="dept-ornament-global" style="top: {{ $hp['top'] }}%; {{ $sideStyle }} transform: rotate({{ $hp['rotate'] }}deg) scale({{ $hp['scale'] }});">
+      {!! $ornExtra['svg'] !!}
+    </div>
+  @endforeach
+
+  {{-- Distribusi Utama dari atas ke bawah --}}
+  @for($i = 0; $i < $totalPerSide; $i++)
+    {{-- Sisi Kiri --}}
+    @php
+      $ornLeft = $ornaments[($i * 2) % $count];
+      // Bagi tinggi halaman jadi 8 bagian, mulai dari 20% ke bawah (karena 0-18% sudah diisi khusus Hero)
+      $baseTopLeft = 20 + ($i * (75 / $totalPerSide)) + rand(1, 4); 
+      // Jarak dari pinggir kiri antara 3% sampai 15% (agar masuk ke wilayah yang terlihat)
+      $xPosLeft = rand(3, 15); 
+      $rotateLeft = rand(-45, 45);
+      $scaleLeft = rand(8, 12) / 10;
+    @endphp
+    <div class="dept-ornament-global" style="top: {{ $baseTopLeft }}%; left: {{ $xPosLeft }}%; transform: rotate({{ $rotateLeft }}deg) scale({{ $scaleLeft }});">
+      {!! $ornLeft['svg'] !!}
+    </div>
+
+    {{-- Sisi Kanan --}}
+    @php
+      $ornRight = $ornaments[($i * 2 + 1) % $count];
+      // Offset sedikit berbeda dari kiri agar terlihat asimetris
+      $baseTopRight = 20 + ($i * (75 / $totalPerSide)) + rand(3, 7);
+      // Jarak dari pinggir kanan
+      $xPosRight = rand(3, 15);
+      $rotateRight = rand(-45, 45);
+      $scaleRight = rand(8, 12) / 10;
+    @endphp
+    <div class="dept-ornament-global" style="top: {{ $baseTopRight }}%; right: {{ $xPosRight }}%; transform: rotate({{ $rotateRight }}deg) scale({{ $scaleRight }});">
+      {!! $ornRight['svg'] !!}
+    </div>
+  @endfor
+  </div>
+@endif
 @endsection
 
 @section('content')
@@ -368,15 +591,8 @@
 
 <!-- HERO -->
 <section class="hero">
-  
-  {{-- Render Floating Ornaments jika ada --}}
-  @if(isset($dept['ornaments']))
-    @foreach($dept['ornaments'] as $ornament)
-      <div class="dept-ornament" style="{!! $ornament['pos'] !!}">
-        {!! $ornament['svg'] !!}
-      </div>
-    @endforeach
-  @else
+
+  @if(!isset($dept['ornaments']))
     {{-- Default Bintang (fallback) --}}
     <span class="star" style="top:12%; left:10%;">★</span>
     <span class="star" style="top:70%; left:6%; animation-delay:1s;">★</span>
@@ -421,7 +637,7 @@
       <p>{{ $dept['deskripsi'] }}</p>
       <div class="stat-row">
         <div class="stat"><div class="num">{{ count($dept['anggota']) }}</div><div class="lbl">Anggota Aktif</div></div>
-        <div class="stat"><div class="num">{{ count($dept['divisi']) }}</div><div class="lbl">Divisi Kerja</div></div>
+        <div class="stat"><div class="num">{{ count($dept['proker']) }}</div><div class="lbl">Program Kerja</div></div>
         <div class="stat"><div class="num">{{ $dept['periode'] ?? '2026/2027' }}</div><div class="lbl">Periode Kepengurusan</div></div>
       </div>
     </div>
@@ -445,6 +661,188 @@
       </div>
     </div>
   </div>
+</section>
+
+<!-- SOROTAN (section baru, gaya kartu-tim.html) -->
+<section id="sorotan">
+  <div class="section-head">
+    <div class="ribbon">Sorotan Pengurus</div>
+    <div class="rule"></div>
+  </div>
+
+  @php
+    $allAnggota  = array_values($dept['anggota']);
+    $isBph       = stripos($dept['singkatan'] ?? '', 'BPH') !== false
+                || stripos($dept['nama']      ?? '', 'Badan Pengurus Harian') !== false;
+
+    $matchJabatan = function(string $jabatan, array $keywords): bool {
+        foreach ($keywords as $kw) {
+            if (stripos($jabatan, $kw) !== false) return true;
+        }
+        return false;
+    };
+
+    if ($isBph && count($allAnggota) > 0) {
+        /* ── BPH: kelompokkan berdasarkan hierarki jabatan ── */
+
+        // 1. Ketua Umum
+        $ketum   = collect($allAnggota)->first(fn($a) => $matchJabatan($a['jabatan'] ?? '', ['ketua umum']));
+        // 2. Wakil Ketua Umum
+        $waketum = collect($allAnggota)->first(fn($a) => $matchJabatan($a['jabatan'] ?? '', ['wakil ketua', 'waketum']));
+        // 3. Bendahara Umum
+        $bendum  = collect($allAnggota)->first(fn($a) => $matchJabatan($a['jabatan'] ?? '', ['bendahara umum']));
+        // 4. Sekretaris Umum
+        $sekum   = collect($allAnggota)->first(fn($a) => $matchJabatan($a['jabatan'] ?? '', ['sekretaris umum']));
+
+        // Kumpulkan yang sudah dipick
+        $picked  = array_filter([$ketum, $waketum, $bendum, $sekum]);
+        // Sisa anggota
+        $sisa    = array_values(array_filter($allAnggota, fn($a) => !in_array($a, $picked, true)));
+
+        // Baris 1: Ketum + Waketum (2 orang)
+        $group1 = array_values(array_filter([$ketum, $waketum]));
+        // Baris 2: Bendum + Sekum (2 orang)
+        $group2 = array_values(array_filter([$bendum, $sekum]));
+        // Baris 3+: sisa BPH per 2 orang
+        $sisaGroups = [];
+        foreach (array_chunk($sisa, 2) as $chunk) {
+            $sisaGroups[] = array_values($chunk);
+        }
+
+        $sorotanGroups = array_values(array_filter(
+            array_merge([$group1, $group2], $sisaGroups),
+            fn($g) => count($g) > 0
+        ));
+
+    } else {
+        /* ── Non-BPH: Ketua+Wakil di baris pertama, staf per 3 ── */
+        $ketuaEl = collect($allAnggota)->first(fn($a) => stripos($a['jabatan'] ?? '', 'ketua') !== false);
+        $wakilEl = collect($allAnggota)->first(fn($a) => stripos($a['jabatan'] ?? '', 'wakil') !== false);
+        $topPicked = array_filter([$ketuaEl, $wakilEl]);
+        $sisa    = array_values(array_filter($allAnggota, fn($a) => !in_array($a, $topPicked, true)));
+
+        $group1 = array_values(array_filter([$ketuaEl, $wakilEl]));
+        $sisaGroups = [];
+        foreach (array_chunk($sisa, 3) as $chunk) {
+            $sisaGroups[] = array_values($chunk);
+        }
+        $sorotanGroups = array_values(array_filter(
+            array_merge([$group1], $sisaGroups),
+            fn($g) => count($g) > 0
+        ));
+    }
+  @endphp
+
+  @if(count($sorotanGroups) > 0)
+  <div class="sorotan-multi-stack">
+    @foreach($sorotanGroups as $gIdx => $group)
+    @php
+      $cnt    = count($group);
+      // 2 orang: orang ke-0 aktif default; 3 orang: orang ke-1 (tengah) aktif default
+      $midIdx = ($cnt >= 3) ? 1 : 0;
+    <div class="sorotan-multi-connector">
+      <div class="sorotan-multi-line"></div>
+    </div>
+    @endif
+
+    <div class="spotlight-card spotlight-card-multi" id="spotlightCard-{{ $gIdx }}">
+      {{-- Panel kiri: info orang aktif --}}
+      <div class="spotlight-left">
+        <span class="eyebrow-tape">Kenali Kami</span>
+        <h3 class="spotlight-nama" id="spotlightNama-{{ $gIdx }}">{{ $defaultS['nama'] }}</h3>
+        <p class="spotlight-jabatan" id="spotlightJabatan-{{ $gIdx }}">{{ $defaultS['jabatan'] }}</p>
+        <p class="spotlight-desc">{{ $dept['deskripsi'] }}</p>
+      </div>
+
+      {{-- Panel kanan: foto-foto grup --}}
+      <div class="spotlight-right">
+        <div class="spotlight-group group-active{{ $cnt === 2 ? ' group-2' : '' }}"
+             style="display:flex; align-items:flex-end; justify-content:center; width:100%;">
+          @foreach($group as $pos => $s)
+          @php
+            $soPos   = $pos + 1;
+            $isMid   = ($pos === $midIdx);
+            $fbClass = 'sp-fb-' . $soPos;
+            $fotoUrl = !empty($s['foto_nobg']) 
+                ? (isset($s['is_db']) ? $s['foto_nobg'] : asset('images/'.$s['foto_nobg']))
+                : (!empty($s['foto']) ? (isset($s['is_db']) ? $s['foto'] : asset('images/'.$s['foto'])) : '');
+          @endphp
+          <div class="spotlight-orang so-{{ $soPos }}{{ $isMid ? ' active' : '' }}"
+               data-nama="{{ $s['nama'] }}"
+               data-jabatan="{{ $s['jabatan'] }}"
+               data-card="{{ $gIdx }}"
+               role="button" tabindex="0"
+               aria-label="Lihat profil {{ $s['nama'] }}">
+
+            @if($fotoUrl)
+              <img class="spotlight-foto"
+                   src="{{ $fotoUrl }}"
+                   alt="Foto {{ $s['nama'] }}"
+                   loading="lazy"
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <svg class="spotlight-svg-fallback {{ $fbClass }}" style="display:none;"
+                   viewBox="0 0 160 220" xmlns="http://www.w3.org/2000/svg">
+                <ellipse class="sp-fb-bayangan" cx="80" cy="210" rx="45" ry="8"/>
+                <path class="badan" d="M25 220 C25 150 40 120 80 120 C120 120 135 150 135 220 Z"/>
+                <circle class="kepala" cx="80" cy="80" r="42"/>
+                <path class="rambut" d="M38 80 C38 40 60 22 80 22 C100 22 122 40 122 80 C110 62 95 55 80 55 C65 55 50 62 38 80 Z"/>
+              </svg>
+            @else
+              <svg class="spotlight-svg-fallback {{ $fbClass }}"
+                   viewBox="0 0 160 220" xmlns="http://www.w3.org/2000/svg">
+                <ellipse class="sp-fb-bayangan" cx="80" cy="210" rx="45" ry="8"/>
+                <path class="badan" d="M25 220 C25 150 40 120 80 120 C120 120 135 150 135 220 Z"/>
+                <circle class="kepala" cx="80" cy="80" r="42"/>
+                <path class="rambut" d="M38 80 C38 40 60 22 80 22 C100 22 122 40 122 80 C110 62 95 55 80 55 C65 55 50 62 38 80 Z"/>
+              </svg>
+            @endif
+
+            <div class="spotlight-badge" style="display: none;">{{ Str::limit($s['nama'], 16) }}</div>
+          </div>
+          @endforeach
+        </div>
+      </div>
+    </div>
+    @endforeach
+  </div>
+
+  <script>
+  (function() {
+    /* ── Per-card: klik foto update panel kiri card yg sama ── */
+    document.querySelectorAll('.spotlight-card-multi').forEach(function(card) {
+      var cardId  = card.id.replace('spotlightCard-', '');
+      var namaEl  = document.getElementById('spotlightNama-'    + cardId);
+      var jabEl   = document.getElementById('spotlightJabatan-' + cardId);
+      var oranEl  = card.querySelectorAll('.spotlight-orang');
+
+      if (!namaEl || !jabEl) return;
+
+      function tampilkan(nama, jabatan) {
+        namaEl.style.opacity = 0;
+        jabEl.style.opacity  = 0;
+        setTimeout(function() {
+          namaEl.textContent = nama;
+          jabEl.textContent  = jabatan;
+          namaEl.style.opacity = 1;
+          jabEl.style.opacity  = 1;
+        }, 180);
+      }
+
+      oranEl.forEach(function(o) {
+        function activate() {
+          oranEl.forEach(function(x) { x.classList.remove('active'); });
+          o.classList.add('active');
+          tampilkan(o.getAttribute('data-nama'), o.getAttribute('data-jabatan'));
+        }
+        o.addEventListener('click', activate);
+        o.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+        });
+      });
+    });
+  })();
+  </script>
+  @endif
 </section>
 
 <!-- STRUKTUR -->
@@ -490,7 +888,8 @@
       <div class="org-branch">
         <div class="org-node">
           <div class="org-photo">
-            @if($ketua['foto']) <img src="{{ isset($ketua['is_db']) ? $ketua['foto'] : asset('images/'.$ketua['foto']) }}" alt="{{ $ketua['nama'] }}"> @else {{ getInitials($ketua['nama']) }} @endif
+            @php $fotoKetua = $ketua['foto_nobg'] ?? $ketua['foto']; @endphp
+            @if($fotoKetua) <img src="{{ isset($ketua['is_db']) ? $fotoKetua : asset('images/'.$fotoKetua) }}" alt="{{ $ketua['nama'] }}"> @else {{ getInitials($ketua['nama']) }} @endif
           </div>
           <small>{{ $ketua['jabatan'] }}</small><span class="nama">{{ $ketua['nama'] }}</span>
         </div>
@@ -504,7 +903,8 @@
       <div class="org-branch">
         <div class="org-node">
           <div class="org-photo">
-            @if($wakil['foto']) <img src="{{ isset($wakil['is_db']) ? $wakil['foto'] : asset('images/'.$wakil['foto']) }}" alt="{{ $wakil['nama'] }}"> @else {{ getInitials($wakil['nama']) }} @endif
+            @php $fotoWakil = $wakil['foto_nobg'] ?? $wakil['foto']; @endphp
+            @if($fotoWakil) <img src="{{ isset($wakil['is_db']) ? $fotoWakil : asset('images/'.$fotoWakil) }}" alt="{{ $wakil['nama'] }}"> @else {{ getInitials($wakil['nama']) }} @endif
           </div>
           <small>{{ $wakil['jabatan'] }}</small><span class="nama">{{ $wakil['nama'] }}</span>
         </div>
@@ -520,7 +920,8 @@
         <div class="org-branch">
           <div class="org-node">
             <div class="org-photo">
-              @if($l3['foto']) <img src="{{ isset($l3['is_db']) ? $l3['foto'] : asset('images/'.$l3['foto']) }}" alt="{{ $l3['nama'] }}"> @else {{ getInitials($l3['nama']) }} @endif
+              @php $fotoL3 = $l3['foto_nobg'] ?? $l3['foto']; @endphp
+              @if($fotoL3) <img src="{{ isset($l3['is_db']) ? $fotoL3 : asset('images/'.$fotoL3) }}" alt="{{ $l3['nama'] }}"> @else {{ getInitials($l3['nama']) }} @endif
             </div>
             <small>{{ $l3['jabatan'] }}</small><span class="nama">{{ $l3['nama'] }}</span>
           </div>
@@ -537,7 +938,8 @@
         <div class="org-branch">
           <div class="org-node">
             <div class="org-photo">
-              @if($l4['foto']) <img src="{{ isset($l4['is_db']) ? $l4['foto'] : asset('images/'.$l4['foto']) }}" alt="{{ $l4['nama'] }}"> @else {{ getInitials($l4['nama']) }} @endif
+              @php $fotoL4 = $l4['foto_nobg'] ?? $l4['foto']; @endphp
+              @if($fotoL4) <img src="{{ isset($l4['is_db']) ? $fotoL4 : asset('images/'.$fotoL4) }}" alt="{{ $l4['nama'] }}"> @else {{ getInitials($l4['nama']) }} @endif
             </div>
             <small>{{ $l4['jabatan'] }}</small><span class="nama">{{ $l4['nama'] }}</span>
           </div>
@@ -553,7 +955,8 @@
         <div class="org-branch">
             <div class="org-node">
             <div class="org-photo">
-                @if($o['foto']) <img src="{{ isset($o['is_db']) ? $o['foto'] : asset('images/'.$o['foto']) }}" alt="{{ $o['nama'] }}"> @else {{ getInitials($o['nama']) }} @endif
+                @php $fotoO = $o['foto_nobg'] ?? $o['foto']; @endphp
+                @if($fotoO) <img src="{{ isset($o['is_db']) ? $fotoO : asset('images/'.$fotoO) }}" alt="{{ $o['nama'] }}"> @else {{ getInitials($o['nama']) }} @endif
             </div>
             <small>{{ $o['jabatan'] }}</small><span class="nama">{{ $o['nama'] }}</span>
             </div>
@@ -562,14 +965,6 @@
     </div>
     @endif
 
-    <div class="org-row3" style="margin-top:26px;">
-      @foreach($dept['divisi'] as $idx => $div)
-      <div class="div-card {{ $idx % 2 != 0 ? 'blue-accent' : '' }}">
-        <div class="div-title">{{ $div['nama'] }}</div>
-        <div class="div-people">{!! implode('<br>', $div['anggota']) !!}</div>
-      </div>
-      @endforeach
-    </div>
   </div>
 </section>
 

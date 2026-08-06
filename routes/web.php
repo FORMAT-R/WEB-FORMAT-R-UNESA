@@ -19,13 +19,13 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 
 /*
 |--------------------------------------------------------------------------
-| FORMAT-R UNESA — Web Routes
+| FORMAT-R UNESA - Web Routes
 |--------------------------------------------------------------------------
 */
 
 /*
 |--------------------------------------------------------------------------
-| Public Routes
+| Frontend Routes (Public)
 |--------------------------------------------------------------------------
 */
 
@@ -121,40 +121,3 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('notifications/send', [App\Http\Controllers\Admin\NotificationController::class, 'send'])->name('notifications.send');
     });
 });
-
-/*
-|--------------------------------------------------------------------------
-| API Routes (for AJAX)
-|--------------------------------------------------------------------------
-*/
-// Route::prefix('api/admin')->middleware('auth:admin')->group(function () {
-//     Route::get('events/statistics', [AdminEventController::class, 'statistics']);
-//     Route::get('events/search', [AdminEventController::class, 'search']);
-//     Route::get('departemen/search', [AdminDepartemenController::class, 'search']);
-//     Route::get('users/search', [AdminUserController::class, 'search']);
-//     Route::post('upload/image', [App\Http\Controllers\Admin\UploadController::class, 'uploadImage']);
-//     Route::delete('upload/image', [App\Http\Controllers\Admin\UploadController::class, 'deleteImage']);
-// });
-
-/*
-|--------------------------------------------------------------------------
-| Frontend Routes (Public)
-|--------------------------------------------------------------------------
-*/
-
-// Beranda
-Route::get('/', [HomeController::class, 'index'])->name('home');
-
-// Departemen
-Route::get('/departemen', [DepartemenController::class, 'index'])->name('departemen.index');
-Route::get('/departemen/{slug}', [DepartemenController::class, 'show'])->name('departemen.show');
-
-// Berita
-Route::get('/berita/{slug}', [BeritaController::class, 'show'])->name('berita.show');
-
-// Event
-Route::get('/event', [EventController::class, 'index'])->name('event.index');
-Route::get('/event/{slug}', [EventController::class, 'show'])->name('event.show');
-
-// Apresiasi (Penghargaan & Ultah)
-Route::get('/apresiasi', [HomeController::class, 'apresiasi'])->name('apresiasi');

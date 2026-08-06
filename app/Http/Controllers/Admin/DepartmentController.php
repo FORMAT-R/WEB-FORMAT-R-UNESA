@@ -41,6 +41,10 @@ class DepartmentController extends Controller
             'image' => 'nullable|image|max:10240',
             'doc_image_1' => 'nullable|image|max:10240',
             'doc_image_2' => 'nullable|image|max:10240',
+            'prokers' => 'nullable|array',
+            'prokers.*.no' => 'required|string|max:10',
+            'prokers.*.name' => 'required|string|max:255',
+            'prokers.*.description' => 'nullable|string',
         ]);
 
         if ($request->hasFile('image')) {
@@ -55,7 +59,13 @@ class DepartmentController extends Controller
 
         $validated['slug'] = Str::slug($validated['name']);
 
-        Department::create($validated);
+        $department = Department::create($validated);
+
+        if (!empty($validated['prokers'])) {
+            foreach ($validated['prokers'] as $proker) {
+                $department->programs()->create($proker);
+            }
+        }
 
         return redirect()->route('admin.departemen.index')->with('success', 'Departemen berhasil ditambahkan.');
     }
@@ -107,6 +117,10 @@ class DepartmentController extends Controller
             'image' => 'nullable|image|max:10240',
             'doc_image_1' => 'nullable|image|max:10240',
             'doc_image_2' => 'nullable|image|max:10240',
+            'prokers' => 'nullable|array',
+            'prokers.*.no' => 'required|string|max:10',
+            'prokers.*.name' => 'required|string|max:255',
+            'prokers.*.description' => 'nullable|string',
         ]);
 
         if ($request->hasFile('image')) {
@@ -131,6 +145,14 @@ class DepartmentController extends Controller
         $validated['slug'] = Str::slug($validated['name']);
 
         $department->update($validated);
+
+        // Update Prokers
+        $department->programs()->delete(); // Hapus yang lama
+        if (!empty($validated['prokers'])) {
+            foreach ($validated['prokers'] as $proker) {
+                $department->programs()->create($proker);
+            }
+        }
 
         return redirect()->route('admin.departemen.index')->with('success', 'Departemen berhasil diperbarui.');
     }

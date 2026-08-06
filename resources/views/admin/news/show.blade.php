@@ -221,6 +221,53 @@
     .main-grid{grid-template-columns:1fr;}
     .body-columns{columns:1;}
   }
+
+  /* ===== DOWNLOAD TOOLBAR ===== */
+  .download-toolbar {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 999;
+  }
+  .dl-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    transition: transform .15s, box-shadow .15s, opacity .15s;
+  }
+  .dl-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.22);
+  }
+  .dl-btn:active { transform: translateY(0); }
+  .dl-btn-png { background: var(--ink); color: #fff; }
+  .dl-btn-pdf { background: var(--red); color: #fff; }
+  .dl-btn svg { flex-shrink: 0; }
+  .dl-btn.loading { opacity: .6; pointer-events: none; }
+  .dl-btn .spinner {
+    width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    display: none;
+  }
+  .dl-btn.loading .spinner { display: block; }
+  .dl-btn.loading .btn-icon { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -243,8 +290,8 @@
   </div>
 
   <div class="issue-bar" style="display:flex; justify-content:space-between;">
-    <span>FORMAT-R UNESA</span>
-    <span>ADMIN PREVIEW</span>
+    <span>Forum Mahasiswa Tuban Ronggolawe</span>
+    <span>Kolaborasi Asa</span>
   </div>
 
   <!-- MAIN GRID -->
@@ -344,5 +391,156 @@
   </footer>
 
 </div>
+
+<!-- ===== DOWNLOAD TOOLBAR ===== -->
+<div class="download-toolbar" id="downloadToolbar">
+  <button class="dl-btn dl-btn-png" id="btnPng" onclick="downloadAsPng()" title="Download sebagai PNG">
+    <span class="btn-icon">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21 15 16 10 5 21"/>
+      </svg>
+    </span>
+    <span class="spinner"></span>
+    Download PNG
+  </button>
+  <button class="dl-btn dl-btn-pdf" id="btnPdf" onclick="downloadAsPdf()" title="Download sebagai PDF">
+    <span class="btn-icon">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+        <polyline points="10 9 9 9 8 9"/>
+      </svg>
+    </span>
+    <span class="spinner"></span>
+    Download PDF
+  </button>
+</div>
+
+<!-- html2canvas + jsPDF CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  const FILENAME = '{{ Str::slug($berita->title ?? "berita-format") }}';
+
+  function getTarget() {
+    return document.querySelector('.page');
+  }
+
+  function setLoading(btnId, state) {
+    const btn = document.getElementById(btnId);
+    if (state) btn.classList.add('loading');
+    else btn.classList.remove('loading');
+  }
+
+  async function captureCanvas() {
+    const toolbar = document.getElementById('downloadToolbar');
+    toolbar.style.display = 'none';
+
+    // ── Drop-cap fix ──────────────────────────────────────────────────────────
+    // html2canvas tidak mendukung ::first-letter pseudo-element.
+    // Kita inject <span> nyata dengan inline styles sebelum capture,
+    // lalu restore innerHTML asli setelah selesai.
+    const firstPara = document.querySelector('.body-columns p:first-of-type');
+    let savedParaHTML = null;
+    let suppressStyle = null;
+
+    if (firstPara) {
+      savedParaHTML = firstPara.innerHTML;
+
+      // Cari posisi huruf pertama (lewati tag HTML pembuka jika ada)
+      const raw = firstPara.innerHTML;
+      const m = raw.match(/^(\s*(?:<[^>]+>\s*)*)([^\s<])/);
+      if (m) {
+        const prefix  = m[1];                   // tag-tag pembuka sebelum teks
+        const firstCh = m[2];                   // huruf pertama
+        const rest    = raw.slice(m[0].length); // sisa konten
+        const dropSpan =
+          '<span style="font-family:\'Playfair Display\',\'Times New Roman\',serif;' +
+          'font-size:46px;font-weight:900;float:left;line-height:0.82;' +
+          'padding:4px 6px 0 0;color:#a3272f;">' + firstCh + '</span>';
+        firstPara.innerHTML = prefix + dropSpan + rest;
+      }
+
+      // Matikan ::first-letter sementara agar tidak terjadi double-styling
+      suppressStyle = document.createElement('style');
+      suppressStyle.textContent =
+        '.body-columns p:first-of-type::first-letter{' +
+        'font-size:inherit!important;font-weight:inherit!important;' +
+        'float:none!important;line-height:inherit!important;' +
+        'padding:0!important;color:inherit!important;font-family:inherit!important}';
+      document.head.appendChild(suppressStyle);
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
+    const target = getTarget();
+    const canvas = await html2canvas(target, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#faf7ef',
+      logging: false,
+      scrollX: 0,
+      scrollY: 0,
+      windowWidth: target.scrollWidth,
+      windowHeight: target.scrollHeight,
+    });
+
+    // Restore drop-cap ke CSS pseudo-element (balikin tampilan browser normal)
+    if (firstPara && savedParaHTML !== null) {
+      firstPara.innerHTML = savedParaHTML;
+    }
+    if (suppressStyle) {
+      document.head.removeChild(suppressStyle);
+    }
+
+    toolbar.style.display = '';
+    return canvas;
+  }
+
+  async function downloadAsPng() {
+    setLoading('btnPng', true);
+    try {
+      const canvas = await captureCanvas();
+      const link = document.createElement('a');
+      link.download = FILENAME + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch(e) {
+      alert('Gagal mengunduh PNG. Coba lagi.');
+      console.error(e);
+    } finally {
+      setLoading('btnPng', false);
+    }
+  }
+
+  async function downloadAsPdf() {
+    setLoading('btnPdf', true);
+    try {
+      const canvas = await captureCanvas();
+      const imgData = canvas.toDataURL('image/png');
+      const { jsPDF } = window.jspdf;
+      const pxWidth  = canvas.width;
+      const pxHeight = canvas.height;
+      const mmWidth  = 210;
+      const mmHeight = (pxHeight / pxWidth) * mmWidth;
+      const pdf = new jsPDF({
+        orientation: mmHeight > mmWidth ? 'portrait' : 'landscape',
+        unit: 'mm',
+        format: [mmWidth, mmHeight],
+      });
+      pdf.addImage(imgData, 'PNG', 0, 0, mmWidth, mmHeight);
+      pdf.save(FILENAME + '.pdf');
+    } catch(e) {
+      alert('Gagal mengunduh PDF. Coba lagi.');
+      console.error(e);
+    } finally {
+      setLoading('btnPdf', false);
+    }
+  }
+</script>
 </body>
 </html>

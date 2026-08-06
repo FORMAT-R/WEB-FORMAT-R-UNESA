@@ -44,6 +44,24 @@ trait ImageUploadTrait
             }
         }
 
+        // Check EXIF data to fix rotation before any processing
+        if (in_array($extension, ['jpg', 'jpeg', 'tiff'])) {
+            $exif = @exif_read_data($path);
+            if (!empty($exif['Orientation'])) {
+                switch ($exif['Orientation']) {
+                    case 3:
+                        $image = imagerotate($image, 180, 0);
+                        break;
+                    case 6:
+                        $image = imagerotate($image, -90, 0);
+                        break;
+                    case 8:
+                        $image = imagerotate($image, 90, 0);
+                        break;
+                }
+            }
+        }
+
         // Jika GD gagal membaca file, gunakan mekanisme upload bawaan
         if (!$image) {
             return $file->store($directory, 'public');
@@ -66,5 +84,174 @@ trait ImageUploadTrait
         Storage::disk('public')->put($storePath, $imageContent);
 
         return $storePath;
+    }
+
+    /**
+     * Remove background from an image using python rembg, convert to WebP, and return the path.
+     *
+     * @param string $sourcePath Path of the local original file relative to storage/app/public
+     * @param string $directory Target directory relative to storage/app/public
+     * @return string|null Path to the saved image without background, or null on failure
+     */
+    public function removeBackgroundAndSaveWebp(string $sourcePath, string $directory): ?string
+    {
+        // Path absolut sumber
+        $absSource = Storage::disk('public')->path($sourcePath);
+        if (!file_exists($absSource)) {
+            return null;
+        }
+
+        $filename = Str::random(40) . '_nobg.webp';
+        $storePath = trim($directory, '/') . '/' . $filename;
+        $absTarget = Storage::disk('public')->path($storePath);
+
+        // Pastikan folder target ada
+        $targetDir = dirname($absTarget);
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0755, true);
+        }
+
+        // Simpan sementara sebagai PNG (karena rembg outputnya PNG transparent)
+        $tempPngPath = sys_get_temp_dir() . '/' . Str::random(20) . '_temp.png';
+
+        // Panggil command python rembg
+        // Jalankan via cmd rembg langsung
+        $command = "rembg i " . escapeshellarg($absSource) . " " . escapeshellarg($tempPngPath) . " 2>&1";
+        
+        // Memaksa menaikkan batasan limit PHP di dalam trait saat proses background jalan
+        set_time_limit(1800); // 30 menit
+
+        exec($command, $output, $returnVar);
+
+        if ($returnVar !== 0 || !file_exists($tempPngPath)) {
+            \Log::error("Rembg failed: " . implode("\n", $output));
+            return null;
+        }
+
+        // Convert the temporary PNG to WebP with transparency
+        $image = @imagecreatefrompng($tempPngPath);
+        if ($image) {
+            imagepalettetotruecolor($image);
+            imagealphablending($image, false); // false agar transparansi terjaga di GD saat disave ke webp
+            imagesavealpha($image, true);
+            
+            // Auto Crop (Trim) ruang kosong (transparan)
+            $croppedImage = $this->autoCropTransparent($image);
+            if ($croppedImage) {
+                imagedestroy($image);
+                $image = $croppedImage;
+            }
+
+            // Konversi ke webp di memori
+            ob_start();
+            imagewebp($image, null, 80);
+            $imageContent = ob_get_clean();
+            imagedestroy($image);
+            
+            @unlink($tempPngPath);
+
+            if ($imageContent) {
+                Storage::disk('public')->put($storePath, $imageContent);
+                return $storePath;
+            }
+        }
+        
+        @unlink($tempPngPath);
+        return null;
+    }
+
+    /**
+     * Auto crop an image to remove transparent boundaries.
+     * 
+     * @param \GdImage $image
+     * @return \GdImage|false Cropped image resource or false on failure
+     */
+    private function autoCropTransparent($image)
+    {
+        $width = imagesx($image);
+        $height = imagesy($image);
+
+        $top = 0;
+        $bottom = 0;
+        $left = 0;
+        $right = 0;
+
+        // Cari batas atas
+        for ($y = 0; $y < $height; $y++) {
+            for ($x = 0; $x < $width; $x++) {
+                $color = imagecolorat($image, $x, $y);
+                $alpha = ($color >> 24) & 0x7F;
+                if ($alpha < 127) { // 127 berarti transparan penuh
+                    $top = $y;
+                    break 2;
+                }
+            }
+        }
+
+        // Cari batas bawah
+        for ($y = $height - 1; $y >= 0; $y--) {
+            for ($x = 0; $x < $width; $x++) {
+                $color = imagecolorat($image, $x, $y);
+                $alpha = ($color >> 24) & 0x7F;
+                if ($alpha < 127) {
+                    $bottom = $y;
+                    break 2;
+                }
+            }
+        }
+
+        // Cari batas kiri
+        for ($x = 0; $x < $width; $x++) {
+            for ($y = $top; $y <= $bottom; $y++) {
+                $color = imagecolorat($image, $x, $y);
+                $alpha = ($color >> 24) & 0x7F;
+                if ($alpha < 127) {
+                    $left = $x;
+                    break 2;
+                }
+            }
+        }
+
+        // Cari batas kanan
+        for ($x = $width - 1; $x >= 0; $x--) {
+            for ($y = $top; $y <= $bottom; $y++) {
+                $color = imagecolorat($image, $x, $y);
+                $alpha = ($color >> 24) & 0x7F;
+                if ($alpha < 127) {
+                    $right = $x;
+                    break 2;
+                }
+            }
+        }
+
+        $newWidth = $right - $left + 1;
+        $newHeight = $bottom - $top + 1;
+
+        if ($newWidth <= 0 || $newHeight <= 0) {
+            return false;
+        }
+
+        // --- STANDARISASI RASIO UNTUK MEMBUANG KAKI (FULL BODY) ---
+        // Rasio wajar pas-foto setengah badan biasanya tinggi = lebar * 1.5. 
+        // Jika tinggi jauh melebihi itu, berarti ini kemungkinan foto seluruh badan.
+        // Kita akan paksa batas bawahnya naik (memotong bagian pinggang ke bawah).
+        $idealHeight = (int)($newWidth * 1.5);
+        if ($newHeight > $idealHeight) {
+            // Karena fokus kita mempertahankan kepala (top), kita potong sisa tinggi dari bawah
+            $newHeight = $idealHeight; 
+        }
+
+        // Lakukan crop
+        $croppedImage = imagecreatetruecolor($newWidth, $newHeight);
+        
+        // Pertahankan transparansi
+        imagealphablending($croppedImage, false);
+        imagesavealpha($croppedImage, true);
+        $transparent = imagecolorallocatealpha($croppedImage, 0, 0, 0, 127);
+        imagefill($croppedImage, 0, 0, $transparent);
+
+        imagecopy($croppedImage, $image, 0, 0, $left, $top, $newWidth, $newHeight);
+
+        return $croppedImage;
     }
 }
