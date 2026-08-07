@@ -601,10 +601,10 @@
       padding-bottom: 0px !important; 
     }
     #struktur {
-      margin-bottom: -320px !important; 
+      margin-bottom: -200px !important; /* Sesuaikan kembali margin ke -200px */
     }
     .org-tree {
-      transform: scale(0.38) !important; 
+      transform: scale(0.45) !important; /* Diturunkan dari 0.48 ke 0.45 sesuai request */
       transform-origin: top center !important;
       margin: 0 auto !important; 
       padding-bottom: 0 !important; 
