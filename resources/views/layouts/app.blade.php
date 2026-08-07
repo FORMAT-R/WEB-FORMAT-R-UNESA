@@ -7,6 +7,7 @@
     <meta name="description" content="@yield('description', 'Website Resmi FORMAT-R (Forum Mahasiswa Trunojoyo - Rantau) UNESA. Wadah silaturahmi, informasi, dan pengembangan diri mahasiswa rantau di Universitas Negeri Surabaya.')">
     <meta name="keywords" content="FORMAT-R, FORMAT-R UNESA, Mahasiswa Rantau UNESA, Forum Mahasiswa Trunojoyo, UNESA, Organisasi Mahasiswa UNESA, Berita Mahasiswa">
     <meta name="author" content="FORMAT-R UNESA">
+    <meta name="google-site-verification" content="un3u9nhJOS7PGtAUphZ9a1s4CyZzUUn14aixFHtyxVI" />
     <meta name="robots" content="index, follow">
 
     <!-- Open Graph (Facebook, WhatsApp, dll) -->
