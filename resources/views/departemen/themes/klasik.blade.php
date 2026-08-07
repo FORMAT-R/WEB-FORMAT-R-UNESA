@@ -520,154 +520,197 @@
   }
   
   @media (max-width: 560px) {
-    /* Perbaikan Hero area untuk mobile */
-    .hero {
-      align-items: center !important;
-      justify-content: center !important;
-      text-align: center !important;
-      padding: 60px 20px 80px !important; /* Kurangi padding kiri kanan */
-      width: 100vw !important;
-      max-width: 100vw !important;
-      box-sizing: border-box !important;
-      overflow: hidden !important;
-    }
+    /* MATIKAN SEMUA SKALA & GUNAKAN NATIVE FLEX/GRID DEMI KESTABILAN MOBILE */
     
-    .hero h1, .hero p, .hero .subtitle-ribbon {
+    /* 1. HERO - Paksa ke tengah & kecilkan font */
+    .hero {
+      padding: 60px 15px 40px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      text-align: center !important;
+    }
+    .hero h1 { font-size: 2rem !important; transform: none !important; margin: 0 auto !important; }
+    .hero .subtitle-ribbon { font-size: 1.2rem !important; margin: 10px auto !important; }
+    .hero p.lede { font-size: 0.85rem !important; margin: 15px auto !important; }
+    .emblem-wrap { max-width: 250px !important; margin: 20px auto 0 !important; }
+    
+    /* 2. PROFIL / TENTANG - Paksa ke tengah */
+    .about-wrap {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      text-align: center !important;
+      padding: 0 15px !important;
+    }
+    .tentang-isi {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
       text-align: center !important;
       width: 100% !important;
-      display: block !important;
-      margin-left: auto !important;
-      margin-right: auto !important;
     }
-    
-    .tentang-isi {
-      text-align: center !important;
-    }
-    .tentang-isi > div {
-      align-items: center !important;
-    }
-    .tentang-isi p, .tentang-isi h2, .tentang-isi .eyebrow-tape {
+    .tentang-isi h2, .tentang-isi p, .tentang-isi .eyebrow-tape {
       text-align: center !important;
       margin-left: auto !important;
       margin-right: auto !important;
     }
     
-    /* Mencegah flex-wrap pada elemen PC agar layout tidak ke bawah */
-    .org-row2 { flex-wrap: nowrap !important; }
-    .org-row3 { flex-wrap: nowrap !important; }
-    
+    /* 3. SOROTAN - Kembalikan ke layout PC/Laptop yang menyamping, tapi SANGAT KECIL */
+    .sorotan-multi-stack { gap: -20px !important; padding-top: 5px !important; display: flex !important; flex-direction: column !important; align-items: center !important; }
     .spotlight-card { 
-      transform: scale(0.65); 
-      margin-bottom: -100px;
+      transform: scale(0.4) !important; /* Dikecilkan sangat drastis (hanya 40% dari ukuran PC) */
+      transform-origin: top center !important;
+      margin: 0 auto -150px auto !important; /* Tarik naik ruang kosong akibat efek scale, dan paksa margin kiri-kanan auto */
+      flex-direction: row !important; /* Kembalikan ke format menyamping seperti PC */
+      padding: 24px 36px !important; /* Kembalikan padding asli */
+      height: 250px !important; min-height: 250px !important; /* Kembalikan tinggi asli PC */
+      width: 900px !important; max-width: 900px !important; /* Fix width agar posisinya stabil di tengah saat di scale */
+      left: 50% !important;
+      position: relative !important;
+      transform: translateX(-50%) scale(0.4) !important; /* Geser persis ke tengah lalu kecilkan */
     }
-    .sorotan-multi-stack {
-      gap: 10px;
+    .spotlight-card::before { height: 250px !important; border-radius: 22px !important; }
+    .spotlight-left { 
+      padding: 24px 36px !important; 
+      height: 250px !important; 
+      text-align: left !important; /* Kembalikan rata kiri (kiri Teks, kanan Foto) */
+      align-items: flex-start !important;
     }
+    .spotlight-nama { font-size: 1.9rem !important; } /* Kembalikan ukuran asli agar tidak terlalu buram saat di-scale */
+    .spotlight-jabatan { font-size: 0.78rem !important; }
+    .spotlight-desc { display: block !important; } /* Munculkan lagi deskripsinya */
+    .spotlight-right { padding: 0 !important; width: auto !important; flex: 1.2 !important; justify-content: center !important; }
+    .spotlight-orang { width: auto !important; margin: 0 !important; }
+    /* so-1: kiri */
+    .so-1 { margin-right: -80px !important; }
+    /* so-3: kanan */
+    .so-3 { margin-left: -80px !important; }
+    .spotlight-orang.active { width: auto !important; margin: 0 !important; }
+    .spotlight-foto, .spotlight-svg-fallback { width: 250px !important; height: 420px !important; } /* Kembalikan ukuran foto asli */
+    .spotlight-group { height: 100% !important; min-height: 100% !important; align-items: flex-end !important; }
     
-    /* Paksa Lebar Container Struktur agar muat 1 baris lalu kecilkan skalanya */
+    /* 4. STRUKTUR - Kecilkan ekstrim, paksa center lurus, matikan scroll x */
+    /* STRUKTUR ORGANISASI MOBILE */
     #struktur .container {
-      width: 100vw !important; /* Gunakan lebar layar */
-      max-width: 100vw !important;
-      position: relative;
-      left: 0;
-      margin-left: 0;
-      transform: none !important; /* Hapus scale ekstrem */
-      margin-bottom: 0 !important;
-      overflow-x: auto; /* Izinkan scroll ke samping jika masih kurang lebar */
+      width: 100vw !important; max-width: 100vw !important;
+      padding: 0 !important; margin: 0 !important;
+      overflow-x: hidden !important; overflow-y: hidden !important;
+      display: flex !important; justify-content: center !important;
+      align-items: center !important;
+      padding-bottom: 0px !important; 
+    }
+    #struktur {
+      margin-bottom: -320px !important; 
     }
     .org-tree {
-      transform: scale(0.65) !important; /* Kecilkan sewajarnya saja */
-      transform-origin: top center;
-      margin: 0 auto;
-      width: fit-content;
-      display: flex;
-      flex-direction: column;
-      align-items: center; /* Paksa ke tengah */
+      transform: scale(0.38) !important; 
+      transform-origin: top center !important;
+      margin: 0 auto !important; 
+      padding-bottom: 0 !important; 
+      width: auto !important;
+      display: flex !important;
+      flex-direction: column !important; /* PAstikan berurut dari atas ke bawah */
+      align-items: center !important;
     }
-    .org-children {
-      display: flex;
-      justify-content: center !important; /* Paksa ke tengah */
-      width: 100%;
-    }
+    .org-row-top { justify-content: center !important; }
     
-    /* KEMBALIKAN TIM KAMI MENJADI GRID KE BAWAH 2 KOLOM YANG BENAR-BENAR DI TENGAH */
-    .team-top-row { 
-        display: grid !important; 
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 8px !important;
-        width: 100% !important;
-        max-width: 100vw !important;
-        padding: 0 10px !important;
-        justify-content: center !important;
-        justify-items: center !important;
-        box-sizing: border-box !important;
+    /* KHUSUS DEPARTEMEN SELAIN BPH - JANGAN MEMANJANG KE BAWAH DI MOBILE */
+    .org-row-staff {
+      display: grid !important;
+      grid-template-columns: repeat(4, 1fr) !important; /* Paksa berjajar ke samping 4 kotak per baris */
+      justify-content: center !important;
+      justify-items: center !important;
+      gap: 15px !important; 
     }
-    .team-top-row .team-card { 
-        min-width: 0 !important; 
-        width: 100% !important; 
-        max-width: 160px !important; /* Maksimal agak wajar agar muat bersisian */
-        margin: 0 auto !important;
-        padding: 8px 4px !important;
-        box-sizing: border-box !important;
-    }
-    .team-grid { 
-        display: grid !important; 
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 8px !important;
-        width: 100% !important;
-        max-width: 100vw !important;
-        margin: 8px auto 0 !important;
-        padding: 0 10px !important;
-        justify-content: center !important;
-        justify-items: center !important;
-        box-sizing: border-box !important;
-    }
-    .team-grid .team-card {
-        min-width: 0 !important; 
-        width: 100% !important; 
-        max-width: 160px !important;
-        margin: 0 auto !important;
-        padding: 8px 4px !important;
-        box-sizing: border-box !important;
-    }
+    /* Matikan flex-wrap agar tidak acak-acakan */
+    .org-row2 { flex-wrap: nowrap !important; gap: 15px !important; justify-content: center !important; }
+    .org-row3 { flex-wrap: nowrap !important; gap: 10px !important; justify-content: center !important; }
+    .org-children { flex-wrap: nowrap !important; gap: 15px !important; justify-content: center !important; }
+    .org-children .org-node { margin-top: 0 !important; }
+    .org-children::before { display: block !important; }
+    .org-children .org-node::before { height: 26px !important; top: -26px !important; }
     
-    /* Perkecil foto di grid 2 kolom agar muat dan rapi */
-    .team-card .team-photo {
-        width: 40px !important; 
-        height: 40px !important;
-        margin: 0 auto 4px auto !important; /* Paksa foto ke tengah */
+    /* 5. TIM KAMI - Kembalikan seperti PC/Laptop, lalu skalakan */
+    #anggota {
+      width: 100vw !important; max-width: 100vw !important;
+      padding: 0 !important; margin: 0 !important;
+      overflow-x: hidden !important; overflow-y: hidden !important;
+      display: flex !important; flex-direction: column !important; justify-content: flex-start !important;
+      align-items: center !important;
     }
-    .team-info {
-        text-align: center !important; /* Paksa teks ke tengah */
-        width: 100%;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-    }
-    .team-info h4 { font-size: 0.7rem !important; text-align: center !important; width: 100%; margin: 0 auto !important; }
-    .team-info p { font-size: 0.55rem !important; text-align: center !important; width: 100%; margin: 0 auto !important; }
+    #anggota .section-head { margin-bottom: 20px !important; margin-top: 0 !important; }
     
-    #tim-kami {
-      width: 100vw !important;
-      max-width: 100vw !important;
-      box-sizing: border-box !important;
-      overflow-x: hidden !important;
-    }
-    
-    #tim-kami .container {
-      width: 100% !important; 
-      max-width: 100% !important; 
-      margin: 0 auto !important;
-      padding: 0 !important; 
-      display: flex;
-      flex-direction: column;
-      align-items: center !important; /* Paksa semua isi ke tengah */
-      box-sizing: border-box !important;
+    #anggota .container {
+      width: 100vw !important; max-width: 100vw !important;
+      display: flex !important; flex-direction: column !important; justify-content: flex-start !important;
+      align-items: center !important;
     }
 
-    /* Sembunyikan hiasan agar tidak memperparah tumpang tindih dari scaling ekstrem */
+    #anggota .team-top-row, #anggota .team-grid {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      flex-direction: column !important; /* SEJAJAR KE BAWAH / SATU-SATU */
+      justify-content: center !important;
+      align-items: center !important;
+      gap: 20px !important; 
+      width: 100% !important;
+      margin: 0 auto 30px auto !important;
+      padding: 0 !important;
+    }
+    
+    #anggota .team-card-wrapper {
+      transform: scale(0.85) !important; /* Dikecilkan wajar saja agar bisa dibaca */
+      transform-origin: top center !important;
+      margin-bottom: -50px !important; /* Kompensasi ruang kosong dari scale */
+      width: 280px !important; /* Lebar minimum aslinya di PC */
+      max-width: 360px !important; 
+      margin-left: auto !important;
+      margin-right: auto !important;
+      display: block !important;
+      height: auto !important; /* Jangan dipaksa mutlak */
+    }
+    
+    #anggota .team-card {
+      width: 100% !important; 
+      max-width: 100% !important;
+      padding: 22px 20px 30px !important; /* PADDING MURNI PC */
+      margin: 0 !important;
+      display: block !important; /* Matikan flex untuk isi dalam card */
+      text-align: center !important;
+      min-width: unset !important;
+      height: 100% !important;
+      border-radius: 22px !important;
+      box-sizing: border-box !important;
+    }
+    
+    /* Kembalikan aspek rasio foto aslinya di PC (3/4, BUKAN bulat) */
+    #anggota .team-card .team-photos {
+        width: 100% !important;
+        margin-bottom: 12px !important;
+    }
+    #anggota .team-card .team-photos .avatar-tile { 
+      width: 100% !important; 
+      height: auto !important;
+      aspect-ratio: 3/4 !important; /* Proporsi potret aslinya */
+      margin: 0 auto 12px !important; 
+      border-radius: 14px !important; /* Bukan 50% */
+      overflow: hidden !important; 
+      display: block !important;
+    }
+    #anggota .team-card .team-photos .avatar-tile img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      object-position: top center !important;
+    }
+    #anggota .team-card .name-strip { font-size: 0.9rem !important; line-height: 1.3 !important; margin-bottom: 4px !important; text-align: center !important; }
+    #anggota .team-card .team-card-title { font-size: 0.85rem !important; line-height: 1.3 !important; text-align: center !important; }
+    #anggota .team-card .team-label { font-size: 0.75rem !important; margin-top: 14px !important; display: inline-block !important; }
+    
+    /* Global fixes */
     .global-ornaments-wrapper { display: none !important; }
-    .spotlight-badge { display: none !important; }
+    .section-head .ribbon { font-size: 1rem !important; padding: 4px 12px !important; }
   }
 
 </style>
@@ -1115,7 +1158,7 @@
     @endif
 
     @if($others->count() > 0)
-    <div class="org-row2" style="margin-top:{{ (isset($isBPH) && $isBPH && (isset($sekretarisUmum) || $sekretarisLain->count() > 0)) ? '0' : '26px' }}; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+    <div class="org-row2 {{ (!isset($isBPH) || !$isBPH) ? 'org-row-staff' : '' }}" style="margin-top:{{ (isset($isBPH) && $isBPH && (isset($sekretarisUmum) || $sekretarisLain->count() > 0)) ? '0' : '26px' }}; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
         @foreach($others as $o)
         <div class="org-branch">
             <div class="org-node">
