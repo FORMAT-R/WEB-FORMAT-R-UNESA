@@ -113,58 +113,73 @@ trait ImageUploadTrait
 
         // Simpan sementara sebagai PNG
         $tempPngPath = sys_get_temp_dir() . '/' . Str::random(20) . '_temp.png';
-
-        // --- Coba gunakan Multi-Key Remove.bg API ---
-        $keys = [
-            env('REMOVE_BG_KEY_1'),
-            env('REMOVE_BG_KEY_2'),
-            env('REMOVE_BG_KEY_3'),
-        ];
         
-        $keys = array_filter($keys); // Hapus key yang kosong
-        $apiSuccess = false;
+        $localRembgSuccess = false;
 
-        if (!empty($keys)) {
-            foreach ($keys as $key) {
-                $ch = curl_init();
-                curl_setopt_array($ch, [
-                    CURLOPT_URL => "https://api.remove.bg/v1.0/removebg",
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_POST => true,
-                    CURLOPT_HTTPHEADER => [
-                        "X-Api-Key: " . $key
-                    ],
-                    CURLOPT_POSTFIELDS => [
-                        'image_file' => new \CURLFile($absSource),
-                        'size' => 'auto'
-                    ],
-                ]);
+        // --- 1. UTAMAKAN MENGGUNAKAN PYTHON REMBG LOKAL ---
+        \Log::info("Mencoba menggunakan Python rembg lokal terlebih dahulu...");
+        // Lokasi spesifik Python dan script rembg jika Anda ingin memastikannya berjalan dengan conda/venv (opsional)
+        // $command = "C:\\path\\to\\python.exe -m rembg i " ... 
+        // Atau jika rembg ada di PATH environment:
+        $command = "rembg i " . escapeshellarg($absSource) . " " . escapeshellarg($tempPngPath) . " 2>&1";
+        
+        set_time_limit(1800); // 30 menit
+        exec($command, $output, $returnVar);
 
-                $response = curl_exec($ch);
-                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                curl_close($ch);
-
-                if ($httpCode == 200) {
-                    file_put_contents($tempPngPath, $response);
-                    $apiSuccess = true;
-                    \Log::info("Remove.bg API success using a valid key.");
-                    break; // Berhenti mencari key jika sudah berhasil
-                } else {
-                    \Log::warning("Remove.bg API failed for a key. HTTP Code: $httpCode. Message: " . substr($response, 0, 100));
-                    // Jika 402/403 (kredit habis/invalid), loop akan lanjut ke key berikutnya
-                }
-            }
+        if ($returnVar === 0 && file_exists($tempPngPath) && filesize($tempPngPath) > 0) {
+            \Log::info("Local Rembg berhasil.");
+            $localRembgSuccess = true;
+        } else {
+            \Log::error("Local Rembg gagal: " . implode("\n", $output));
         }
 
-        // --- Fallback ke Python Rembg Lokal jika API tidak disetel atau semua key gagal ---
-        if (!$apiSuccess) {
-            \Log::info("Falling back to local Python rembg...");
-            $command = "rembg i " . escapeshellarg($absSource) . " " . escapeshellarg($tempPngPath) . " 2>&1";
-            set_time_limit(1800); // 30 menit
-            exec($command, $output, $returnVar);
+        // --- 2. FALLBACK KE REMOVE.BG API JIKA REMBG LOKAL GAGAL ---
+        if (!$localRembgSuccess) {
+            \Log::info("Local Rembg gagal, mencoba menggunakan Remove.bg API sebagai fallback...");
+            $keys = [
+                env('REMOVE_BG_KEY_1'),
+                env('REMOVE_BG_KEY_2'),
+                env('REMOVE_BG_KEY_3'),
+            ];
+            
+            $keys = array_filter($keys); // Hapus key yang kosong
+            $apiSuccess = false;
 
-            if ($returnVar !== 0 || !file_exists($tempPngPath)) {
-                \Log::error("Local Rembg failed: " . implode("\n", $output));
+            if (!empty($keys)) {
+                foreach ($keys as $key) {
+                    $ch = curl_init();
+                    curl_setopt_array($ch, [
+                        CURLOPT_URL => "https://api.remove.bg/v1.0/removebg",
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_POST => true,
+                        CURLOPT_HTTPHEADER => [
+                            "X-Api-Key: " . $key
+                        ],
+                        CURLOPT_POSTFIELDS => [
+                            'image_file' => new \CURLFile($absSource),
+                            'size' => 'auto'
+                        ],
+                    ]);
+
+                    $response = curl_exec($ch);
+                    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    curl_close($ch);
+
+                    if ($httpCode == 200) {
+                        file_put_contents($tempPngPath, $response);
+                        $apiSuccess = true;
+                        \Log::info("Remove.bg API success using a valid key.");
+                        break; // Berhenti mencari key jika sudah berhasil
+                    } else {
+                        \Log::warning("Remove.bg API failed for a key. HTTP Code: $httpCode. Message: " . substr($response, 0, 100));
+                        // Jika 402/403 (kredit habis/invalid), loop akan lanjut ke key berikutnya
+                    }
+                }
+            }
+            
+            // Jika semuanya gagal
+            if (!$apiSuccess) {
+                \Log::error("Semua metode remove background gagal (Local & API).");
                 return null;
             }
         }

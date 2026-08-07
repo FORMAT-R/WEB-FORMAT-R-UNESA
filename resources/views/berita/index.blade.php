@@ -22,10 +22,17 @@
 @section('content')
 <div class="pt-32 pb-20 bg-gray-50 min-h-screen" style="background-color: var(--surface);">
     <div class="container mx-auto px-4 max-w-7xl" style="max-width: 1200px; margin: 0 auto;">
-        <div class="text-center mb-12" data-reveal style="text-align: center; margin-bottom: 50px;">
-            <span class="text-blue-600 font-semibold tracking-wider uppercase text-sm mb-2 block" style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--yellow-deep);letter-spacing:0.08em;text-transform:uppercase; margin-bottom: 10px; display: block;">Kumpulan Berita</span>
+        <div class="text-center mb-16" data-reveal style="text-align: center; margin-bottom: 64px;">
             <h1 class="text-4xl md:text-5xl font-bold text-gray-900 font-['Space_Grotesk'] mb-4" style="font-size:3.4rem;line-height:1.06;margin:18px 0 22px;color:var(--navy);">Ruang Baca & Informasi</h1>
-            <p class="text-gray-600 max-w-2xl mx-auto" style="font-size:1.08rem;color:var(--ink-soft);max-width:600px;margin: 0 auto 32px;">Kumpulan artikel, tips, ulasan kegiatan, dan informasi terkini dari seluruh departemen FORMAT-R UNESA.</p>
+            <p class="text-gray-600 max-w-2xl mx-auto" style="font-size:1.08rem;color:var(--ink-soft);max-width:600px;margin: 0 auto;">Kumpulan artikel, tips, ulasan kegiatan, dan informasi terkini dari seluruh departemen FORMAT-R UNESA.</p>
+        </div>
+
+        <div class="mb-16 mt-8" style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 80px;">
+            <a href="{{ route('berita.index') }}" class="btn" style="padding: 8px 20px; border-radius: 100px; font-weight: 600; font-size: 0.9rem; text-decoration: none; {{ request('filter') ? 'background: var(--surface); color: var(--ink); border: 1px solid var(--line);' : 'background: var(--navy); color: #fff; border: 1px solid var(--navy);' }}">Semua Berita</a>
+            <a href="{{ route('berita.index', ['filter' => 'baru']) }}" class="btn" style="padding: 8px 20px; border-radius: 100px; font-weight: 600; font-size: 0.9rem; text-decoration: none; {{ request('filter') == 'baru' ? 'background: var(--navy); color: #fff; border: 1px solid var(--navy);' : 'background: var(--surface); color: var(--ink); border: 1px solid var(--line);' }}">Baru</a>
+            <a href="{{ route('berita.index', ['filter' => 'minggu_lalu']) }}" class="btn" style="padding: 8px 20px; border-radius: 100px; font-weight: 600; font-size: 0.9rem; text-decoration: none; {{ request('filter') == 'minggu_lalu' ? 'background: var(--navy); color: #fff; border: 1px solid var(--navy);' : 'background: var(--surface); color: var(--ink); border: 1px solid var(--line);' }}">Minggu Lalu</a>
+            <a href="{{ route('berita.index', ['filter' => 'bulan_lalu']) }}" class="btn" style="padding: 8px 20px; border-radius: 100px; font-weight: 600; font-size: 0.9rem; text-decoration: none; {{ request('filter') == 'bulan_lalu' ? 'background: var(--navy); color: #fff; border: 1px solid var(--navy);' : 'background: var(--surface); color: var(--ink); border: 1px solid var(--line);' }}">Bulan Lalu</a>
+            <a href="{{ route('berita.index', ['filter' => 'tahun_lalu']) }}" class="btn" style="padding: 8px 20px; border-radius: 100px; font-weight: 600; font-size: 0.9rem; text-decoration: none; {{ request('filter') == 'tahun_lalu' ? 'background: var(--navy); color: #fff; border: 1px solid var(--navy);' : 'background: var(--surface); color: var(--ink); border: 1px solid var(--line);' }}">Tahun Lalu</a>
         </div>
 
         <div class="art-grid" data-stagger>

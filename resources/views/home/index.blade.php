@@ -774,7 +774,6 @@
 <section class="stack-section" id="berita" data-reveal>
     <div class="container">
         <div class="sec-head" data-stagger-child>
-            <span class="eyebrow">Ruang Baca</span>
             <h2>Berita Terbaru</h2>
             <p>Cerita, tips, dan informasi seputar dunia perkuliahan dan kegiatan FORMAT-R.</p>
         </div>
