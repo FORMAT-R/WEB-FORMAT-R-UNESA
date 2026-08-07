@@ -849,10 +849,15 @@
         </div>
         {{-- TAB: PENGHARGAAN --}}
         <div id="penghargaan-content" class="apresiasi-pane" style="display:block;">
-            @if($penghargaan['bulan_ini']->count() > 0)
+            @if(isset($penghargaan['bulan_ini']) && $penghargaan['bulan_ini']->count() > 0)
+            <div style="text-align: center; margin-bottom: 24px;">
+                <p style="font-size: 1.1rem; color: var(--ink-soft); font-family: 'Inter', sans-serif;">
+                    Fungsionaris Terbaik Bulan <span style="font-weight: 700; color: var(--navy);">{{ \Carbon\Carbon::parse($penghargaan['bulan_ini']->first()->period)->translatedFormat('F Y') }}</span>
+                </p>
+            </div>
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:32px; margin: 0 auto;">
                 @foreach($penghargaan['bulan_ini'] as $best)
-                <div style="width: 260px; aspect-ratio: 9/16; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px rgba(11,37,69,0.08); background: linear-gradient(135deg,var(--blue),var(--navy)); position: relative; display:flex; align-items:center; justify-content:center; font-family:'Sora', sans-serif; font-size:4rem; color:rgba(255,255,255,0.8);">
+                <div style="width: 260px; aspect-ratio: 4/5; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px rgba(11,37,69,0.08); background: linear-gradient(135deg,var(--blue),var(--navy)); position: relative; display:flex; align-items:center; justify-content:center; font-family:'Sora', sans-serif; font-size:4rem; color:rgba(255,255,255,0.8);">
                     @if($best->photo)
                         <img src="{{ Storage::url($best->photo) }}" alt="Fungsionaris Terbaik" style="width:100%; height:100%; object-fit:cover; position:absolute; inset:0;">
                     @else
@@ -863,7 +868,7 @@
             </div>
             @else
             <div style="text-align: center; color: var(--ink-soft); padding: 40px;">
-                Belum ada Fungsionaris Terbaik bulan ini.
+                Belum ada Fungsionaris Terbaik.
             </div>
             @endif
         </div>

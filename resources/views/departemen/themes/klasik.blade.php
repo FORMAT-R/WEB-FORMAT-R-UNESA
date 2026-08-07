@@ -740,6 +740,10 @@
       $cnt    = count($group);
       // 2 orang: orang ke-0 aktif default; 3 orang: orang ke-1 (tengah) aktif default
       $midIdx = ($cnt >= 3) ? 1 : 0;
+      $defaultS = $group[$midIdx] ?? current($group);
+    @endphp
+
+    @if($gIdx > 0)
     <div class="sorotan-multi-connector">
       <div class="sorotan-multi-line"></div>
     </div>
