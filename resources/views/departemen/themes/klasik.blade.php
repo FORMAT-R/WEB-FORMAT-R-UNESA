@@ -490,23 +490,184 @@
 
   /* RESPONSIVE */
   @media (max-width: 980px) {
-    .team-grid { grid-template-columns: repeat(2, 1fr); }
+    /* Jangan ubah grid tim pada resolusi sedang jika kita akan scale down container utamanya */
     .about-wrap { grid-template-columns: 1fr; }
     .stamp { display: none; }
   }
 
   @media (max-width: 720px) {
-    .spotlight-card { flex-direction: column; }
-    .spotlight-right { padding-top: 0; padding-bottom: 24px; }
-    .spotlight-desc { max-width: 100%; }
+    /* Murni mengecilkan (scale down) layout PC tanpa mengubah strukturnya */
+    .spotlight-card { 
+      transform: scale(0.85); /* Diperbesar dari 0.7 */
+      transform-origin: top center;
+      margin-bottom: -50px; /* Kompensasi ruang kosong akibat scale */
+    }
+    .sorotan-multi-stack {
+      gap: 30px; 
+    }
+    .org-tree {
+      transform: scale(0.75); /* Diperbesar */
+      transform-origin: top center;
+      margin-bottom: -30px; 
+    }
+    
+    /* Tim Kami: kembalikan ke layout awal dan gunakan scale */
+    #tim-kami .container {
+      transform: scale(0.85); /* Diperbesar */
+      transform-origin: top center;
+      margin-bottom: -100px;
+    }
   }
+  
   @media (max-width: 560px) {
-    .team-top-row { gap: 24px; }
-    .team-top-row .team-card { width: 100%; max-width: 360px; min-width: unset; }
-    .team-grid { grid-template-columns: 1fr; max-width: 360px; margin: 0 auto; }
-    .team-card:nth-child(3n+2) { margin-top: 0; }
-    .polaroid-stack { width: 280px; height: 280px; }
-    .polaroid .frame-img { height: 180px; }
+    /* Perbaikan Hero area untuk mobile */
+    .hero {
+      align-items: center !important;
+      justify-content: center !important;
+      text-align: center !important;
+      padding: 60px 20px 80px !important; /* Kurangi padding kiri kanan */
+      width: 100vw !important;
+      max-width: 100vw !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+    }
+    
+    .hero h1, .hero p, .hero .subtitle-ribbon {
+      text-align: center !important;
+      width: 100% !important;
+      display: block !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+    
+    .tentang-isi {
+      text-align: center !important;
+    }
+    .tentang-isi > div {
+      align-items: center !important;
+    }
+    .tentang-isi p, .tentang-isi h2, .tentang-isi .eyebrow-tape {
+      text-align: center !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+    
+    /* Mencegah flex-wrap pada elemen PC agar layout tidak ke bawah */
+    .org-row2 { flex-wrap: nowrap !important; }
+    .org-row3 { flex-wrap: nowrap !important; }
+    
+    .spotlight-card { 
+      transform: scale(0.65); 
+      margin-bottom: -100px;
+    }
+    .sorotan-multi-stack {
+      gap: 10px;
+    }
+    
+    /* Paksa Lebar Container Struktur agar muat 1 baris lalu kecilkan skalanya */
+    #struktur .container {
+      width: 100vw !important; /* Gunakan lebar layar */
+      max-width: 100vw !important;
+      position: relative;
+      left: 0;
+      margin-left: 0;
+      transform: none !important; /* Hapus scale ekstrem */
+      margin-bottom: 0 !important;
+      overflow-x: auto; /* Izinkan scroll ke samping jika masih kurang lebar */
+    }
+    .org-tree {
+      transform: scale(0.65) !important; /* Kecilkan sewajarnya saja */
+      transform-origin: top center;
+      margin: 0 auto;
+      width: fit-content;
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* Paksa ke tengah */
+    }
+    .org-children {
+      display: flex;
+      justify-content: center !important; /* Paksa ke tengah */
+      width: 100%;
+    }
+    
+    /* KEMBALIKAN TIM KAMI MENJADI GRID KE BAWAH 2 KOLOM YANG BENAR-BENAR DI TENGAH */
+    .team-top-row { 
+        display: grid !important; 
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+        padding: 0 10px !important;
+        justify-content: center !important;
+        justify-items: center !important;
+        box-sizing: border-box !important;
+    }
+    .team-top-row .team-card { 
+        min-width: 0 !important; 
+        width: 100% !important; 
+        max-width: 160px !important; /* Maksimal agak wajar agar muat bersisian */
+        margin: 0 auto !important;
+        padding: 8px 4px !important;
+        box-sizing: border-box !important;
+    }
+    .team-grid { 
+        display: grid !important; 
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+        margin: 8px auto 0 !important;
+        padding: 0 10px !important;
+        justify-content: center !important;
+        justify-items: center !important;
+        box-sizing: border-box !important;
+    }
+    .team-grid .team-card {
+        min-width: 0 !important; 
+        width: 100% !important; 
+        max-width: 160px !important;
+        margin: 0 auto !important;
+        padding: 8px 4px !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* Perkecil foto di grid 2 kolom agar muat dan rapi */
+    .team-card .team-photo {
+        width: 40px !important; 
+        height: 40px !important;
+        margin: 0 auto 4px auto !important; /* Paksa foto ke tengah */
+    }
+    .team-info {
+        text-align: center !important; /* Paksa teks ke tengah */
+        width: 100%;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+    .team-info h4 { font-size: 0.7rem !important; text-align: center !important; width: 100%; margin: 0 auto !important; }
+    .team-info p { font-size: 0.55rem !important; text-align: center !important; width: 100%; margin: 0 auto !important; }
+    
+    #tim-kami {
+      width: 100vw !important;
+      max-width: 100vw !important;
+      box-sizing: border-box !important;
+      overflow-x: hidden !important;
+    }
+    
+    #tim-kami .container {
+      width: 100% !important; 
+      max-width: 100% !important; 
+      margin: 0 auto !important;
+      padding: 0 !important; 
+      display: flex;
+      flex-direction: column;
+      align-items: center !important; /* Paksa semua isi ke tengah */
+      box-sizing: border-box !important;
+    }
+
+    /* Sembunyikan hiasan agar tidak memperparah tumpang tindih dari scaling ekstrem */
+    .global-ornaments-wrapper { display: none !important; }
+    .spotlight-badge { display: none !important; }
   }
 
 </style>
