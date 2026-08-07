@@ -119,10 +119,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('cabinets', App\Http\Controllers\Admin\CabinetController::class)->except(['create', 'edit']);
         Route::patch('cabinets/{cabinet}/toggle', [App\Http\Controllers\Admin\CabinetController::class, 'toggleActive'])->name('cabinets.toggle');
 
-// Notifikasi Email
-Route::get('notifications/send', [App\Http\Controllers\Admin\NotificationController::class, 'send'])->name('notifications.send');
-
-// Sitemap
-Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
+        // Notifikasi Email
+        Route::get('notifications/send', [App\Http\Controllers\Admin\NotificationController::class, 'send'])->name('notifications.send');
     });
 });
+
+// Sitemap - Diletakkan di luar grup admin agar dapat diakses dari root (/)
+Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
