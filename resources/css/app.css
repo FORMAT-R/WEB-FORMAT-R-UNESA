@@ -37,7 +37,7 @@ body.dark {
     box-sizing: border-box;
 }
 
-html { scroll-behavior: smooth; }
+html { /* scroll-behavior: smooth; Dihapus sementara untuk memperbaiki delay scroll */ }
 
 body {
     font-family: 'Inter', sans-serif;
@@ -90,12 +90,16 @@ section { position: relative; padding: 96px 0; }
     max-width: 1180px; margin: 0 auto;
     background: rgba(251,248,241,0.82);
     backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     border: 1px solid var(--line);
     border-radius: 100px;
     padding: 10px 14px 10px 20px;
-    display: flex; align-items: center; justify-content: space-between;
-    box-shadow: 0 8px 30px rgba(11,37,69,0.08);
-    transition: background .4s ease, box-shadow .3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 16px rgba(11,37,69,0.06);
+    will-change: transform;
+    transform: translateZ(0); /* Hardware Acceleration for sticky nav */
 }
 .nav-wrap.scrolled .navbar { box-shadow: 0 12px 34px rgba(11,37,69,0.16); }
 body.dark .navbar { background: rgba(10,26,48,0.82); }
@@ -223,10 +227,20 @@ body.dark .sec-head h2 { color: #fff; }
 .to-top:hover { background: var(--blue); }
 
 /* ===== SCROLL REVEAL ===== */
-.reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+.reveal { 
+    opacity: 0; 
+    transform: translateY(28px); 
+    transition: opacity .7s ease, transform .7s ease; 
+    will-change: transform, opacity;
+}
 .reveal.visible { opacity: 1; transform: translateY(0); }
 .reveal-stagger.visible .stagger-child { opacity: 1; transform: translateY(0); }
-.stagger-child { opacity: 0; transform: translateY(20px); transition: opacity .5s ease, transform .5s ease; }
+.stagger-child { 
+    opacity: 0; 
+    transform: translateY(20px); 
+    transition: opacity .5s ease, transform .5s ease; 
+    will-change: transform, opacity;
+}
 
 /* stagger delays */
 .stagger-child:nth-child(1) { transition-delay: 0s; }

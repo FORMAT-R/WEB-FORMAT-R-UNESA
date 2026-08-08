@@ -110,6 +110,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         
         Route::resource('users', App\Http\Controllers\Admin\UserController::class)->except(['show'])->middleware('can:is-superadmin');
         
+        // Profile
+        Route::get('profile', [App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('profile.edit');
+        Route::put('profile', [App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
+        
         // Settings
         Route::prefix('settings')->name('settings.')->group(function () {
             Route::get('/', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('index');

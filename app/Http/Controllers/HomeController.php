@@ -18,7 +18,8 @@ class HomeController extends Controller
     {
         $stats = [
             ['value' => Department::count(),   'label' => 'Departemen Aktif', 'suffix' => ''],
-            ['value' => Member::count(), 'label' => 'Anggota Terdaftar', 'suffix' => '+'],
+            ['value' => Member::count(), 'label' => 'Fungsionaris Aktif', 'suffix' => ''],
+            ['value' => 2000, 'label' => 'Anggota Format-R', 'suffix' => '+'],
             ['value' => 30,  'label' => 'Program Kerja', 'suffix' => '+'],
         ];
 

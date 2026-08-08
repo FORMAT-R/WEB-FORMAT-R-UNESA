@@ -323,14 +323,15 @@
     padding: 0 24px 0;
     /* Dihapus min-height pada kontainer kanan agar ia mengikuti tinggi gambar yang lebih besar */
   }
-  .spotlight-orang {
-    position: relative; width: 240px; flex-shrink: 0;
-    display: flex; flex-direction: column; align-items: center;
-    cursor: pointer;
-    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s ease;
-    transform-origin: bottom center; /* Penting untuk pop-out dari bawah */
-    margin-bottom: -1px; /* Rata bawah */
-  }
+    .spotlight-orang {
+      position: relative; width: 240px; flex-shrink: 0;
+      display: flex; flex-direction: column; align-items: center;
+      cursor: pointer;
+      transform-origin: bottom center; /* Penting untuk pop-out dari bawah */
+      margin-bottom: -1px; /* Rata bawah */
+      will-change: transform, opacity;
+      transform: translateZ(0); /* Hardware acceleration */
+    }
   .spotlight-orang:hover { transform: translateY(-10px) scale(1.05); z-index: 20 !important; opacity: 1 !important; }
   /* so-1: kiri */
   .so-1 { margin-right: -80px; z-index: 2; opacity: 0.80; }
@@ -342,17 +343,19 @@
   .spotlight-group.group-2 .so-1 { margin-right: 0; opacity: 1; }
   .spotlight-group.group-2 .so-2 { z-index: 2; }
 
-  .spotlight-foto {
-    width: 250px; height: 420px;
-    object-fit: cover; object-position: top center; display: block;
-    filter: drop-shadow(0 15px 20px rgba(0,0,0,0.4));
-    transition: all 0.3s ease;
-    margin-bottom: 0;
-  }
-  .spotlight-orang.active { transform: translateY(-5px) scale(1.08); z-index: 25 !important; opacity: 1 !important; }
-  .spotlight-orang.active .spotlight-foto {
-    filter: drop-shadow(0 0 15px rgba(212,175,55,0.70)) drop-shadow(0 18px 25px rgba(0,0,0,0.45));
-  }
+      .spotlight-foto {
+        width: 250px; height: 420px;
+        object-fit: cover; object-position: top center; display: block;
+        filter: drop-shadow(2px 0 0 white) drop-shadow(-2px 0 0 white) drop-shadow(0 2px 0 white) drop-shadow(0 -2px 0 white) drop-shadow(1.5px 1.5px 0 white) drop-shadow(-1.5px -1.5px 0 white) drop-shadow(1.5px -1.5px 0 white) drop-shadow(-1.5px 1.5px 0 white);
+        transition: all 0.3s ease;
+        margin-bottom: 0;
+        will-change: transform, filter; /* Optimasi render */
+        transform: translateZ(0); /* Hardware acceleration */
+      }
+      .spotlight-orang.active { transform: translateY(-5px) scale(1.08) translateZ(0); z-index: 25 !important; opacity: 1 !important; }
+    .spotlight-orang.active .spotlight-foto {
+      filter: drop-shadow(2px 0 0 white) drop-shadow(-2px 0 0 white) drop-shadow(0 2px 0 white) drop-shadow(0 -2px 0 white) drop-shadow(1.5px 1.5px 0 white) drop-shadow(-1.5px -1.5px 0 white) drop-shadow(1.5px -1.5px 0 white) drop-shadow(-1.5px 1.5px 0 white);
+    }
   .spotlight-svg-fallback {
     width: 250px; height: 420px; display: block;
     filter: drop-shadow(0 10px 18px rgba(0,0,0,0.32));

@@ -331,14 +331,22 @@ trait ImageUploadTrait
         }
 
         // --- STANDARISASI RASIO UNTUK MEMBUANG KAKI (FULL BODY) ---
-        // Rasio wajar pas-foto setengah badan biasanya tinggi = lebar * 1.5. 
-        // Jika tinggi jauh melebihi itu, berarti ini kemungkinan foto seluruh badan.
-        // Kita akan paksa batas bawahnya naik (memotong bagian pinggang ke bawah).
-        $idealHeight = (int)($newWidth * 1.5);
+        // Jika tinggi gambar > 1.3 kali dari lebarnya, kita anggap itu foto seluruh badan atau lebih.
+        // Kita akan potong dari atas (kepala) dan membatasi tingginya maksimal 1.3 kali lebarnya.
+        // Ini memastikan potongan setengah badan yang lebih seragam antar anggota.
+        $idealHeight = (int)($newWidth * 1.3);
         if ($newHeight > $idealHeight) {
-            // Karena fokus kita mempertahankan kepala (top), kita potong sisa tinggi dari bawah
             $newHeight = $idealHeight; 
         }
+
+        // Menambahkan sedikit padding di atas kepala (10% dari tinggi yang baru) agar tidak terlalu mepet
+        $paddingTop = (int)($newHeight * 0.1);
+        
+        // Sesuaikan koordinat top asli jika memungkinkan (jika masih ada ruang transparan di atasnya)
+        $actualTop = max(0, $top - $paddingTop);
+        // Karena kita mengubah top, tinggi juga harus ditambah agar potongan bawah tetap sama
+        $paddingAdded = $top - $actualTop;
+        $newHeight += $paddingAdded;
 
         // Lakukan crop
         $croppedImage = imagecreatetruecolor($newWidth, $newHeight);
@@ -349,7 +357,7 @@ trait ImageUploadTrait
         $transparent = imagecolorallocatealpha($croppedImage, 0, 0, 0, 127);
         imagefill($croppedImage, 0, 0, $transparent);
 
-        imagecopy($croppedImage, $image, 0, 0, $left, $top, $newWidth, $newHeight);
+        imagecopy($croppedImage, $image, 0, 0, $left, $actualTop, $newWidth, $newHeight);
 
         return $croppedImage;
     }

@@ -37,34 +37,35 @@
     align-items: center;
     justify-content: center;
   }
-  .hero-logo-frame {
-    width: 68px;
-    height: 68px;
-    border-radius: 50%;
-    overflow: hidden;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .hero-logo-frame img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    display: block;
-    pointer-events: none;
-    user-select: none;
-  }
-  .hero-logo-frame--format img {
-    object-fit: contain;
-    padding: 6px;
-    background: var(--blue-pale);
-  }
-  .hero-logo-frame--kabinet {
-    background: #EAF1FC;
-  }
-  body.dark .hero-logo-frame--kabinet { background: #0F2545; }
+    .hero-logo-frame {
+        width: 68px;
+        height: 68px;
+        border-radius: 0;
+        overflow: visible;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    .hero-logo-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center;
+        display: block;
+        pointer-events: none;
+        user-select: none;
+      }
+    .hero-logo-frame--unesa {
+        border-radius: 50%;
+        overflow: hidden;
+      }
+    .hero-logo-frame--unesa img {
+        object-fit: cover;
+    }
+    .hero-logo-frame--format img {
+        object-fit: contain;
+      }
   .kabinet-placeholder-svg { width: 52px; height: 52px; }
 
   @media(max-width:560px){
@@ -162,49 +163,43 @@
   body.dark .tentang{background:#0F2545;}
   .tentang-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
   .tentang-copy p{color:var(--ink-soft);margin-bottom:16px;}
-  .tentang-badge{
-    display:flex;align-items:center;justify-content:center;
-    aspect-ratio:1/1;border-radius:32px;
-    background:var(--blue-pale);border:1px solid var(--line);
-    overflow:hidden;position:relative;
-  }
-  body.dark .tentang-badge{background:#0F2545;}
+    .tentang-badge{
+      display:flex;align-items:center;justify-content:center;
+      aspect-ratio:1/1;
+      position:relative;
+    }
+    body.dark .tentang-badge{background:transparent;}
 
   /* ===== VISI MISI ===== */
   .vm-layout{display:grid;grid-template-columns:0.85fr 1.15fr;gap:50px;align-items:center;margin-bottom:52px;}
-  .vm-badge{
-    display:flex;align-items:center;justify-content:center;
-    aspect-ratio:1/1;border-radius:32px;
-    background:var(--blue-pale);border:1px solid var(--line);
-    position:relative;
-  }
-  body.dark .vm-badge{background:#0F2545;}
-  .vm-badge.vm-badge--kabinet {
-    background: #fff;
-    border: 1px solid var(--line);
-    padding: 20px;
-    box-shadow: 0 16px 48px rgba(11,37,69,0.1);
-  }
-  .vm-badge.vm-badge--kabinet .kabinet-logo-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 20px;
-    box-shadow: 0 8px 24px rgba(11,37,69,0.12);
-  }
-  .vm-badge.vm-badge--format {
-    background: #fff;
-    border: 1px solid var(--line);
-    padding: 20px;
-    box-shadow: 0 16px 48px rgba(11,37,69,0.1);
-  }
-  .vm-badge.vm-badge--format .format-logo-img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    border-radius: 20px;
-    box-shadow: 0 8px 24px rgba(11,37,69,0.12);
-  }
+    .vm-badge{
+      display:flex;align-items:center;justify-content:center;
+      aspect-ratio:1/1;
+      position:relative;
+    }
+    body.dark .vm-badge{background:transparent;}
+    .vm-badge.vm-badge--kabinet {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 32px;
+      padding: 20px;
+      box-shadow: 0 16px 48px rgba(11,37,69,0.1);
+    }
+    body.dark .vm-badge.vm-badge--kabinet { background: #0F2545; }
+    .vm-badge.vm-badge--kabinet .kabinet-logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 20px;
+    }
+    .vm-badge.vm-badge--format {
+      padding: 20px;
+    }
+    .vm-badge.vm-badge--format .format-logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
   
 
   .vm-badge .badge-ring{
@@ -689,12 +684,12 @@
             {{-- ===== 3 LOGO HERO ===== --}}
             <div class="hero-logos">
 
-                {{-- Logo UNESA (kiri) --}}
-                <div class="hero-logo-item">
-                    <div class="hero-logo-frame" data-parallax="0.3">
-                        <img src="{{ asset('images/logo_unesa.jpg') }}" alt="Logo Universitas Negeri Surabaya">
-                    </div>
-                </div>
+                  {{-- Logo UNESA (kiri) --}}
+                  <div class="hero-logo-item">
+                      <div class="hero-logo-frame hero-logo-frame--unesa" data-parallax="0.3">
+                          <img src="{{ asset('images/logo_unesa.jpg') }}" alt="Logo Universitas Negeri Surabaya">
+                      </div>
+                  </div>
 
                 {{-- Logo FORMAT-R (tengah) --}}
                 <div class="hero-logo-item">
@@ -706,7 +701,7 @@
                 {{-- Logo Kabinet (kanan) --}}
                 <div class="hero-logo-item">
                     <div class="hero-logo-frame hero-logo-frame--kabinet" data-parallax="0.3">
-                        <img src="{{ get_setting('cabinetLogo') ? Storage::url(get_setting('cabinetLogo')) : asset('images/logo_kabinet.jpeg') }}" alt="Logo Kabinet FORMAT-R" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+                        <img src="{{ get_setting('cabinetLogo') ? Storage::url(get_setting('cabinetLogo')) : asset('images/logo_kabinet.jpeg') }}" alt="Logo Kabinet FORMAT-R" style="width:100%;height:100%;object-fit:contain;">
                     </div>
                 </div>
             </div>

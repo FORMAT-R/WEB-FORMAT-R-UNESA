@@ -266,7 +266,7 @@
     {{-- Main Content Wrapper --}}
     <div class="flex-1 flex flex-col min-h-screen lg:pl-64 w-full transition-all duration-300">
         {{-- Top Bar --}}
-        <header class="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700">
+        <header class="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700" style="will-change: transform; transform: translateZ(0);">
             <div class="flex items-center justify-between px-6 py-4">
                 <div class="flex items-center gap-4">
                     <button @click="sidebarOpen = true" class="lg:hidden p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
@@ -341,7 +341,7 @@
                         </button>
 
                         <div x-show="showUserMenu" @click.outside="showUserMenu = false" x-transition:origin.top.right.opacity class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
-                            <a href="{{ route('admin.settings.index') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">Profil</a>
+                            <a href="{{ route('admin.profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">Profil</a>
                             <a href="{{ route('admin.settings.index') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">Pengaturan</a>
                             <hr class="my-1 border-gray-200 dark:border-gray-700">
                             <form action="{{ route('admin.logout') }}" method="POST">

@@ -125,7 +125,7 @@
             <div>
                 <div class="foot-brand">
                     <span class="mark" style="width:30px;height:30px;">
-                        <img src="{{ asset('images/logo_format.png') }}" alt="Logo FORMAT-R" style="width:30px;height:30px;object-fit:contain;border-radius:50%;">
+                        <img src="{{ asset('images/logo_format.png') }}" alt="Logo FORMAT-R" style="width:30px;height:30px;">
                     </span>
                     FORMAT-R UNESA
                 </div>

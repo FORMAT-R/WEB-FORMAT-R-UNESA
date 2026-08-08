@@ -100,7 +100,7 @@
         @endphp
         <h1>{{ $firstWord }} @if($rest)<span class="hl">{{ $rest }}</span>@endif</h1>
         <p class="tagline">
-            BPH dan enam departemen, satu tujuan. Bersama kami membangun mahasiswa UNESA yang berdaya, berkarakter, dan berdampak.
+            BPH dan departemen lainnya, satu tujuan. Bersama kami membangun mahasiswa UNESA yang berdaya, berkarakter, dan berdampak.
         </p>
     </div>
 </section>
