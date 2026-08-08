@@ -12,7 +12,7 @@ class SitemapController extends Controller
 {
     public function index()
     {
-        $now = Carbon::now()->toAtomString();
+        $now = Carbon::now()->tz('Asia/Jakarta')->toAtomString();
         
         $urls = [
             ['loc' => url('/'), 'lastmod' => $now, 'priority' => '1.0'],
@@ -27,7 +27,7 @@ class SitemapController extends Controller
         foreach ($departments as $dept) {
             $urls[] = [
                 'loc' => url('/departemen/' . $dept->slug),
-                'lastmod' => $dept->updated_at->toAtomString(),
+                'lastmod' => $dept->updated_at->tz('Asia/Jakarta')->toAtomString(),
                 'priority' => '0.7'
             ];
         }
@@ -37,7 +37,7 @@ class SitemapController extends Controller
         foreach ($news as $item) {
             $urls[] = [
                 'loc' => url('/berita/' . $item->slug),
-                'lastmod' => $item->updated_at->toAtomString(),
+                'lastmod' => $item->updated_at->tz('Asia/Jakarta')->toAtomString(),
                 'priority' => '0.7'
             ];
         }
@@ -47,7 +47,7 @@ class SitemapController extends Controller
         foreach ($events as $event) {
             $urls[] = [
                 'loc' => url('/event/' . $event->slug),
-                'lastmod' => $event->updated_at->toAtomString(),
+                'lastmod' => $event->updated_at->tz('Asia/Jakarta')->toAtomString(),
                 'priority' => '0.7'
             ];
         }
