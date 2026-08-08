@@ -31,6 +31,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 
 // Beranda
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::post('/kontak', [HomeController::class, 'kirimPesan'])->name('kontak.kirim');
 
 // Departemen
 Route::get('/departemen', [DepartemenController::class, 'index'])->name('departemen.index');

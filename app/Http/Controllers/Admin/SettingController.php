@@ -21,7 +21,7 @@ class SettingController extends Controller
 
         // Only superadmin can update general and system settings
         if (auth()->user()->role !== 'superadmin') {
-            $data = $request->only(['contactEmail', 'contactPhone', 'instagram', 'youtube', 'address']);
+            $data = $request->only(['contactEmail', 'contactPhone', 'instagram', 'youtube', 'tiktok', 'address']);
         }
 
         foreach ($data as $key => $value) {

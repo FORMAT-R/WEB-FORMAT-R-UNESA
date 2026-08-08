@@ -12,6 +12,13 @@
             <p>Jejak kegiatan yang telah selesai dilaksanakan oleh FORMAT-R UNESA pada periode sebelumnya.</p>
         </div>
 
+        <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 32px; flex-wrap: wrap;">
+            <a href="{{ route('arsip', ['kategori' => 'semua']) }}" class="btn {{ $kategori === 'semua' || !isset($kategori) ? 'btn-primary' : 'btn-ghost' }}">Semua</a>
+            <a href="{{ route('arsip', ['kategori' => 'minggu_lalu']) }}" class="btn {{ $kategori === 'minggu_lalu' ? 'btn-primary' : 'btn-ghost' }}">Minggu Lalu</a>
+            <a href="{{ route('arsip', ['kategori' => 'bulan_lalu']) }}" class="btn {{ $kategori === 'bulan_lalu' ? 'btn-primary' : 'btn-ghost' }}">Bulan Lalu</a>
+            <a href="{{ route('arsip', ['kategori' => 'tahun_sebelumnya']) }}" class="btn {{ $kategori === 'tahun_sebelumnya' ? 'btn-primary' : 'btn-ghost' }}">Tahun Sebelumnya</a>
+        </div>
+
         <div class="archive-grid reveal-stagger reveal">
             @forelse($arsip as $a)
             <div class="archive-card stagger-child">
@@ -28,10 +35,6 @@
                 <p>Belum ada arsip kegiatan yang selesai.</p>
             </div>
             @endforelse
-        </div>
-
-        <div style="text-align:center;margin-top:36px;">
-            <a href="#kontak" class="btn btn-ghost">Lihat Semua Arsip</a>
         </div>
     </div>
 </section>
@@ -71,9 +74,14 @@
         background: linear-gradient(135deg, var(--blue-pale, #EAF1FC), var(--cream));
         opacity: 0;
         transition: opacity .28s ease;
+        z-index: 0;
     }
     .archive-card:hover::before {
         opacity: 1;
+    }
+    .archive-card > * {
+        position: relative;
+        z-index: 1;
     }
     .archive-thumb {
         aspect-ratio: 16/9;

@@ -720,7 +720,7 @@
             <br>
             <div class="btn-row" style="justify-content:center;">
                 <a href="#tentang" class="btn btn-primary">Kenali Kami →</a>
-                <a href="#arsip" class="btn btn-ghost">Lihat Kegiatan</a>
+                <a href="event" class="btn btn-ghost">Lihat Kegiatan</a>
             </div>
             <div class="stat-row" style="justify-content:center;" data-reveal>
                 @foreach($stats as $s)
@@ -952,30 +952,42 @@
             <h2>Mari Terhubung dengan FORMAT-R UNESA</h2>
             <p style="color:#AFC0DA;margin-top:12px;max-width:420px;">Punya pertanyaan, ide kolaborasi, atau ingin bergabung? Sampaikan pesanmu, kami akan segera merespons.</p>
             <ul class="kontak-list" data-stagger>
-                <li data-stagger-child><span class="kicon">📍</span> Kampus Ketintang, Universitas Negeri Surabaya, Jawa Timur 60231</li>
-                <li data-stagger-child><span class="kicon">✉️</span> formatr@unesa.ac.id</li>
-                <li data-stagger-child><span class="kicon">📷</span> @formatr_unesa</li>
+                <li data-stagger-child><span class="kicon">📍</span> {{ get_setting('address', 'Kampus Ketintang, Universitas Negeri Surabaya, Jawa Timur 60231') }}</li>
+                <li data-stagger-child><span class="kicon">✉️</span> {{ get_setting('contactEmail', 'formatr@unesa.ac.id') }}</li>
+                <li data-stagger-child style="display: block; padding: 0;">
+                    @php
+                        $igLink = get_setting('instagram', 'https://instagram.com/formatrunesaofficial');
+                        // Bersihkan URL dari parameter tracking (seperti ?igsh=...)
+                        $igCleanUrl = strtok($igLink, '?'); 
+                        $igHandle = preg_replace('/^https?:\/\/(www\.)?instagram\.com\//', '@', $igCleanUrl);
+                        $igHandle = rtrim($igHandle, '/');
+                    @endphp
+                    <a href="{{ $igLink }}" target="_blank" style="color: inherit; text-decoration: none; display: flex; gap: 14px; align-items: center;">
+                        <span class="kicon">📷</span> {{ $igHandle }}
+                    </a>
+                </li>
             </ul>
         </div>
-        <form id="kontakForm" novalidate>
-            <div class="form-field" id="fieldNama">
-                <label>Nama</label>
-                <input type="text" id="inputNama" placeholder="Nama lengkap kamu">
-                <span class="field-msg">Nama wajib diisi.</span>
-            </div>
-            <div class="form-field" id="fieldEmail">
-                <label>Email</label>
-                <input type="email" id="inputEmail" placeholder="nama@email.com">
-                <span class="field-msg">Masukkan email yang valid.</span>
-            </div>
-            <div class="form-field" id="fieldPesan">
-                <label>Pesan</label>
-                <textarea rows="4" id="inputPesan" placeholder="Tulis pesanmu di sini..."></textarea>
-                <span class="field-msg">Pesan wajib diisi.</span>
-            </div>
-            <button class="btn-submit" type="submit" id="submitBtn">Kirim Pesan</button>
-            <p class="form-note" id="formNote"></p>
-        </form>
+        <form id="kontakForm" action="{{ route('kontak.kirim') }}" method="POST" novalidate>
+            @csrf
+              <div class="form-field" id="fieldNama">
+                  <label>Nama</label>
+                  <input type="text" name="nama" id="inputNama" placeholder="Nama lengkap kamu" required>
+                  <span class="field-msg">Nama wajib diisi.</span>
+              </div>
+              <div class="form-field" id="fieldEmail">
+                  <label>Email</label>
+                  <input type="email" name="email" id="inputEmail" placeholder="nama@email.com" required>
+                  <span class="field-msg">Masukkan email yang valid.</span>
+              </div>
+              <div class="form-field" id="fieldPesan">
+                  <label>Pesan</label>
+                  <textarea rows="4" name="pesan" id="inputPesan" placeholder="Tulis pesanmu di sini..." required></textarea>
+                  <span class="field-msg">Pesan wajib diisi.</span>
+              </div>
+              <button class="btn-submit" type="submit" id="submitBtn">Kirim Pesan</button>
+              <p class="form-note" id="formNote" style="margin-top: 10px; font-size: 0.9rem;"></p>
+          </form>
     </div>
 </section>
 
@@ -1076,6 +1088,80 @@
             document.getElementById(targetId).style.display = 'block';
         });
     });
+    const kontakForm = document.getElementById('kontakForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const formNote = document.getElementById('formNote');
+
+    if (kontakForm) {
+        kontakForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Basic validation
+            let isValid = true;
+            const nama = document.getElementById('inputNama').value;
+            const email = document.getElementById('inputEmail').value;
+            const pesan = document.getElementById('inputPesan').value;
+
+            document.querySelectorAll('.field-msg').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.form-field').forEach(el => el.classList.remove('error'));
+
+            if (!nama) {
+                document.getElementById('fieldNama').classList.add('error');
+                document.querySelector('#fieldNama .field-msg').style.display = 'block';
+                isValid = false;
+            }
+            if (!email || !email.includes('@')) {
+                document.getElementById('fieldEmail').classList.add('error');
+                document.querySelector('#fieldEmail .field-msg').style.display = 'block';
+                isValid = false;
+            }
+            if (!pesan) {
+                document.getElementById('fieldPesan').classList.add('error');
+                document.querySelector('#fieldPesan .field-msg').style.display = 'block';
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            // Submit AJAX
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Mengirim...';
+            formNote.style.color = 'var(--ink-soft)';
+            formNote.textContent = '';
+
+            const formData = new FormData(kontakForm);
+
+            fetch(kontakForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    formNote.style.color = 'green';
+                    formNote.textContent = data.message;
+                    kontakForm.reset();
+                } else {
+                    formNote.style.color = 'var(--red)';
+                    formNote.textContent = data.message || 'Terjadi kesalahan.';
+                }
+            })
+            .catch(error => {
+                formNote.style.color = 'var(--red)';
+                formNote.textContent = 'Gagal terhubung ke server. Silakan coba lagi.';
+                console.error(error);
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Kirim Pesan';
+            });
+        });
+    }
+
 </script>
 @endpush
 

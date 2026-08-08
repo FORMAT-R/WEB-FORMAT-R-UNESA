@@ -10,6 +10,7 @@ use App\Models\BestOfficer;
 use App\Models\Birthday;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class HomeController extends Controller
 {
@@ -95,10 +96,47 @@ class HomeController extends Controller
         ));
     }
 
-    public function arsip()
+    public function kirimPesan(Request $request)
     {
-        $arsip = Event::where('status', 'completed')->latest('end_date')->get();
-        return view('arsip', compact('arsip'));
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'pesan' => 'required|string',
+        ]);
+
+        $emailTujuan = get_setting('contactEmail', 'formatr@unesa.ac.id');
+
+        try {
+            Mail::raw("Nama: {$request->nama}\nEmail: {$request->email}\n\nPesan:\n{$request->pesan}", function ($message) use ($emailTujuan, $request) {
+                $message->to($emailTujuan)
+                        ->subject('Pesan Baru dari Website FORMAT-R UNESA')
+                        ->replyTo($request->email, $request->nama);
+            });
+
+            return response()->json(['success' => true, 'message' => 'Pesan berhasil dikirim! Kami akan segera merespons.']);
+        } catch (\Exception $e) {
+            \Log::error('Gagal mengirim email kontak: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Gagal mengirim pesan. Silakan coba beberapa saat lagi.'], 500);
+        }
+    }
+
+    public function arsip(Request $request)
+    {
+        $kategori = $request->query('kategori', 'semua');
+        
+        $query = Event::where('status', 'completed');
+
+        if ($kategori === 'minggu_lalu') {
+            $query->whereBetween('end_date', [Carbon::now()->subWeek()->startOfWeek(), Carbon::now()->subWeek()->endOfWeek()]);
+        } elseif ($kategori === 'bulan_lalu') {
+            $query->whereMonth('end_date', Carbon::now()->subMonth()->month)
+                  ->whereYear('end_date', Carbon::now()->subMonth()->year);
+        } elseif ($kategori === 'tahun_sebelumnya') {
+            $query->whereYear('end_date', '<', Carbon::now()->year);
+        }
+
+        $arsip = $query->latest('end_date')->get();
+        return view('arsip', compact('arsip', 'kategori'));
     }
 
     public function apiBeritaPaginate(Request $request)

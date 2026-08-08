@@ -413,9 +413,9 @@
     <div style="margin-bottom:16px;">
       <h4 style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--ink); margin-bottom:8px; letter-spacing:.08em;">Sosial Media</h4>
       <div style="display:flex; justify-content:center; gap:24px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.05em;">
-        <a href="#" style="color:var(--ink-soft); transition:color 0.2s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--ink-soft)'">Instagram</a>
-        <a href="#" style="color:var(--ink-soft); transition:color 0.2s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--ink-soft)'">TikTok</a>
-        <a href="#" style="color:var(--ink-soft); transition:color 0.2s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--ink-soft)'">YouTube</a>
+        <a href="{{ get_setting('instagram', '#') }}" target="_blank" style="color:var(--ink-soft); transition:color 0.2s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--ink-soft)'">Instagram</a>
+        <a href="{{ get_setting('tiktok', '#') }}" target="_blank" style="color:var(--ink-soft); transition:color 0.2s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--ink-soft)'">TikTok</a>
+        <a href="{{ get_setting('youtube', '#') }}" target="_blank" style="color:var(--ink-soft); transition:color 0.2s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--ink-soft)'">YouTube</a>
       </div>
     </div>
     &copy; {{ date('Y') }} Format R UNESA. Seluruh hak cipta dilindungi.

@@ -120,6 +120,11 @@
                     <input type="url" name="youtube" value="{{ $settings['youtube'] ?? 'https://youtube.com/@formatrunesa' }}"
                         class="w-full rounded-xl border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white">
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Link TikTok</label>
+                    <input type="url" name="tiktok" value="{{ $settings['tiktok'] ?? 'https://tiktok.com/@formatrunesa' }}"
+                        class="w-full rounded-xl border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+                </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Alamat Sekretariat</label>
                     <textarea rows="2" name="address"

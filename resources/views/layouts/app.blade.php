@@ -155,9 +155,9 @@
             <div class="foot-col">
                 <h5>Sosial Media</h5>
                 <ul>
-                    <li><a href="#">Instagram</a></li>
-                    <li><a href="#">TikTok</a></li>
-                    <li><a href="#">YouTube</a></li>
+                    <li><a href="{{ get_setting('instagram', '#') }}" target="_blank">Instagram</a></li>
+                    <li><a href="{{ get_setting('tiktok', '#') }}" target="_blank">TikTok</a></li>
+                    <li><a href="{{ get_setting('youtube', '#') }}" target="_blank">YouTube</a></li>
                 </ul>
             </div>
             <div class="foot-col">
