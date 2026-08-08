@@ -96,18 +96,23 @@ MAIL_FROM_NAME="${APP_NAME}"
 ## 6. Mengatasi Fitur Auto Remove Background AI di cPanel
 
 Fitur potong background lokal (`rembg`) membutuhkan Python dan akses eksekusi sistem operasi tingkat rendah yang **diblokir oleh cPanel**. 
-Oleh karena itu, saya telah mendesain sistem yang bisa "melompati" *(fallback)* keterbatasan ini dengan menggunakan **API Cloud dari Remove.bg**.
+Oleh karena itu, sistem ini telah dirancang untuk melompat *(fallback)* menggunakan **Clipdrop API (High-Res)** terlebih dahulu, lalu disusul **Remove.bg API (Low-Res)** sebagai pertahanan terakhir.
 
-1. Buat 3 buah akun gratis (Google Mail berbeda) di [Remove.bg](https://www.remove.bg/api).
-2. Dari masing-masing akun, ambil **API Key** mereka.
-3. Edit kembali file `.env` di dalam cPanel, dan tempelkan 3 kunci API tersebut:
+1. Buat akun di [Clipdrop API](https://clipdrop.co/apis) dan [Remove.bg API](https://www.remove.bg/api).
+2. Ambil **API Key** dari masing-masing akun (Bisa mendaftarkan beberapa akun/email untuk menumpuk kuota gratis).
+3. Edit file `.env` di dalam cPanel, dan tempelkan kunci API tersebut:
 ```env
-REMOVE_BG_KEY_1="paste_api_key_akun_1_di_sini"
-REMOVE_BG_KEY_2="paste_api_key_akun_2_di_sini"
-REMOVE_BG_KEY_3="paste_api_key_akun_3_di_sini"
+# Prioritas 1: Clipdrop API (Kualitas Tinggi)
+CLIPDROP_KEY_1="paste_api_key_clipdrop_1"
+CLIPDROP_KEY_2="paste_api_key_clipdrop_2"
+CLIPDROP_KEY_3="paste_api_key_clipdrop_3"
+
+# Prioritas 2 (Cadangan): Remove.bg API (Resolusi diturunkan)
+REMOVE_BG_KEY_1="paste_api_key_removebg_1"
+REMOVE_BG_KEY_2="paste_api_key_removebg_2"
+REMOVE_BG_KEY_3="paste_api_key_removebg_3"
 ```
-*Sistem akan otomatis menggunakan Kunci 1. Jika batas bulanannya (50 foto) habis, sistem akan mulus berpindah ke Kunci 2, dst.*
-*(Total kuota: 150 foto pengurus per bulan. Jika tidak cukup, tambahkan akun ke-4 dan sesuaikan kodenya).*
+*Sistem akan otomatis mencoba Clipdrop Key 1. Jika gagal/kredit habis, pindah ke Key 2. Jika semua Clipdrop habis/gagal, baru ia akan menggunakan Remove.bg.*
 
 ## 7. Membuat Symlink Storage (Menampilkan Foto)
 

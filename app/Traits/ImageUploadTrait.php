@@ -133,9 +133,52 @@ trait ImageUploadTrait
             \Log::error("Local Rembg gagal: " . implode("\n", $output));
         }
 
-        // --- 2. FALLBACK KE REMOVE.BG API JIKA REMBG LOKAL GAGAL ---
+        // --- 2. FALLBACK KE CLIPDROP API (HIGH-RES) JIKA LOKAL GAGAL ---
+        $clipdropSuccess = false;
         if (!$localRembgSuccess) {
-            \Log::info("Local Rembg gagal, mencoba menggunakan Remove.bg API sebagai fallback...");
+            \Log::info("Mencoba menggunakan Clipdrop API (High-Res) sebagai fallback pertama...");
+            $clipdropKeys = [
+                env('CLIPDROP_KEY_1'),
+                env('CLIPDROP_KEY_2'),
+                env('CLIPDROP_KEY_3'),
+            ];
+            
+            $clipdropKeys = array_filter($clipdropKeys);
+
+            if (!empty($clipdropKeys)) {
+                foreach ($clipdropKeys as $key) {
+                    $ch = curl_init();
+                    curl_setopt_array($ch, [
+                        CURLOPT_URL => "https://clipdrop-api.co/remove-background/v1",
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_POST => true,
+                        CURLOPT_HTTPHEADER => [
+                            "x-api-key: " . $key
+                        ],
+                        CURLOPT_POSTFIELDS => [
+                            'image_file' => new \CURLFile($absSource)
+                        ],
+                    ]);
+
+                    $response = curl_exec($ch);
+                    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    curl_close($ch);
+
+                    if ($httpCode == 200) {
+                        file_put_contents($tempPngPath, $response);
+                        $clipdropSuccess = true;
+                        \Log::info("Clipdrop API success using a valid key.");
+                        break;
+                    } else {
+                        \Log::warning("Clipdrop API failed for a key. HTTP Code: $httpCode. Message: " . substr($response, 0, 100));
+                    }
+                }
+            }
+        }
+
+        // --- 3. FALLBACK KE REMOVE.BG API (LOW-RES) JIKA CLIPDROP GAGAL ---
+        if (!$localRembgSuccess && !$clipdropSuccess) {
+            \Log::info("Clipdrop gagal, menggunakan Remove.bg API sebagai fallback terakhir...");
             $keys = [
                 env('REMOVE_BG_KEY_1'),
                 env('REMOVE_BG_KEY_2'),
@@ -179,7 +222,7 @@ trait ImageUploadTrait
             
             // Jika semuanya gagal
             if (!$apiSuccess) {
-                \Log::error("Semua metode remove background gagal (Local & API).");
+                \Log::error("Semua metode remove background gagal (Local, Clipdrop & Remove.bg API).");
                 return null;
             }
         }
