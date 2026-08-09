@@ -170,28 +170,28 @@
     }
     body.dark .tentang-badge{background:transparent;}
 
-  /* ===== VISI MISI ===== */
-  .vm-layout{display:grid;grid-template-columns:0.85fr 1.15fr;gap:50px;align-items:center;margin-bottom:52px;}
-    .vm-badge{
-      display:flex;align-items:center;justify-content:center;
-      aspect-ratio:1/1;
-      position:relative;
-    }
-    body.dark .vm-badge{background:transparent;}
-    .vm-badge.vm-badge--kabinet {
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 32px;
-      padding: 20px;
-      box-shadow: 0 16px 48px rgba(11,37,69,0.1);
-    }
-    body.dark .vm-badge.vm-badge--kabinet { background: #0F2545; }
-    .vm-badge.vm-badge--kabinet .kabinet-logo-img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      border-radius: 20px;
-    }
+    /* ===== VISI MISI ===== */
+    .vm-layout{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center;margin-bottom:52px;}
+      .vm-badge{
+        display:flex;align-items:center;justify-content:center;
+        aspect-ratio:4/4;
+        position:relative;
+      }
+      body.dark .vm-badge{background:transparent;}
+      .vm-badge.vm-badge--kabinet {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 32px;
+        padding: 20px;
+        box-shadow: 0 16px 48px rgba(11,37,69,0.1);
+      }
+      body.dark .vm-badge.vm-badge--kabinet { background: #0F2545; }
+      .vm-badge.vm-badge--kabinet .kabinet-logo-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        border-radius: 20px;
+      }
     .vm-badge.vm-badge--format {
       padding: 20px;
     }
@@ -289,7 +289,7 @@
   }
 
     /* ===== PEMBINA ===== */
-    .pembina-layout { display:grid; grid-template-columns:1.2fr 0.8fr; gap:50px; align-items:center; margin-top:80px; }
+    .pembina-layout { display:grid; grid-template-columns:1fr 0.8fr; gap:50px; align-items:center; margin-top:80px; }
     .pembina-content { display:flex; flex-direction:column; }
     .pembina-card {
         background:var(--cream); border:1px solid var(--line); border-radius:20px;
@@ -313,7 +313,7 @@
     body.dark .pembina-card h4 { color: #fff; }
     
     .pembina-photo-wrap {
-        position: relative; width: 100%; max-width: 320px; margin: 0 auto;
+        position: relative; width: 100%; max-width: 400px; margin: 0 auto;
         aspect-ratio: 4/5; border-radius: 24px; overflow: hidden;
         background: var(--blue-pale); border: 1px solid var(--line);
         box-shadow: 0 16px 48px rgba(11,37,69,0.1);
