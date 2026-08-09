@@ -17,9 +17,8 @@ class EventController extends Controller
     {
         $event = \App\Models\Event::where('slug', $slug)->firstOrFail();
         $lainnya = \App\Models\Event::where('slug', '!=', $slug)
-            ->whereIn('status', ['upcoming', 'ongoing'])
             ->latest('start_date')
-            ->take(3)
+            ->take(4)
             ->get();
 
         return view('event.show', compact('event', 'lainnya'));
