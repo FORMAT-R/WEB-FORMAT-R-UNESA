@@ -18,15 +18,15 @@
         </div>
     @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         @foreach($cabinets as $cabinet)
         <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
-            <div class="relative w-full aspect-[4/5] bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700">
+            <div class="relative w-full aspect-[4/5] bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700 overflow-hidden">
                 @if($cabinet->logo)
-                    <img src="{{ Storage::url($cabinet->logo) }}" alt="{{ $cabinet->name }}" class="w-full h-full object-cover">
+                    <img src="{{ Storage::url($cabinet->logo) }}" alt="{{ $cabinet->name }}" class="w-full h-full object-contain p-4">
                 @else
                     <div class="w-full h-full flex items-center justify-center">
-                        <span class="text-6xl text-gray-400 font-bold opacity-50">{{ substr($cabinet->name, 0, 1) }}</span>
+                        <span class="text-4xl text-gray-400 font-bold opacity-50">{{ substr($cabinet->name, 0, 1) }}</span>
                     </div>
                 @endif
                 
@@ -44,23 +44,23 @@
                 </div>
             </div>
 
-            <div class="p-5 flex-1 flex flex-col">
+            <div class="p-4 flex-1 flex flex-col">
                 <div class="mb-auto">
-                    <a href="{{ route('admin.cabinets.show', $cabinet->id) }}" class="text-xl font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors block mb-1">
+                    <a href="{{ route('admin.cabinets.show', $cabinet->id) }}" class="text-lg font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors block mb-1">
                         {{ $cabinet->name }}
                     </a>
-                    <p class="text-sm font-medium text-blue-600 dark:text-blue-400 mb-4">{{ $cabinet->period }}</p>
+                    <p class="text-xs font-medium text-blue-600 dark:text-blue-400 mb-3">{{ $cabinet->period }}</p>
 
                     @if($cabinet->vision)
                         <div>
-                            <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Visi</h4>
-                            <p class="text-sm text-gray-700 dark:text-gray-300 line-clamp-3 leading-relaxed">{{ $cabinet->vision }}</p>
+                            <h4 class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Visi</h4>
+                            <p class="text-xs text-gray-700 dark:text-gray-300 line-clamp-3 leading-relaxed">{{ $cabinet->vision }}</p>
                         </div>
                     @endif
                 </div>
             </div>
 
-            <div class="bg-gray-50 dark:bg-gray-900/50 px-5 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div class="bg-gray-50 dark:bg-gray-900/50 px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <div>
                     <form action="{{ route('admin.cabinets.toggle', $cabinet->id) }}" method="POST" class="inline">
                         @csrf

@@ -21,15 +21,15 @@
         </div>
     @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         @forelse($pembinas as $p)
             <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
-                <div class="relative w-full aspect-[4/5] bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700">
+                <div class="relative w-full aspect-[4/5] bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700 overflow-hidden">
                     @if($p->photo)
                         <img src="{{ Storage::url($p->photo) }}" class="w-full h-full object-cover">
                     @else
                         <div class="w-full h-full flex items-center justify-center">
-                            <svg class="w-16 h-16 text-gray-400 opacity-50" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2a5 5 0 100 10 5 5 0 000-10zm-7 14a7 7 0 1114 0H5z" clip-rule="evenodd" /></svg>
+                            <svg class="w-12 h-12 text-gray-400 opacity-50" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2a5 5 0 100 10 5 5 0 000-10zm-7 14a7 7 0 1114 0H5z" clip-rule="evenodd" /></svg>
                         </div>
                     @endif
                     
@@ -43,18 +43,18 @@
                     @endif
                 </div>
 
-                <div class="p-5 flex-1 flex flex-col">
+                <div class="p-4 flex-1 flex flex-col">
                     <div class="mb-auto">
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-1">{{ $p->name }}</h3>
-                        <p class="text-sm font-medium text-blue-600 dark:text-blue-400 mb-4">{{ $p->term_period }}</p>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">{{ $p->name }}</h3>
+                        <p class="text-xs font-medium text-blue-600 dark:text-blue-400 mb-3">{{ $p->term_period }}</p>
                         
-                        <div class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 leading-relaxed">
+                        <div class="text-xs text-gray-600 dark:text-gray-400 line-clamp-3 leading-relaxed">
                             {!! strip_tags($p->biography) !!}
                         </div>
                     </div>
                 </div>
                 
-                <div class="bg-gray-50 dark:bg-gray-900/50 px-5 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <div class="bg-gray-50 dark:bg-gray-900/50 px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
                     <div>
                         @if(!$p->is_active)
                             <form action="{{ route('admin.pembinas.toggle', $p->id) }}" method="POST" class="inline">
