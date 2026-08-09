@@ -21,9 +21,9 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @foreach($cabinets as $cabinet)
         <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
-            <div class="relative w-full aspect-[4/5] bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700">
+            <div class="relative w-full aspect-[4/5] bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700 overflow-hidden">
                 @if($cabinet->logo)
-                    <img src="{{ Storage::url($cabinet->logo) }}" alt="{{ $cabinet->name }}" class="w-full h-full object-cover">
+                    <img src="{{ Storage::url($cabinet->logo) }}" alt="{{ $cabinet->name }}" class="w-full h-full object-contain p-4">
                 @else
                     <div class="w-full h-full flex items-center justify-center">
                         <span class="text-6xl text-gray-400 font-bold opacity-50">{{ substr($cabinet->name, 0, 1) }}</span>
