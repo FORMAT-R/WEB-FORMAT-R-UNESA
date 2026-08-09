@@ -171,7 +171,7 @@
     body.dark .tentang-badge{background:transparent;}
 
     /* ===== VISI MISI ===== */
-    .vm-layout{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center;margin-bottom:52px;}
+    .vm-layout{display:grid;grid-template-columns: 4fr 4fr;gap:50px;align-items:center;margin-bottom:52px;}
       .vm-badge{
         display:flex;align-items:center;justify-content:center;
         aspect-ratio:4/4;
@@ -184,6 +184,9 @@
         border-radius: 32px;
         padding: 20px;
         box-shadow: 0 16px 48px rgba(11,37,69,0.1);
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
       }
       body.dark .vm-badge.vm-badge--kabinet { background: #0F2545; }
       .vm-badge.vm-badge--kabinet .kabinet-logo-img {
@@ -289,7 +292,7 @@
   }
 
     /* ===== PEMBINA ===== */
-    .pembina-layout { display:grid; grid-template-columns:1fr 0.8fr; gap:50px; align-items:center; margin-top:80px; }
+    .pembina-layout { display:grid; grid-template-columns: 5fr 4fr; gap:50px; align-items:center; margin-top:80px; }
     .pembina-content { display:flex; flex-direction:column; }
     .pembina-card {
         background:var(--cream); border:1px solid var(--line); border-radius:20px;
@@ -313,7 +316,7 @@
     body.dark .pembina-card h4 { color: #fff; }
     
     .pembina-photo-wrap {
-        position: relative; width: 100%; max-width: 400px; margin: 0 auto;
+        position: relative; width: 100%; max-width: 480px; margin: 0 auto;
         aspect-ratio: 4/5; border-radius: 24px; overflow: hidden;
         background: var(--blue-pale); border: 1px solid var(--line);
         box-shadow: 0 16px 48px rgba(11,37,69,0.1);
@@ -672,6 +675,8 @@
     .tentang-badge{max-width:280px;margin:0 auto;}
     .vm-layout{grid-template-columns:1fr;gap:28px;}
     .vm-badge{max-width:340px;margin:0 auto;}
+    .pembina-layout{grid-template-columns:1fr;gap:28px;}
+    .pembina-photo-wrap{max-width: 320px; margin:0 auto;}
     .dept-grid{grid-template-columns:repeat(2,1fr);}
     .spotlight-card{grid-template-columns:1fr;}
     .spotlight-photo{aspect-ratio:16/9;}
