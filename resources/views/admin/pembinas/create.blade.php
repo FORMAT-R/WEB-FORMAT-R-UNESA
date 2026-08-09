@@ -37,7 +37,8 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Biografi / Profil Singkat <span class="text-red-500">*</span></label>
-                <textarea name="biography" id="biography-editor" rows="6" class="w-full rounded-xl border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white" required>{{ old('biography') }}</textarea>
+                <input type="hidden" name="biography" id="biography-hidden" value="{{ old('biography') }}">
+                <div id="biography-editor" class="w-full rounded-b-xl border-gray-300 bg-white text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-white">{!! old('biography') !!}</div>
             </div>
         </div>
 
@@ -69,23 +70,14 @@
         // Sync quill content to hidden textarea before submit
         const form = document.getElementById('pembinaForm');
         form.addEventListener('submit', function(e) {
-            const textarea = document.querySelector('#biography-editor');
+            const hiddenInput = document.getElementById('biography-hidden');
             const html = quill.root.innerHTML;
-            
-            // Cek apakah input hidden sudah ada
-            let hiddenInput = document.querySelector('input[name="biography"][type="hidden"]');
-            
-            if (!hiddenInput) {
-                hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'biography';
-                form.appendChild(hiddenInput);
-            }
-            
             hiddenInput.value = html === '<p><br></p>' ? '' : html;
             
-            // Remove textarea name attribute to prevent submitting empty/raw html
-            if (textarea) textarea.removeAttribute('name');
+            if(hiddenInput.value.trim() === '') {
+                e.preventDefault();
+                alert('Biografi tidak boleh kosong!');
+            }
         });
     // });
 </script>

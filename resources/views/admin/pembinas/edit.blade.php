@@ -44,6 +44,7 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Biografi / Profil Singkat <span class="text-red-500">*</span></label>
+                <input type="hidden" name="biography" id="biography-hidden" value="{{ old('biography', $pembina->biography) }}">
                 <div id="biography-editor" class="w-full rounded-b-xl border-gray-300 bg-white text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-white">{!! old('biography', $pembina->biography) !!}</div>
             </div>
         </div>
@@ -76,18 +77,14 @@
 
         const form = document.getElementById('pembinaForm');
         form.addEventListener('submit', function(e) {
-            // Cek apakah input hidden sudah ada agar tidak menggandakan saat submit ulang (jika ada error)
-            let hiddenInput = document.querySelector('input[name="biography"]');
-            
-            if (!hiddenInput) {
-                hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'biography';
-                form.appendChild(hiddenInput);
-            }
-            
+            const hiddenInput = document.getElementById('biography-hidden');
             const html = quill.root.innerHTML;
             hiddenInput.value = html === '<p><br></p>' ? '' : html;
+            
+            if(hiddenInput.value.trim() === '') {
+                e.preventDefault();
+                alert('Biografi tidak boleh kosong!');
+            }
         });
         
     // });

@@ -101,24 +101,24 @@ function initStackScroll() {
   // ==========================================
   // SECTION REVEAL ANIMATIONS (ABSOLUTE TRIGGER)
   // ==========================================
-  const sectionReveal = ({ id, fromSelector, stagger = 0.1, parallaxSpeed = 0.1, yFrom = 50, index }) => {
-    const sec = document.querySelector(id);
-    if (!sec) return;
-
-    const elements = sec.querySelectorAll(fromSelector);
-    if (elements.length > 0) {
-      gsap.fromTo(elements, 
-        { y: yFrom, opacity: 0 },
-        {
-          y: 0, opacity: 1, ease: 'power3.out', duration: 0.5, stagger,
-          scrollTrigger: {
-            trigger: document.body, 
-            start: () => (index * window.innerHeight) + (window.innerHeight * 0.3), 
-            toggleActions: 'play none none reverse'
+    const sectionReveal = ({ id, fromSelector, stagger = 0.1, parallaxSpeed = 0.1, yFrom = 50 }) => {
+      const sec = document.querySelector(id);
+      if (!sec) return;
+  
+      const elements = sec.querySelectorAll(fromSelector);
+      if (elements.length > 0) {
+        gsap.fromTo(elements, 
+          { y: yFrom, opacity: 0 },
+          {
+            y: 0, opacity: 1, ease: 'power3.out', duration: 0.5, stagger,
+            scrollTrigger: {
+              trigger: sec, // Trigger is the section itself, NOT the body with absolute index
+              start: 'top 80%', // Starts animation when the top of the section hits 80% down the screen
+              toggleActions: 'play none none reverse'
+            }
           }
-        }
-      );
-    }
+        );
+      }
 
     const parallaxElements = sec.querySelectorAll('.parallax');
     if (parallaxElements.length > 0) {
