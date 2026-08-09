@@ -291,7 +291,7 @@
 
   <div class="issue-bar" style="display:flex; justify-content:space-between;">
     <span>Forum Mahasiswa Tuban Ronggolawe</span>
-    <span>Kolaborasi Asa</span>
+    <span>Kabinet Kolaborasi Asa</span>
   </div>
 
   <!-- MAIN GRID -->

@@ -133,7 +133,7 @@
       <div class="issue-bar">
         <span>Forum Mahasiswa Tuban Ronggolawe</span>
         <span class="text-red-600 font-bold tracking-wider">MODE EDITING</span>
-        <span>Kolaborasi Asa</span>
+        <span>Kabinet Kolaborasi Asa</span>
       </div>
 
       <div class="main-grid">
