@@ -32,11 +32,11 @@ class ProcessMemberPhotoBackground implements ShouldQueue
     {
         $member = Member::find($this->memberId);
         
-        // Cek jika member masih ada dan memiliki foto asli
-        if ($member && $member->photo) {
+        // Cek jika member masih ada dan memiliki foto sorotan
+        if ($member && $member->photo_sorotan) {
             
             // Proses remove background menggunakan trait
-            $nobgPath = $this->removeBackgroundAndSaveWebp($member->photo, 'members');
+            $nobgPath = $this->removeBackgroundAndSaveWebp($member->photo_sorotan, 'members_sorotan');
             
             if ($nobgPath) {
                 // Update tabel jika berhasil

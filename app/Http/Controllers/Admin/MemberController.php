@@ -23,24 +23,28 @@ class MemberController extends Controller
             'name' => 'required|string|max:255',
             'position' => 'required|string|max:255',
             'photo' => 'nullable|image|max:10240',
+            'photo_sorotan' => 'nullable|image|max:10240',
         ]);
 
-        $hasNewPhoto = false;
+        $hasNewSorotan = false;
 
         if ($request->hasFile('photo')) {
             $validated['photo'] = $this->uploadImageWebp($request->file('photo'), 'members');
-            $hasNewPhoto = true;
+        }
+
+        if ($request->hasFile('photo_sorotan')) {
+            $validated['photo_sorotan'] = $this->uploadImageWebp($request->file('photo_sorotan'), 'members_sorotan');
+            $hasNewSorotan = true;
         }
 
         $member = Member::create($validated);
 
-        if ($hasNewPhoto) {
-            // Jalankan remove background di background task via Queue
+        if ($hasNewSorotan) {
             ProcessMemberPhotoBackground::dispatch($member->id);
         }
 
         return redirect()->route('admin.departemen.show', $request->department_id)
-            ->with('success', 'Anggota berhasil ditambahkan. Foto sedang diproses AI di latar belakang.');
+            ->with('success', 'Anggota berhasil ditambahkan. Foto sorotan sedang diproses AI di latar belakang.');
     }
 
     /**
@@ -56,33 +60,39 @@ class MemberController extends Controller
             'name' => 'required|string|max:255',
             'position' => 'required|string|max:255',
             'photo' => 'nullable|image|max:10240',
+            'photo_sorotan' => 'nullable|image|max:10240',
         ]);
 
-        $hasNewPhoto = false;
+        $hasNewSorotan = false;
 
         if ($request->hasFile('photo')) {
             if ($member->photo) {
                 Storage::disk('public')->delete($member->photo);
             }
+            $validated['photo'] = $this->uploadImageWebp($request->file('photo'), 'members');
+        }
+
+        if ($request->hasFile('photo_sorotan')) {
+            if ($member->photo_sorotan) {
+                Storage::disk('public')->delete($member->photo_sorotan);
+            }
             if ($member->photo_nobg) {
                 Storage::disk('public')->delete($member->photo_nobg);
             }
             
-            // Set ke null sementara saat diupdate sebelum di-generate baru oleh Queue
             $validated['photo_nobg'] = null;
-            $validated['photo'] = $this->uploadImageWebp($request->file('photo'), 'members');
-            $hasNewPhoto = true;
+            $validated['photo_sorotan'] = $this->uploadImageWebp($request->file('photo_sorotan'), 'members_sorotan');
+            $hasNewSorotan = true;
         }
 
         $member->update($validated);
 
-        if ($hasNewPhoto) {
-            // Jalankan remove background di background task via Queue
+        if ($hasNewSorotan) {
             ProcessMemberPhotoBackground::dispatch($member->id);
         }
 
         return redirect()->route('admin.departemen.show', $request->department_id)
-            ->with('success', 'Anggota berhasil diperbarui. Foto sedang diproses AI di latar belakang.');
+            ->with('success', 'Anggota berhasil diperbarui. Foto sorotan sedang diproses AI di latar belakang.');
     }
 
     /**
@@ -95,6 +105,9 @@ class MemberController extends Controller
         
         if ($member->photo) {
             Storage::disk('public')->delete($member->photo);
+        }
+        if ($member->photo_sorotan) {
+            Storage::disk('public')->delete($member->photo_sorotan);
         }
         if ($member->photo_nobg) {
             Storage::disk('public')->delete($member->photo_nobg);

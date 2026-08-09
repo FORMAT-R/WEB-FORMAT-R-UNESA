@@ -98,7 +98,7 @@ section { position: relative; padding: 96px 0; }
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 4px 16px rgba(11,37,69,0.06);
-    will-change: transform;
+    will-change: transform, backdrop-filter;
     transform: translateZ(0); /* Hardware Acceleration for sticky nav */
 }
 .nav-wrap.scrolled .navbar { box-shadow: 0 12px 34px rgba(11,37,69,0.16); }

@@ -117,27 +117,37 @@
     
     openAddModal() {
         this.editingId = null;
-        this.form = { name: '', position: 'Staff Muda', cabinet_id: '{{ $selectedCabinetId }}', photo: '' };
+        this.form = { name: '', position: 'Staff Muda', cabinet_id: '{{ $selectedCabinetId }}', photo: '', photo_sorotan: '' };
         this.showModal = true;
     },
     
     openEditModal(member) {
         this.editingId = member.id;
         // Kita tidak bisa pre-fill input file, jadi biarkan photoPreview terisi dari db jika ada
-        this.form = { ...member, photo: member.photo_url };
+        this.form = { ...member, photo: member.photo_url, photo_sorotan: member.photo_sorotan_url };
         this.showModal = true;
     },
     
-    handlePhotoUpload(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                this.form.photo = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    },
+      handlePhotoUpload(e) {
+          const file = e.target.files[0];
+          if (file) {
+              const reader = new FileReader();
+              reader.onload = (e) => {
+                  this.form.photo = e.target.result;
+              };
+              reader.readAsDataURL(file);
+          }
+      },
+      handleSorotanUpload(e) {
+          const file = e.target.files[0];
+          if (file) {
+              const reader = new FileReader();
+              reader.onload = (e) => {
+                  this.form.photo_sorotan = e.target.result;
+              };
+              reader.readAsDataURL(file);
+          }
+      },
     
     deleteId: null,
     deleteMember(id) {
@@ -232,7 +242,7 @@
                         <h3 class="member-name">{{ $member->name }}</h3>
                         <span class="member-position">{{ $member->position }}</span>
                         <div class="member-actions">
-                            <button type="button" class="btn-action btn-edit" @click="openEditModal({ id: {{ $member->id }}, name: '{{ addslashes($member->name) }}', position: '{{ addslashes($member->position) }}', cabinet_id: '{{ $member->cabinet_id }}', photo_url: '{{ $member->photo ? Storage::url($member->photo) : '' }}' })">Edit</button>
+                            <button type="button" class="btn-action btn-edit" @click="openEditModal({ id: {{ $member->id }}, name: '{{ addslashes($member->name) }}', position: '{{ addslashes($member->position) }}', cabinet_id: '{{ $member->cabinet_id }}', photo_url: '{{ $member->photo ? Storage::url($member->photo) : '' }}', photo_sorotan_url: '{{ $member->photo_sorotan ? Storage::url($member->photo_sorotan) : '' }}' })">Edit</button>
                             <button type="button" class="btn-action btn-delete" @click="deleteMember({{ $member->id }})">Hapus</button>
                         </div>
                     </div>
@@ -274,8 +284,9 @@
                     <input type="hidden" name="cabinet_id" x-model="form.cabinet_id">
 
                     <!-- Foto -->
+                    <!-- Foto Profil -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Foto Anggota</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Foto Profil (Card Tim Kami) <span class="text-xs text-gray-500 font-normal ml-1">Sebaiknya Pasfoto/Formal</span></label>
                         <div class="flex items-center gap-4">
                             <div class="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 overflow-hidden flex-shrink-0">
                                 <template x-if="form.photo">
@@ -286,6 +297,22 @@
                                 </template>
                             </div>
                             <input type="file" name="photo" accept="image/*" @change="handlePhotoUpload" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        </div>
+                    </div>
+
+                    <!-- Foto Sorotan -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Foto Sorotan Pengurus <span class="text-xs text-gray-500 font-normal ml-1">Otomatis Remove BG</span></label>
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-16 rounded-xl bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 overflow-hidden flex-shrink-0">
+                                <template x-if="form.photo_sorotan">
+                                    <img :src="form.photo_sorotan" class="w-full h-full object-cover">
+                                </template>
+                                <template x-if="!form.photo_sorotan">
+                                    <svg class="w-8 h-8 text-gray-400 mx-auto mt-4" fill="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                </template>
+                            </div>
+                            <input type="file" name="photo_sorotan" accept="image/*" @change="handleSorotanUpload" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100">
                         </div>
                     </div>
 

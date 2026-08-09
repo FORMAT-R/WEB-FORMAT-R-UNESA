@@ -52,6 +52,10 @@
                         <option value="completed">Selesai</option>
                     </select>
                 </div>
+                <div x-show="status === 'upcoming' || status === 'ongoing'" x-transition>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Link Pendaftaran <span class="text-xs text-gray-500 font-normal ml-1">(Opsional)</span></label>
+                    <input type="url" name="registration_link" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="Contoh: https://forms.gle/..." value="{{ old('registration_link') }}">
+                </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tanggal Mulai <span class="text-red-500">*</span></label>
                     <input type="date" name="start_date" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" required value="{{ old('start_date') }}">
@@ -85,6 +89,12 @@
             <div class="mt-6">
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Deskripsi Singkat <span class="text-red-500">*</span></label>
                 <textarea name="description" rows="3" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" required placeholder="Penjelasan singkat mengenai event ini...">{{ old('description') }}</textarea>
+            </div>
+
+            <div class="mt-6">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Output / Luaran Kegiatan <span class="text-xs text-gray-500 font-normal ml-2">(Opsional)</span></label>
+                <textarea name="output" rows="4" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="Tuliskan hasil kegiatan, pencapaian, atau output lainnya di sini...">{{ old('output') }}</textarea>
+                <p class="text-xs text-gray-500 mt-2">Gunakan Enter untuk membuat paragraf baru. Teks ini akan muncul di bawah deskripsi pada halaman detail event.</p>
             </div>
             
             <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">

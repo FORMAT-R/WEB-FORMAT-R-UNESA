@@ -438,17 +438,35 @@
             </div>
 
             <div class="event-content">
-                <div>
-                    <h1>{{ $event->title }}</h1>
-                    <p class="lede">{!! $event->description !!}</p>
-                    <div style="display:flex;gap:14px;flex-wrap:wrap;">
-                        @if($event->status == 'upcoming')
-                        <a href="{{ route('home') }}#kontak" class="btn">Daftar Sekarang</a>
-                        <a href="{{ route('event.index') }}" class="btn ghost">Lihat Semua Event</a>
-                        @elseif($event->status == 'ongoing')
-                        <a href="{{ route('home') }}#kontak" class="btn">Bergabung Sekarang</a>
-                        <a href="{{ route('event.index') }}" class="btn ghost">Event Lainnya</a>
-                        @else
+                  <div>
+                      <h1>{{ $event->title }}</h1>
+                      <p class="lede">{!! nl2br(e($event->description)) !!}</p>
+                      
+                      @if(!empty($event->output))
+                      <div class="event-output" style="margin-top: 28px; padding-top: 24px; border-top: 1px dashed var(--line); margin-bottom: 28px;">
+                          <h4 style="font-size: 1.15rem; color: var(--navy); margin-bottom: 14px; font-weight: 700;">Output Kegiatan</h4>
+                          <div style="color: var(--ink-soft); font-size: 0.95rem; line-height: 1.7;">
+                              {!! nl2br(e($event->output)) !!}
+                          </div>
+                      </div>
+                      @endif
+
+                        <div style="display:flex;gap:14px;flex-wrap:wrap;">
+                          @if($event->status == 'upcoming')
+                              @if($event->registration_link)
+                                  <a href="{{ $event->registration_link }}" target="_blank" class="btn">Daftar Sekarang</a>
+                              @else
+                                  <button onclick="alert('Link pendaftaran belum tersedia')" class="btn" style="opacity: 0.8; cursor: not-allowed;">Daftar Sekarang</button>
+                              @endif
+                          <a href="{{ route('event.index') }}" class="btn ghost">Lihat Semua Event</a>
+                          @elseif($event->status == 'ongoing')
+                              @if($event->registration_link)
+                                  <a href="{{ $event->registration_link }}" target="_blank" class="btn">Bergabung Sekarang</a>
+                              @else
+                                  <button onclick="alert('Link pendaftaran belum tersedia')" class="btn" style="opacity: 0.8; cursor: not-allowed;">Bergabung Sekarang</button>
+                              @endif
+                          <a href="{{ route('event.index') }}" class="btn ghost">Event Lainnya</a>
+                          @else
                         <a href="{{ route('event.index') }}" class="btn">Lihat Event Lainnya</a>
                         @endif
                     </div>
