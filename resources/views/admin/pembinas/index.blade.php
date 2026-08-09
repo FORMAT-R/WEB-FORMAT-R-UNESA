@@ -24,7 +24,7 @@
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         @forelse($pembinas as $p)
             <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
-                <div class="relative w-full aspect-[4/5] bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="relative w-full aspect-[5/4] bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700 overflow-hidden">
                     @if($p->photo)
                         <img src="{{ Storage::url($p->photo) }}" class="w-full h-full object-cover">
                     @else
@@ -34,8 +34,8 @@
                     @endif
                     
                     @if($p->is_active)
-                        <div class="absolute top-4 right-4 z-10">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800 shadow-sm">
+                        <div class="absolute top-3 right-3 z-10">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800 shadow-sm">
                                 <span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>
                                 Aktif
                             </span>
@@ -45,10 +45,10 @@
 
                 <div class="p-4 flex-1 flex flex-col">
                     <div class="mb-auto">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">{{ $p->name }}</h3>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1 leading-tight">{{ $p->name }}</h3>
                         <p class="text-xs font-medium text-blue-600 dark:text-blue-400 mb-3">{{ $p->term_period }}</p>
                         
-                        <div class="text-xs text-gray-600 dark:text-gray-400 line-clamp-3 leading-relaxed">
+                        <div class="text-[10px] text-gray-600 dark:text-gray-400 line-clamp-3 leading-relaxed">
                             {!! strip_tags($p->biography) !!}
                         </div>
                     </div>
@@ -60,7 +60,7 @@
                             <form action="{{ route('admin.pembinas.toggle', $p->id) }}" method="POST" class="inline">
                                 @csrf
                                 @method('PATCH')
-                                <button type="submit" class="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline transition-colors" onclick="return confirm('Jadikan Pembina ini sebagai yang aktif di halaman depan?');">
+                                <button type="submit" class="text-[10px] font-medium text-blue-600 dark:text-blue-400 hover:underline transition-colors" onclick="return confirm('Jadikan Pembina ini sebagai yang aktif di halaman depan?');">
                                     Jadikan Aktif
                                 </button>
                             </form>

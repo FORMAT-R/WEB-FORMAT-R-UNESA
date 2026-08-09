@@ -18,69 +18,69 @@
         </div>
     @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         @foreach($cabinets as $cabinet)
         <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
-            <div class="relative w-full aspect-[4/5] bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div class="relative w-full aspect-[5/4] bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700 overflow-hidden">
                 @if($cabinet->logo)
                     <img src="{{ Storage::url($cabinet->logo) }}" alt="{{ $cabinet->name }}" class="w-full h-full object-contain p-4">
                 @else
                     <div class="w-full h-full flex items-center justify-center">
-                        <span class="text-6xl text-gray-400 font-bold opacity-50">{{ substr($cabinet->name, 0, 1) }}</span>
+                        <span class="text-4xl text-gray-400 font-bold opacity-50">{{ substr($cabinet->name, 0, 1) }}</span>
                     </div>
                 @endif
                 
-                <div class="absolute top-4 right-4 z-10">
+                <div class="absolute top-3 right-3 z-10">
                     @if($cabinet->is_active)
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800 shadow-sm">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800 shadow-sm">
                             <span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>
                             Aktif
                         </span>
                     @else
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-600 shadow-sm">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-600 shadow-sm">
                             Arsip
                         </span>
                     @endif
                 </div>
             </div>
 
-            <div class="p-5 flex-1 flex flex-col">
+            <div class="p-4 flex-1 flex flex-col">
                 <div class="mb-auto">
-                    <a href="{{ route('admin.cabinets.show', $cabinet->id) }}" class="text-xl font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors block mb-1">
+                    <a href="{{ route('admin.cabinets.show', $cabinet->id) }}" class="text-lg font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors block mb-1 leading-tight">
                         {{ $cabinet->name }}
                     </a>
-                    <p class="text-sm font-medium text-blue-600 dark:text-blue-400 mb-4">{{ $cabinet->period }}</p>
+                    <p class="text-xs font-medium text-blue-600 dark:text-blue-400 mb-3">{{ $cabinet->period }}</p>
 
                     @if($cabinet->vision)
                         <div>
-                            <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Visi</h4>
-                            <p class="text-sm text-gray-700 dark:text-gray-300 line-clamp-3 leading-relaxed">{{ $cabinet->vision }}</p>
+                            <h4 class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Visi</h4>
+                            <p class="text-xs text-gray-700 dark:text-gray-300 line-clamp-3 leading-relaxed">{{ $cabinet->vision }}</p>
                         </div>
                     @endif
                 </div>
             </div>
 
-            <div class="bg-gray-50 dark:bg-gray-900/50 px-5 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div class="bg-gray-50 dark:bg-gray-900/50 px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <div>
                     <form action="{{ route('admin.cabinets.toggle', $cabinet->id) }}" method="POST" class="inline">
                         @csrf
                         @method('PATCH')
-                        <button type="submit" class="text-xs font-medium hover:underline text-{{ $cabinet->is_active ? 'yellow' : 'green' }}-600 dark:text-{{ $cabinet->is_active ? 'yellow' : 'green' }}-400 transition-colors">
-                            {{ $cabinet->is_active ? 'Nonaktifkan' : 'Jadikan Aktif' }}
+                        <button type="submit" class="text-[10px] font-medium hover:underline text-{{ $cabinet->is_active ? 'yellow' : 'green' }}-600 dark:text-{{ $cabinet->is_active ? 'yellow' : 'green' }}-400 transition-colors">
+                            {{ $cabinet->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                         </button>
                     </form>
                 </div>
                 <div class="flex items-center gap-1.5">
-                    <a href="{{ route('admin.cabinets.show', $cabinet->id) }}" class="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors" title="Lihat Anggota">
+                    <a href="{{ route('admin.cabinets.show', $cabinet->id) }}" class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors" title="Lihat Anggota">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                     </a>
-                    <button @click='editForm = { id: "{{ $cabinet->id }}", name: @json($cabinet->name), period: @json($cabinet->period), vision: @json($cabinet->vision ?? ""), mission: @json($cabinet->mission ?? "") }; showEditModal = true' class="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors" title="Edit">
+                    <button @click='editForm = { id: "{{ $cabinet->id }}", name: @json($cabinet->name), period: @json($cabinet->period), vision: @json($cabinet->vision ?? ""), mission: @json($cabinet->mission ?? "") }; showEditModal = true' class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors" title="Edit">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                     </button>
                     <form action="{{ route('admin.cabinets.destroy', $cabinet->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus kabinet ini beserta semua anggotanya?');">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors" title="Hapus">
+                        <button type="submit" class="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors" title="Hapus">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
                     </form>
