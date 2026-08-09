@@ -96,7 +96,7 @@ import './scroll-animations.js';
     /* ========== Scrollspy — Active Nav Link (fallback only; GSAP drives homepage) ========== */
     // Only run this manual scrollspy if GSAP stack-scroll is NOT active on this page.
     if (!hasGsapHome) {
-        const sectionIds = ['home', 'tentang', 'visimisi', 'berita', 'apresiasi', 'arsip', 'penghargaan', 'faq', 'kontak'];
+        const sectionIds = ['home', 'tentang', 'visimisi', 'pembina', 'berita', 'apresiasi', 'arsip', 'penghargaan', 'faq', 'kontak'];
         const sections   = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
         const navItems   = document.querySelectorAll('#navLinks > li[data-sec]');
 
@@ -106,7 +106,7 @@ import './scroll-animations.js';
             sections.forEach(function (sec) {
                 if (sec.offsetTop <= scrollPos) currentId = sec.id;
             });
-            const mapId = (currentId === 'visimisi') ? 'tentang' : currentId;
+            const mapId = (currentId === 'visimisi' || currentId === 'pembina') ? 'tentang' : currentId;
             navItems.forEach(function (li) {
                 li.classList.toggle('active', li.getAttribute('data-sec') === mapId);
             });

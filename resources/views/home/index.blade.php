@@ -288,6 +288,43 @@
     }
   }
 
+    /* ===== PEMBINA ===== */
+    .pembina-layout { display:grid; grid-template-columns:1.2fr 0.8fr; gap:50px; align-items:center; margin-top:80px; }
+    .pembina-content { display:flex; flex-direction:column; }
+    .pembina-card {
+        background:var(--cream); border:1px solid var(--line); border-radius:20px;
+        padding:34px 30px; box-shadow:0 12px 24px rgba(11,37,69,0.06);
+    }
+    .pembina-card-inner {
+        max-height: 280px; 
+        overflow-y: auto; 
+        padding-right: 14px;
+    }
+    .pembina-card-inner::-webkit-scrollbar { width: 6px; }
+    .pembina-card-inner::-webkit-scrollbar-track { background: transparent; }
+    .pembina-card-inner::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+    body.dark .pembina-card { background:var(--navy); }
+    .pembina-card p, .pembina-card ul, .pembina-card ol { font-size:0.95rem; color:var(--ink-soft); line-height:1.7; }
+    .pembina-card p { margin-bottom: 12px; }
+    .pembina-card ul, .pembina-card ol { padding-left: 20px; margin-bottom: 12px; }
+    .pembina-card ul { list-style: disc; }
+    .pembina-card ol { list-style: decimal; }
+    .pembina-card h4 { font-family: 'Sora', sans-serif; font-size: 1.15rem; color: var(--navy); margin-bottom: 12px; margin-top: 16px; }
+    body.dark .pembina-card h4 { color: #fff; }
+    
+    .pembina-photo-wrap {
+        position: relative; width: 100%; max-width: 320px; margin: 0 auto;
+        aspect-ratio: 4/5; border-radius: 24px; overflow: hidden;
+        background: var(--blue-pale); border: 1px solid var(--line);
+        box-shadow: 0 16px 48px rgba(11,37,69,0.1);
+    }
+    body.dark .pembina-photo-wrap { background: var(--navy); }
+    .pembina-photo-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .pembina-info { text-align: center; margin-top: 20px; }
+    .pembina-info h3 { font-family: 'Sora', sans-serif; font-size: 1.35rem; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+    body.dark .pembina-info h3 { color: #fff; }
+    .pembina-info p { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; letter-spacing: 0.05em; color: var(--ink-soft); text-transform: uppercase; font-weight: 600; }
+
   /* ===== DEPARTEMEN (section di beranda) ===== */
   .dept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
   .dept-card{
@@ -783,8 +820,38 @@
             </div>
         </div>
     </div>
+</section>
+
+{{-- ===== PEMBINA ===== --}}
+@if($pembina)
+<section class="stack-section" id="pembina" data-reveal>
+    <div class="container pembina-layout">
+        <div class="pembina-content" data-stagger-child>
+            <h2 style="margin-bottom:24px;">Profil Pembina</h2>
+            
+            <div class="pembina-card">
+                <div class="pembina-card-inner">
+                    {!! $pembina->biography !!}
+                </div>
+            </div>
+        </div>
+
+        <div data-stagger-child data-parallax="0.2">
+            <div class="pembina-photo-wrap">
+                @if($pembina->photo)
+                    <img src="{{ Storage::url($pembina->photo) }}" alt="Foto Pembina">
+                @else
+                    <svg class="w-full h-full text-gray-400" style="padding: 40px;" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2a5 5 0 100 10 5 5 0 000-10zm-7 14a7 7 0 1114 0H5z" clip-rule="evenodd" /></svg>
+                @endif
+            </div>
+            <div class="pembina-info">
+                <h3>{{ $pembina->name }}</h3>
+                <p>Masa Jabatan: {{ $pembina->term_period }}</p>
+            </div>
+        </div>
     </div>
 </section>
+@endif
 
 {{-- ===== BERITA ===== --}}
 <section class="stack-section" id="berita" data-reveal>

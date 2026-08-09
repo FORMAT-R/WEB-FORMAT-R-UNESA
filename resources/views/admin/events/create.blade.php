@@ -78,8 +78,12 @@
                     <select name="organizer" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
                         <option value="FORMAT-R UNESA" {{ old('organizer') == 'FORMAT-R UNESA' ? 'selected' : '' }}>FORMAT-R UNESA (Default)</option>
                         @foreach($departments as $dept)
-                            @php $singkatan = strtoupper($dept->abbreviation ?: $dept->slug); @endphp
-                            <option value="Departemen {{ $singkatan }}" {{ old('organizer') == 'Departemen '.$singkatan ? 'selected' : '' }}>Departemen {{ $singkatan }}</option>
+                            @php 
+                                $singkatan = strtoupper($dept->abbreviation ?: $dept->slug); 
+                                $isBph = ($singkatan === 'BPH');
+                                $orgValue = $isBph ? 'BPH' : 'Departemen ' . $singkatan;
+                            @endphp
+                            <option value="{{ $orgValue }}" {{ old('organizer') == $orgValue ? 'selected' : '' }}>{{ $orgValue }}</option>
                         @endforeach
                     </select>
                 </div>

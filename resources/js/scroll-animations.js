@@ -135,13 +135,14 @@ function initStackScroll() {
     }
   };
 
-  const sectionsList = [
-    { id: '#tentang', fromSelector: '.tentang-copy *, .tentang-badge', stagger: 0.1, parallaxSpeed: 0.3, yFrom: 40, index: 0 },
-    { id: '#visimisi', fromSelector: '.vm-badge, .vm-content > *', stagger: 0.1, parallaxSpeed: 0.2, yFrom: 40, index: 1 },
-    { id: '#berita', fromSelector: '.sec-head, .art-card', stagger: 0.08, parallaxSpeed: 0, yFrom: 30, index: 2 },
-    { id: '#apresiasi', fromSelector: '.sec-head > *', stagger: 0.08, parallaxSpeed: 0, yFrom: 30, index: 3 },
-    { id: '#faq', fromSelector: '.sec-head > *, .faq-item', stagger: 0.05, parallaxSpeed: 0.1, yFrom: 30, index: 4 }
-  ];
+    const sectionsList = [
+      { id: '#tentang', fromSelector: '.tentang-copy *, .tentang-badge', stagger: 0.1, parallaxSpeed: 0.3, yFrom: 40, index: 0 },
+      { id: '#visimisi', fromSelector: '.vm-badge, .vm-content > *', stagger: 0.1, parallaxSpeed: 0.2, yFrom: 40, index: 1 },
+      { id: '#pembina', fromSelector: '.pembina-content > *, .pembina-photo-wrap, .pembina-info', stagger: 0.1, parallaxSpeed: 0.1, yFrom: 30, index: 2 },
+      { id: '#berita', fromSelector: '.sec-head, .art-card', stagger: 0.08, parallaxSpeed: 0, yFrom: 30, index: 3 },
+      { id: '#apresiasi', fromSelector: '.sec-head > *', stagger: 0.08, parallaxSpeed: 0, yFrom: 30, index: 4 },
+      { id: '#faq', fromSelector: '.sec-head > *, .faq-item', stagger: 0.05, parallaxSpeed: 0.1, yFrom: 30, index: 5 }
+    ];
   sectionsList.forEach(s => sectionReveal(s));
 
   // ==========================================

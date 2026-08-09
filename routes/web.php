@@ -33,6 +33,9 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::post('/kontak', [HomeController::class, 'kirimPesan'])->name('kontak.kirim');
 
+// Struktur Organisasi
+Route::get('/struktur', [HomeController::class, 'struktur'])->name('struktur');
+
 // Departemen
 Route::get('/departemen', [DepartemenController::class, 'index'])->name('departemen.index');
 Route::get('/departemen/{slug}', [DepartemenController::class, 'show'])->name('departemen.show');
@@ -90,7 +93,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
             'berita' => 'berita'
         ]);
         
-        // Departemen
+Route::get('/debug-member', function() {
+    $m = \App\Models\Member::with('department')->get();
+    foreach($m as $x) { echo $x->department->slug . ' - ' . $x->position . '<br>'; }
+});
         Route::resource('departemen', DepartmentController::class)->parameters([
             'departemen' => 'department'
         ]);
@@ -108,6 +114,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
             'ultah' => 'ultah'
         ]);
         
+        // Pembina
+        Route::resource('pembinas', App\Http\Controllers\Admin\PembinaController::class)->except(['show']);
+        Route::patch('pembinas/{id}/toggle', [App\Http\Controllers\Admin\PembinaController::class, 'toggleActive'])->name('pembinas.toggle');
+
         Route::resource('users', App\Http\Controllers\Admin\UserController::class)->except(['show'])->middleware('can:is-superadmin');
         
         // Profile

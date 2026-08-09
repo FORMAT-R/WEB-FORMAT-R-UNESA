@@ -201,6 +201,13 @@
                     <span>Departemen</span>
                 </a>
 
+                <a href="{{ route('admin.pembinas.index') }}" class="sidebar-link {{ request()->routeIs('admin.pembinas.*') ? 'active' : '' }}">
+                    <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                    <span>Riwayat Pembina</span>
+                </a>
+
                 <a href="{{ route('admin.cabinets.index') }}" class="sidebar-link {{ request()->routeIs('admin.cabinets.*') ? 'active' : '' }}">
                     <svg class="sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>

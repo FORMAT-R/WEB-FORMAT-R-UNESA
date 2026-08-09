@@ -14,6 +14,54 @@ use Illuminate\Support\Facades\Mail;
 
 class HomeController extends Controller
 {
+    public function struktur()
+    {
+        $pembina = \App\Models\Pembina::where('is_active', true)->first();
+        
+        $activeCabinet = get_active_cabinet();
+        $members = collect();
+        $departments = collect();
+
+        if ($activeCabinet) {
+            // Ambil semua member dari kabinet aktif
+            $members = \App\Models\Member::with('department')->where('cabinet_id', $activeCabinet->id)->get();
+            
+            // Ambil semua departemen (selain BPH)
+            $departments = \App\Models\Department::where('slug', '!=', 'bph')
+                ->where('slug', '!=', 'badan-pengurus-harian')
+                ->whereRaw('LOWER(name) != ?', ['bph'])
+                ->get();
+        }
+
+        // Filter BPH (menggunakan slug 'badan-pengurus-harian' sesuai data db)
+        $bphMembers = $members->filter(function($m) {
+            $slug = strtolower($m->department->slug ?? '');
+            $name = strtolower($m->department->name ?? '');
+            return $slug === 'bph' || $name === 'bph' || strpos($slug, 'badan-pengurus-harian') !== false;
+        });
+
+        $ketum = $bphMembers->first(function($m) {
+            return stripos(strtolower($m->position), 'ketua umum') !== false && stripos(strtolower($m->position), 'wakil') === false;
+        });
+        $waketum = $bphMembers->first(function($m) {
+            return stripos(strtolower($m->position), 'wakil ketua umum') !== false;
+        });
+        
+        $sekretaris = [
+            'umum' => $bphMembers->firstWhere('position', 'Sekretaris Umum'),
+            'satu' => $bphMembers->firstWhere('position', 'Sekretaris 1'),
+            'dua' => $bphMembers->firstWhere('position', 'Sekretaris 2'),
+        ];
+        
+        $bendahara = [
+            'umum' => $bphMembers->firstWhere('position', 'Bendahara Umum'),
+            'satu' => $bphMembers->firstWhere('position', 'Bendahara 1'),
+            'dua' => $bphMembers->firstWhere('position', 'Bendahara 2'),
+        ];
+
+        return view('struktur', compact('pembina', 'ketum', 'waketum', 'sekretaris', 'bendahara', 'departments', 'members'));
+    }
+
     public function index()
     {
         $stats = [
@@ -92,8 +140,10 @@ class HomeController extends Controller
 
         $events = Event::whereIn('status', ['upcoming', 'ongoing'])->orderBy('start_date', 'asc')->take(3)->get();
 
+        $pembina = \App\Models\Pembina::where('is_active', true)->first();
+
         return view('home.index', compact(
-            'stats', 'berita', 'arsip', 'faq', 'penghargaan', 'ultahData', 'ultahHariIni', 'events'
+            'stats', 'berita', 'arsip', 'faq', 'penghargaan', 'ultahData', 'ultahHariIni', 'events', 'pembina'
         ));
     }
 

@@ -88,7 +88,7 @@ class EventController extends Controller
      */
     public function edit(string $id)
     {
-        $event = Event::findOrFail($id);
+        $event = Event::with(['documentations', 'committees'])->findOrFail($id);
         $departments = \App\Models\Department::all();
         return view('admin.events.edit', compact('event', 'departments'));
     }

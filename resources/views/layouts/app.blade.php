@@ -61,8 +61,10 @@
                 <div class="dropdown">
                     <a href="{{ route('home') }}#tentang">Tentang FORMAT-R</a>
                     <a href="{{ route('home') }}#visimisi">Visi &amp; Misi</a>
+                    <a href="{{ route('home') }}#pembina">Profil Pembina</a>
                 </div>
             </li>
+            <li data-sec="struktur"><a href="{{ route('struktur') }}" class="top-link">Struktur</a></li>
             <li data-sec="departemen"><a href="{{ route('departemen.index') }}" class="top-link">Departemen</a></li>
             <li data-sec="berita"><a href="{{ route('home') }}#berita" class="top-link">Berita</a></li>
             <li data-sec="event"><a href="{{ route('event.index') }}" class="top-link">Event</a></li>
@@ -103,6 +105,8 @@
         <a href="{{ route('home') }}">Beranda</a>
         <a href="{{ route('home') }}#tentang">Tentang</a>
         <a href="{{ route('home') }}#visimisi">Visi &amp; Misi</a>
+        <a href="{{ route('home') }}#pembina">Profil Pembina</a>
+        <a href="{{ route('struktur') }}">Struktur</a>
         <a href="{{ route('departemen.index') }}">Departemen</a>
         <a href="{{ route('home') }}#berita">Berita</a>
         <a href="{{ route('event.index') }}">Event</a>
