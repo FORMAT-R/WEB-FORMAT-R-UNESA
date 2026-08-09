@@ -18,64 +18,84 @@
         </div>
     @endif
 
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-700">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nama Kabinet</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Periode</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                @foreach($cabinets as $cabinet)
-                <tr>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <a href="{{ route('admin.cabinets.show', $cabinet->id) }}" class="flex items-center gap-3 group">
-                            <div class="h-10 w-10 flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center overflow-hidden">
-                                @if($cabinet->logo)
-                                    <img src="{{ Storage::url($cabinet->logo) }}" alt="" class="h-full w-full object-contain">
-                                @else
-                                    <span class="text-xs text-gray-500 font-bold">{{ substr($cabinet->name, 0, 1) }}</span>
-                                @endif
-                            </div>
-                            <div class="text-sm font-medium text-blue-600 group-hover:underline dark:text-blue-400">
-                                {{ $cabinet->name }}
-                            </div>
-                        </a>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                        {{ $cabinet->period }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        @if($cabinet->is_active)
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Aktif</span>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach($cabinets as $cabinet)
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+            <div class="p-5 flex-1 relative">
+                @if($cabinet->is_active)
+                    <div class="absolute top-4 right-4">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800">
+                            <span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>
+                            Aktif
+                        </span>
+                    </div>
+                @else
+                    <div class="absolute top-4 right-4">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                            Arsip / Nonaktif
+                        </span>
+                    </div>
+                @endif
+                
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="h-16 w-16 flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center overflow-hidden border border-gray-200 dark:border-gray-600">
+                        @if($cabinet->logo)
+                            <img src="{{ Storage::url($cabinet->logo) }}" alt="{{ $cabinet->name }}" class="h-full w-full object-contain">
                         @else
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Arsip / Nonaktif</span>
+                            <span class="text-xl text-gray-500 font-bold">{{ substr($cabinet->name, 0, 1) }}</span>
                         @endif
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <form action="{{ route('admin.cabinets.toggle', $cabinet->id) }}" method="POST" class="inline-block mr-2">
-                            @csrf
-                            @method('PATCH')
-                            <button type="submit" class="text-{{ $cabinet->is_active ? 'yellow' : 'green' }}-600 hover:text-{{ $cabinet->is_active ? 'yellow' : 'green' }}-900">
-                                {{ $cabinet->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
-                            </button>
-                        </form>
-                        
-                        <button @click='editForm = { id: "{{ $cabinet->id }}", name: @json($cabinet->name), period: @json($cabinet->period), vision: @json($cabinet->vision ?? ""), mission: @json($cabinet->mission ?? "") }; showEditModal = true' class="text-blue-600 hover:text-blue-900 mr-2">Edit</button>
-                        
-                        <form action="{{ route('admin.cabinets.destroy', $cabinet->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus kabinet ini beserta semua anggotanya?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+                    </div>
+                    <div>
+                        <a href="{{ route('admin.cabinets.show', $cabinet->id) }}" class="text-lg font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                            {{ $cabinet->name }}
+                        </a>
+                        <p class="text-sm font-medium text-blue-600 dark:text-blue-400 mt-1">{{ $cabinet->period }}</p>
+                    </div>
+                </div>
+
+                @if($cabinet->vision)
+                    <div class="mt-4">
+                        <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Visi</h4>
+                        <p class="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">{{ $cabinet->vision }}</p>
+                    </div>
+                @endif
+            </div>
+
+            <div class="bg-gray-50 dark:bg-gray-900/50 px-5 py-3 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <div>
+                    <form action="{{ route('admin.cabinets.toggle', $cabinet->id) }}" method="POST" class="inline">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="text-xs font-medium hover:underline text-{{ $cabinet->is_active ? 'yellow' : 'green' }}-600 dark:text-{{ $cabinet->is_active ? 'yellow' : 'green' }}-400">
+                            {{ $cabinet->is_active ? 'Nonaktifkan' : 'Jadikan Aktif' }}
+                        </button>
+                    </form>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="{{ route('admin.cabinets.show', $cabinet->id) }}" class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors" title="Lihat Anggota">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    </a>
+                    <button @click='editForm = { id: "{{ $cabinet->id }}", name: @json($cabinet->name), period: @json($cabinet->period), vision: @json($cabinet->vision ?? ""), mission: @json($cabinet->mission ?? "") }; showEditModal = true' class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors" title="Edit">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                    </button>
+                    <form action="{{ route('admin.cabinets.destroy', $cabinet->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus kabinet ini beserta semua anggotanya?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors" title="Hapus">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        @endforeach
+        
+        @if($cabinets->isEmpty())
+        <div class="col-span-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 text-center text-gray-500 dark:text-gray-400">
+            <svg class="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            <p>Belum ada data kabinet.</p>
+        </div>
+        @endif
     </div>
 
     <!-- Add Modal -->
