@@ -560,7 +560,7 @@
         </div>
         <div class="gallery">
             @foreach($event->documentations as $doc)
-            <div class="g" style="background-image: url('{{ Storage::url($doc->photo) }}'); background-size: cover; background-position: center;"><span>{{ $doc->title }}</span></div>
+            <div class="g" style="background-image: url('{{ Storage::url($doc->photo) }}'); background-size: cover; background-position: center;"></div>
             @endforeach
         </div>
     </div>

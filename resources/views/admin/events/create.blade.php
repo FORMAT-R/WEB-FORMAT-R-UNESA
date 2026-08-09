@@ -135,10 +135,15 @@
                                 <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Jabatan (Ketik manual)</label>
                                 <input type="text" :name="`committees[${idx}][role]`" x-model="c.role" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm">
                             </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Foto Panitia</label>
-                                <input type="file" :name="`committees[${idx}][photo]`" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-blue-50 file:text-blue-700">
-                            </div>
+                              <div>
+                                  <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Foto Panitia <span class="font-normal">(Fokus Wajah)</span></label>
+                                  <div class="flex items-center gap-3">
+                                      <div class="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-400">
+                                          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2a5 5 0 100 10 5 5 0 000-10zm-7 14a7 7 0 1114 0H5z" clip-rule="evenodd" /></svg>
+                                      </div>
+                                      <input type="file" :name="`committees[${idx}][photo]`" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-blue-50 file:text-blue-700">
+                                  </div>
+                              </div>
                             <div class="flex justify-end pb-1">
                                 <button type="button" @click="removeCommittee(idx)" class="text-red-500 hover:text-red-700 p-2">Hapus</button>
                             </div>
@@ -160,17 +165,13 @@
                 </div>
                 <div class="space-y-4">
                     <template x-for="(d, idx) in documentations" :key="idx">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Judul / Caption (Opsional)</label>
-                                <input type="text" :name="`documentations[${idx}][title]`" x-model="d.title" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm">
-                            </div>
-                            <div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                            <div class="md:col-span-1">
                                 <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Foto Dokumentasi</label>
-                                <input type="file" :name="`documentations[${idx}][photo]`" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-blue-50 file:text-blue-700">
+                                <input type="file" :name="`documentations[${idx}][photo]`" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-blue-50 file:text-blue-700" required>
                             </div>
-                            <div class="flex justify-end pb-1">
-                                <button type="button" @click="removeDoc(idx)" class="text-red-500 hover:text-red-700 p-2">Hapus</button>
+                            <div class="flex justify-end pb-1 h-full items-start">
+                                <button type="button" @click="removeDoc(idx)" class="text-red-500 hover:text-red-700 p-2 bg-red-50 dark:bg-red-900/30 rounded-lg">Hapus Foto</button>
                             </div>
                         </div>
                     </template>

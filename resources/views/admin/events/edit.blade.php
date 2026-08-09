@@ -147,11 +147,20 @@
                                 <input type="text" :name="`committees[${idx}][role]`" x-model="c.role" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm">
                             </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Foto Panitia</label>
-                                    <template x-if="c.photo && c.photo !== ''">
-                                        <div class="mb-1 text-xs text-blue-600"><a :href="`/storage/${c.photo}`" target="_blank">Lihat Foto Saat Ini</a></div>
-                                    </template>
-                                    <input type="file" :name="`committees[${idx}][photo]`" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-blue-50 file:text-blue-700">
+                                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Foto Panitia <span class="font-normal">(Fokus Wajah)</span></label>
+                                    <div class="flex items-center gap-3">
+                                        <template x-if="c.photo && c.photo !== ''">
+                                            <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                                                <img :src="`/storage/${c.photo}`" class="w-full h-full object-cover object-top">
+                                            </div>
+                                        </template>
+                                        <template x-if="!c.photo || c.photo === ''">
+                                            <div class="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-400">
+                                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2a5 5 0 100 10 5 5 0 000-10zm-7 14a7 7 0 1114 0H5z" clip-rule="evenodd" /></svg>
+                                            </div>
+                                        </template>
+                                        <input type="file" :name="`committees[${idx}][photo]`" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-blue-50 file:text-blue-700">
+                                    </div>
                                 </div>
                             <div class="flex justify-end pb-1">
                                 <button type="button" @click="removeCommittee(idx)" class="text-red-500 hover:text-red-700 p-2">Hapus</button>
@@ -172,23 +181,24 @@
                         + Tambah Foto
                     </button>
                 </div>
-                <div class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <template x-for="(d, idx) in documentations" :key="idx">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                        <div class="flex flex-col bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700 relative">
                             <input type="hidden" :name="`documentations[${idx}][id]`" :value="d.id">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Judul / Caption (Opsional)</label>
-                                <input type="text" :name="`documentations[${idx}][title]`" x-model="d.title" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm">
-                            </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Foto Dokumentasi</label>
-                                    <template x-if="d.photo && d.photo !== ''">
-                                        <div class="mb-1 text-xs text-blue-600"><a :href="`/storage/${d.photo}`" target="_blank">Lihat Foto Saat Ini</a></div>
-                                    </template>
-                                    <input type="file" :name="`documentations[${idx}][photo]`" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-blue-50 file:text-blue-700">
+                            
+                            <button type="button" @click="removeDoc(idx)" class="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-900/50 dark:text-red-400 rounded-lg transition-colors z-10" title="Hapus Foto">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+
+                            <template x-if="d.photo && d.photo !== ''">
+                                <div class="mb-3 w-full">
+                                    <img :src="`/storage/${d.photo}`" alt="Foto Dokumentasi" class="w-full h-40 object-cover rounded-lg border border-gray-200 dark:border-gray-700">
                                 </div>
-                            <div class="flex justify-end pb-1">
-                                <button type="button" @click="removeDoc(idx)" class="text-red-500 hover:text-red-700 p-2">Hapus</button>
+                            </template>
+                            
+                            <div class="mt-auto">
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Ganti/Pilih Foto</label>
+                                <input type="file" :name="`documentations[${idx}][photo]`" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-blue-50 file:text-blue-700">
                             </div>
                         </div>
                     </template>
