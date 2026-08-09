@@ -146,13 +146,13 @@
                                 <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Jabatan (Ketik manual)</label>
                                 <input type="text" :name="`committees[${idx}][role]`" x-model="c.role" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm">
                             </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Foto Panitia</label>
-                                <template x-if="c.photo && typeof c.photo === 'string'">
-                                    <div class="mb-1 text-xs text-blue-600"><a :href="`/storage/${c.photo}`" target="_blank">Lihat Foto</a></div>
-                                </template>
-                                <input type="file" :name="`committees[${idx}][photo]`" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-blue-50 file:text-blue-700">
-                            </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Foto Panitia</label>
+                                    <template x-if="c.photo && c.photo !== ''">
+                                        <div class="mb-1 text-xs text-blue-600"><a :href="`/storage/${c.photo}`" target="_blank">Lihat Foto Saat Ini</a></div>
+                                    </template>
+                                    <input type="file" :name="`committees[${idx}][photo]`" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-blue-50 file:text-blue-700">
+                                </div>
                             <div class="flex justify-end pb-1">
                                 <button type="button" @click="removeCommittee(idx)" class="text-red-500 hover:text-red-700 p-2">Hapus</button>
                             </div>
@@ -180,13 +180,13 @@
                                 <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Judul / Caption (Opsional)</label>
                                 <input type="text" :name="`documentations[${idx}][title]`" x-model="d.title" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm">
                             </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Foto Dokumentasi</label>
-                                <template x-if="d.photo && typeof d.photo === 'string'">
-                                    <div class="mb-1 text-xs text-blue-600"><a :href="`/storage/${d.photo}`" target="_blank">Lihat Foto</a></div>
-                                </template>
-                                <input type="file" :name="`documentations[${idx}][photo]`" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-blue-50 file:text-blue-700">
-                            </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Foto Dokumentasi</label>
+                                    <template x-if="d.photo && d.photo !== ''">
+                                        <div class="mb-1 text-xs text-blue-600"><a :href="`/storage/${d.photo}`" target="_blank">Lihat Foto Saat Ini</a></div>
+                                    </template>
+                                    <input type="file" :name="`documentations[${idx}][photo]`" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-blue-50 file:text-blue-700">
+                                </div>
                             <div class="flex justify-end pb-1">
                                 <button type="button" @click="removeDoc(idx)" class="text-red-500 hover:text-red-700 p-2">Hapus</button>
                             </div>
