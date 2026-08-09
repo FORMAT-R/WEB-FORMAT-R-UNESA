@@ -332,8 +332,8 @@
   .gallery-head h2{font-size:clamp(28px,3.4vw,38px);}
   .gallery{
     display:grid;
-    grid-template-columns:repeat(4,1fr);
-    grid-auto-rows:150px;
+    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    grid-auto-rows:220px;
     gap:16px;
   }
   .g{
@@ -341,14 +341,13 @@
     display:flex;align-items:flex-end;padding:16px;
     color:#F4F8FF;font-weight:700;font-size:13px;
     box-shadow:inset 0 -60px 50px -30px rgba(6,15,28,0.55);
+    background-color: var(--blue-pale);
+    transition: transform 0.3s ease;
   }
-  .g span{position:relative;z-index:2;letter-spacing:0.02em;}
-  .g.g1{grid-column:span 2;grid-row:span 2;background:radial-gradient(circle at 30% 20%, #4C7EF0, #10233F 85%);}
-  .g.g2{grid-column:span 2;background:radial-gradient(circle at 60% 20%, #C4D7F8, #2A5CDB 85%);}
-  .g.g3{background:radial-gradient(circle at 40% 30%, #8FB2F5, #1B3E9E 85%);}
-  .g.g4{background:radial-gradient(circle at 50% 25%, #EAF1FE, #4C7EF0 85%);}
-  .g.g5{grid-column:span 2;background:radial-gradient(circle at 55% 30%, #6E93E8, #123071 85%);}
-  .g.g6{grid-column:span 2;grid-row:span 1;background:radial-gradient(circle at 40% 25%, #A9C2EF, #23428A 85%);}
+  .g:hover {
+      transform: translateY(-4px);
+  }
+  .g span{position:relative;z-index:2;letter-spacing:0.02em; text-shadow: 0 2px 4px rgba(0,0,0,0.6);}
 
   /* ===== CTA STRIP ===== */
   .cta-strip{
@@ -368,17 +367,15 @@
     font-size:13px;color:var(--navy-soft);
   }
 
-  @media(max-width:900px){
-    .hero-grid{grid-template-columns:1fr;}
-    .hero-art{height:340px;margin-top:20px;}
-    .cards{grid-template-columns:1fr;}
-    .visit{grid-template-columns:1fr;padding:40px 26px;border-radius:24px;}
-    .gallery{grid-template-columns:repeat(2,1fr);}
-    .g.g1,.g.g2,.g.g5,.g.g6{grid-column:span 2;}
-    .cta-strip{padding:40px 24px;border-radius:24px;}
-    .team-grid{grid-template-columns:repeat(2,1fr);}
-    .stat-grid{grid-template-columns:repeat(2,1fr);}
-  }
+    @media(max-width:900px){
+      .hero-grid{grid-template-columns:1fr;}
+      .hero-art{height:340px;margin-top:20px;}
+      .cards{grid-template-columns:1fr;}
+      .visit{grid-template-columns:1fr;padding:40px 26px;border-radius:24px;}
+      .cta-strip{padding:40px 24px;border-radius:24px;}
+      .team-grid{grid-template-columns:repeat(2,1fr);}
+      .stat-grid{grid-template-columns:repeat(2,1fr);}
+    }
   @media(min-width:901px) and (max-width:1150px){
     .team-grid{grid-template-columns:repeat(3,1fr);}
   }
@@ -560,7 +557,6 @@
                 <h2>Dokumentasi Kegiatan</h2>
                 <p>Momen-momen berharga yang terekam sepanjang pelaksanaan kegiatan.</p>
             </div>
-            <a href="#" class="btn ghost">Lihat Semua</a>
         </div>
         <div class="gallery">
             @foreach($event->documentations as $doc)

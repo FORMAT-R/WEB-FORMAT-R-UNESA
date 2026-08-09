@@ -67,6 +67,33 @@ trait ImageUploadTrait
             return $file->store($directory, 'public');
         }
 
+        // --- OPTIMASI: RESIZE GAMBAR BESAR SEBELUM KONVERSI KE WEBP ---
+        // Jika ukuran gambar terlalu besar (misal dari kamera HP > 1200px lebar/tingginya),
+        // kita akan melakukan downscale untuk mempercepat proses kompresi WebP
+        // dan menghindari timeout pada proses upload massal.
+        $maxWidth = 1200;
+        $maxHeight = 1200;
+        $origWidth = imagesx($image);
+        $origHeight = imagesy($image);
+
+        if ($origWidth > $maxWidth || $origHeight > $maxHeight) {
+            $ratio = min($maxWidth / $origWidth, $maxHeight / $origHeight);
+            $newWidth = (int) ($origWidth * $ratio);
+            $newHeight = (int) ($origHeight * $ratio);
+
+            $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
+            
+            // Pertahankan transparansi untuk gambar PNG/GIF yang diresize
+            imagealphablending($resizedImage, false);
+            imagesavealpha($resizedImage, true);
+            $transparent = imagecolorallocatealpha($resizedImage, 0, 0, 0, 127);
+            imagefill($resizedImage, 0, 0, $transparent);
+
+            imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $origWidth, $origHeight);
+            imagedestroy($image);
+            $image = $resizedImage;
+        }
+
         // Konversi ke webp di memori
         ob_start();
         imagewebp($image, null, $quality);

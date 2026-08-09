@@ -146,5 +146,36 @@ Agar pengingat kalender acara terkirim ke email, buat satu Cron Job terakhir.
 /usr/local/bin/php /home/username_cpanel/formatr_core/artisan schedule:run >> /dev/null 2>&1
 ```
 
+
+
+Berikut adalah langkah-langkah sistematis dan aman untuk memperbarui (update) aplikasi Laravel kamu di cPanel via Git:
+Langkah 1: Push Kode dari Komputer/Sistem Lokal ke GitHub
+Karena cPanel kamu mengambil (pull) dari repositori Git, pastikan kode yang baru kita ubah ini sudah ter-commit dan di-push ke GitHub milikmu.
+- Buka terminal di komputer atau VS Code tempat kode ini berada.
+- Jalankan:
+git add .
+git commit -m "Update: Profil admin mandiri, auto-crop foto sorotan, link daftar, fitur UI"
+git push origin main
+Langkah 2: Masuk ke Terminal cPanel
+Setelah kode berada di GitHub (atau repository Git kamu), kita akan menariknya (pull) ke server cPanel.
+1. Login ke akun cPanel kamu.
+2. Cari dan klik menu Terminal (biasanya di bawah kategori "Advanced").
+3. Di dalam terminal, pindah ke folder core aplikasi kamu:
+cd /home/formatrunesa/formatr_core/web_format_r_unesa
+(Catatan: pastikan formatrunesa sesuai dengan username cPanel kamu).
+Langkah 3: Tarik (Pull) Pembaruan Kode
+Jalankan perintah Git untuk mengunduh kode terbaru dari repositori:
+git pull origin main
+(Pastikan tidak ada pesan konflik. Jika sukses, akan muncul daftar file yang diperbarui seperti ImageUploadTrait.php, web.php, dll).
+Langkah 4: Jalankan Migrasi Database
+Karena kita menambahkan 2 kolom baru di database (output pada tabel events dan photo_sorotan pada tabel members), kamu wajib menjalankan perintah migrate. Gunakan path PHP 8.3 yang benar:
+/opt/cpanel/ea-php83/root/usr/bin/php artisan migrate
+(Pastikan muncul tulisan Migrating: ...add_output_to_events_table).
+Langkah 5: Bersihkan Cache (Sangat Penting)
+Ini wajib dilakukan agar Laravel menyadari adanya rute baru dan kolom baru:
+/opt/cpanel/ea-php83/root/usr/bin/php artisan optimize:clear
+Langkah 6: Restart Pekerja Latar Belakang (Queue Worker)
+Karena kita mengubah logika AI di ProcessMemberPhotoBackground.php dan ImageUploadTrait.php, kita harus mematikan pekerja latar belakang yang lama agar cron job cPanel menghidupkan pekerja yang baru (yang memuat kode terbaru).
+/opt/cpanel/ea-php83/root/usr/bin/php artisan queue:restart
 ---
 **Selesai!** Website FORMAT-R Anda kini siap digunakan secara publik di cPanel dengan dukungan AI Remove.bg Multi-API Key!
