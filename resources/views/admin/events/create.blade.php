@@ -218,6 +218,11 @@
                     Sortable.create(el, {
                         handle: '.handle',
                         animation: 150,
+                        forceFallback: true, // This enables autoscroll in most edge cases
+                        scroll: true, // Enable native scrolling
+                        scrollSensitivity: 80, // Pixels from edge to trigger scroll
+                        scrollSpeed: 20, // Scroll speed
+                        bubbleScroll: true, // Allows window to scroll if parent is un-scrollable
                         onEnd: (evt) => {
                             // Update the array order based on DOM changes
                             let oldIndex = evt.oldIndex;
