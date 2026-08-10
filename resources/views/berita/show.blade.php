@@ -218,7 +218,13 @@
   footer{font-family:var(--sans); font-size:10.5px; color:var(--ink-soft); text-align:center; padding:16px 0 26px; border-top:1px solid var(--rule);}
 
   @media (max-width:960px){
-    .main-grid{grid-template-columns:1fr;}
+    .main-grid{
+        display: flex;
+        flex-direction: column;
+    }
+    .main-grid > article.hero {
+        order: -1;
+    }
     .body-columns{columns:1;}
   }
 
