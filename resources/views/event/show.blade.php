@@ -467,12 +467,9 @@
                               @else
                                   <button onclick="alert('Link pendaftaran belum tersedia')" class="btn" style="opacity: 0.8; cursor: not-allowed;">Bergabung Sekarang</button>
                               @endif
-                          <a href="{{ route('event.index') }}" class="btn ghost">Event Lainnya</a>
-                          @else
-                        <a href="{{ route('event.index') }}" class="btn">Lihat Event Lainnya</a>
-                        @endif
-                    </div>
-                </div>
+                          @endif
+                      </div>
+                  </div>
 
                 <div class="info-list">
                     <div class="info-item">
