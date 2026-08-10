@@ -229,7 +229,7 @@
         return {
             isSubmitting: false,
             status: '{{ old('status', $event->status) }}',
-            committees: {!! json_encode(old('committees', $event->committees->count() ? $event->committees->orderBy('sort_order')->get()->toArray() : [['name' => '', 'role' => '', 'photo' => null, 'sort_order' => 0]])) !!}.map((c, i) => ({...c, id: c.id || Date.now() + i})),
+            committees: {!! json_encode(old('committees', $event->committees->count() ? $event->committees()->orderBy('sort_order')->get()->toArray() : [['name' => '', 'role' => '', 'photo' => null, 'sort_order' => 0]])) !!}.map((c, i) => ({...c, id: c.id || Date.now() + i})),
             documentations: {!! json_encode(old('documentations', $event->documentations->count() ? $event->documentations->toArray() : [['title' => '', 'photo' => null]])) !!},
             addCommittee() { this.committees.push({id: Date.now(), name: '', role: '', photo: null, sort_order: this.committees.length}); },
             removeCommittee(idx) { this.committees.splice(idx, 1); },
