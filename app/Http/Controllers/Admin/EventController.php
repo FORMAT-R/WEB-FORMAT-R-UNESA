@@ -198,7 +198,7 @@ class EventController extends Controller
             $updatedDocIds = [];
 
             foreach ($request->documentations as $idx => $d) {
-                if ($idx >= 10) break; // Limit to 10 photos
+                if ($idx >= 15) break; // Limit to 15 photos
 
                 $data = [
                     'title' => $d['title'] ?? null,

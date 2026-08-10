@@ -164,10 +164,10 @@
             <div x-show="status === 'ongoing' || status === 'completed'" class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700" style="display: none;">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Dokumentasi (Maks. 10)</h3>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Dokumentasi (Maks. 15)</h3>
                         <p class="text-xs text-gray-500">Berlaku untuk event berjalan & selesai.</p>
                     </div>
-                    <button type="button" @click="addDoc()" x-show="documentations.length < 10" class="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200">
+                    <button type="button" @click="addDoc()" x-show="documentations.length < 15" class="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200">
                         + Tambah Foto
                     </button>
                 </div>
@@ -209,7 +209,7 @@
                 this.committees.push({id: Date.now(), name: '', role: '', photo: null, sort_order: this.committees.length}); 
             },
             removeCommittee(idx) { this.committees.splice(idx, 1); },
-            addDoc() { if(this.documentations.length < 10) this.documentations.push({title: '', photo: null}); },
+            addDoc() { if(this.documentations.length < 15) this.documentations.push({title: '', photo: null}); },
             removeDoc(idx) { this.documentations.splice(idx, 1); },
             
             initSortable() {
