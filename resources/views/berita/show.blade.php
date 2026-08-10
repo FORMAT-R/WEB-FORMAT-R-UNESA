@@ -315,7 +315,7 @@
           </figure>
           <h4 style="margin-top:8px;"><a href="{{ route('berita.show', $nb->slug) }}" style="color:var(--ink); text-decoration:none;">{{ $nb->title }}</a></h4>
           <p>{{ Str::limit(strip_tags($nb->content), 120) }}</p>
-          <div class="byline">{{ $nb->author ? $nb->author->name : 'Redaksi' }} &middot; FORMAT NEWS</div>
+          <div class="byline">{{ $nb->author_name ?? ($nb->author ? $nb->author->name : 'Redaksi FORMAT-R') }} &middot; FORMAT NEWS</div>
         </div>
         @endforeach
       </div>
@@ -333,7 +333,7 @@
         <figcaption>{{ $berita->title }}</figcaption>
       </figure>
       @endif
-      <div class="byline"><b>{{ $berita->author ? $berita->author->name : 'Redaksi FORMAT-R' }}</b> &middot; Koresponden FORMAT-R</div>
+      <div class="byline"><b>{{ $berita->author_name ?? ($berita->author ? $berita->author->name : 'Redaksi FORMAT-R') }}</b> &middot; Koresponden FORMAT-R</div>
       <div class="body-columns">
         {!! $berita->content !!}
       </div>

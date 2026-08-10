@@ -50,7 +50,7 @@
                             <div style="font-size: 0.8rem; color: var(--ink-soft); font-weight: 500; letter-spacing: 0.5px;">
                                 {{ $b->published_at ? \Carbon\Carbon::parse($b->published_at)->translatedFormat('d M Y') : $b->created_at->translatedFormat('d M Y') }}
                             </div>
-                            <span style="font-size: 0.75rem; color: var(--ink-soft); font-weight: 500; opacity: 0.8;">{{ $b->author->name ?? 'Admin' }}</span>
+                            <span style="font-size: 0.75rem; color: var(--ink-soft); font-weight: 500; opacity: 0.8;">{{ $b->author_name ?? ($b->author->name ?? 'Admin') }}</span>
                         </div>
                         
                         <h4 style="margin:0 0 10px 0; font-size:1.15rem; line-height: 1.4; color:var(--navy);">{{ $b->title }}</h4>

@@ -110,7 +110,7 @@
                 <h2>{{ $item->title }}</h2>
                 <p>{{ Str::limit($item->content, 120) }}</p>
                 <div class="news-meta">
-                    <span>{{ $item->author ? $item->author->name : 'Redaksi' }}</span>
+                    <span>{{ $item->author_name ?? ($item->author ? $item->author->name : 'Redaksi') }}</span>
                 </div>
             </div>
             <div class="px-5 py-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
