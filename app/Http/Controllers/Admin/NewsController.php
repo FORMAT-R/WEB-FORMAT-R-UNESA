@@ -70,12 +70,14 @@ class NewsController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'author' => 'nullable|string|max:255',
             'image' => 'nullable|image|max:10240',
             'status' => 'required|in:draft,published',
             'published_at' => 'nullable|date',
         ]);
 
         $validated['slug'] = Str::slug($validated['title']);
+        $validated['author_name'] = $request->input('author', 'Redaksi FORMAT-R');
         
         // Use auth user if available, otherwise fallback to first user or create one
         $user_id = Auth::id();
@@ -126,12 +128,14 @@ class NewsController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'author' => 'nullable|string|max:255',
             'image' => 'nullable|image|max:10240',
             'status' => 'required|in:draft,published',
             'published_at' => 'nullable|date',
         ]);
 
         $validated['slug'] = Str::slug($validated['title']);
+        $validated['author_name'] = $request->input('author', 'Redaksi FORMAT-R');
 
         if ($request->hasFile('image')) {
             if ($berita->image) {

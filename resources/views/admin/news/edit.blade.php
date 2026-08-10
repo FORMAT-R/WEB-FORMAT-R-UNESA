@@ -259,7 +259,7 @@ function inlineEditor() {
     return {
         form: {
             judul: {!! json_encode(old('title', $berita->title)) !!},
-            penulis: 'Redaksi',
+            penulis: {!! json_encode(old('author_name', $berita->author_name ?? 'Redaksi FORMAT-R')) !!},
             tag: 'Kabar FORMAT',
             caption: '',
             fotoPreview: {!! json_encode($berita->image ? Storage::url($berita->image) : '') !!},

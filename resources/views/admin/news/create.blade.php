@@ -259,7 +259,7 @@ function inlineEditor() {
     return {
         form: {
             judul: oldTitle,
-            penulis: 'Redaksi',
+            penulis: 'Redaksi FORMAT-R',
             tag: 'Kabar FORMAT',
             caption: '',
             fotoPreview: '',
