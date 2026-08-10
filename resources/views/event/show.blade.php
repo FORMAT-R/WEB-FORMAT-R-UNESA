@@ -546,27 +546,6 @@
     </div>
 </section>
 
-@if($event->status == 'completed' && $event->documentations->count() > 0)
-<!-- DOKUMENTASI (posisi 3) -->
-<section class="section" style="padding-top:0;">
-    <div class="wrap">
-        <div class="gallery-head">
-            <div>
-                <div class="eyebrow">Rekam Jejak</div>
-                <h2>Dokumentasi Kegiatan</h2>
-                <p>Momen-momen berharga yang terekam sepanjang pelaksanaan kegiatan.</p>
-            </div>
-        </div>
-        <div class="gallery">
-            @foreach($event->documentations as $doc)
-            <div class="g" style="background-image: url('{{ Storage::url($doc->photo) }}'); background-size: cover; background-position: center;"></div>
-            @endforeach
-        </div>
-    </div>
-</section>
-@endif
-
-{{-- ===== SUSUNAN PEMATERI ===== --}}
 @if($event->speakers->count() > 0)
 <section class="section" style="padding-top:0;">
     <div class="wrap">
@@ -599,6 +578,25 @@
                     @endif
                 </div>
             </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
+@if($event->status == 'completed' && $event->documentations->count() > 0)
+<section class="section" style="padding-top:0;">
+    <div class="wrap">
+        <div class="gallery-head">
+            <div>
+                <div class="eyebrow">Rekam Jejak</div>
+                <h2>Dokumentasi Kegiatan</h2>
+                <p>Momen-momen berharga yang terekam sepanjang pelaksanaan kegiatan.</p>
+            </div>
+        </div>
+        <div class="gallery">
+            @foreach($event->documentations as $doc)
+            <div class="g" style="background-image: url('{{ Storage::url($doc->photo) }}'); background-size: cover; background-position: center;"></div>
             @endforeach
         </div>
     </div>
