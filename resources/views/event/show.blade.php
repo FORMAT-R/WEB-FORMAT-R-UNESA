@@ -435,38 +435,27 @@
             </div>
 
             <div class="event-content">
-                  <div>
-                      <h1>{{ $event->title }}</h1>
-                      <p class="lede">{!! nl2br(e($event->description)) !!}</p>
-                      
-                      @if(!empty($event->output))
-                      <div class="event-output" style="margin-top: 28px; margin-bottom: 28px; background: var(--bg-card); border: 1px solid var(--line); border-radius: 20px; padding: 24px; box-shadow: 0 10px 24px rgba(14,35,64,0.04);">
-                          <div style="display: flex; items-center; gap: 10px; margin-bottom: 16px;">
-                              <h4 style="font-size: 1.15rem; color: var(--navy); font-weight: 700; margin: 0; line-height: 32px;">Output Kegiatan</h4>
-                          </div>
-                          <div style="color: var(--ink-soft); font-size: 0.95rem; line-height: 1.7; border-top: 1px dashed var(--line); padding-top: 16px;">
-                              {!! nl2br(e($event->output)) !!}
-                          </div>
-                      </div>
-                      @endif
+                    <div>
+                        <h1>{{ $event->title }}</h1>
+                        <p class="lede">{!! nl2br(e($event->description)) !!}</p>
 
-                        <div style="display:flex;gap:14px;flex-wrap:wrap;">
-                          @if($event->status == 'upcoming')
-                              @if($event->registration_link)
-                                  <a href="{{ $event->registration_link }}" target="_blank" class="btn">Daftar Sekarang</a>
-                              @else
-                                  <button onclick="alert('Link pendaftaran belum tersedia')" class="btn" style="opacity: 0.8; cursor: not-allowed;">Daftar Sekarang</button>
-                              @endif
-                          <a href="{{ route('event.index') }}" class="btn ghost">Lihat Semua Event</a>
-                          @elseif($event->status == 'ongoing')
-                              @if($event->registration_link)
-                                  <a href="{{ $event->registration_link }}" target="_blank" class="btn">Bergabung Sekarang</a>
-                              @else
-                                  <button onclick="alert('Link pendaftaran belum tersedia')" class="btn" style="opacity: 0.8; cursor: not-allowed;">Bergabung Sekarang</button>
-                              @endif
-                          @endif
-                      </div>
-                  </div>
+                          <div style="display:flex;gap:14px;flex-wrap:wrap;">
+                            @if($event->status == 'upcoming')
+                                @if($event->registration_link)
+                                    <a href="{{ $event->registration_link }}" target="_blank" class="btn">Daftar Sekarang</a>
+                                @else
+                                    <button onclick="alert('Link pendaftaran belum tersedia')" class="btn" style="opacity: 0.8; cursor: not-allowed;">Daftar Sekarang</button>
+                                @endif
+                            <a href="{{ route('event.index') }}" class="btn ghost">Lihat Semua Event</a>
+                            @elseif($event->status == 'ongoing')
+                                @if($event->registration_link)
+                                    <a href="{{ $event->registration_link }}" target="_blank" class="btn">Bergabung Sekarang</a>
+                                @else
+                                    <button onclick="alert('Link pendaftaran belum tersedia')" class="btn" style="opacity: 0.8; cursor: not-allowed;">Bergabung Sekarang</button>
+                                @endif
+                            @endif
+                        </div>
+                    </div>
 
                 <div class="info-list">
                     <div class="info-item">
@@ -531,20 +520,38 @@
                         </div>
                     </div>
 
-                    <div class="info-item">
-                        <div class="info-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-                        </div>
-                        <div class="info-text">
-                            <span class="lbl">Peserta</span>
-                            <span class="val muted">{{ $event->participant_count ? $event->participant_count . ' Orang' : '-' }}</span>
-                        </div>
-                    </div>
-                </div>
+                      <div class="info-item">
+                          <div class="info-icon">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                          </div>
+                          <div class="info-text">
+                              <span class="lbl">Peserta</span>
+                              <span class="val muted">{{ $event->participant_count ? $event->participant_count . ' Orang' : '-' }}</span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+@if(!empty($event->output))
+<section class="section" style="padding-top:0;">
+    <div class="wrap">
+        <div class="gallery-head" style="margin-bottom: 20px;">
+            <div>
+                <div class="eyebrow">Pencapaian</div>
+                <h2>Output Kegiatan</h2>
+            </div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--line); border-radius: 20px; padding: 24px; box-shadow: 0 10px 24px rgba(14,35,64,0.04);">
+            <div style="color: var(--ink-soft); font-size: 0.95rem; line-height: 1.7;">
+                {!! nl2br(e($event->output)) !!}
             </div>
         </div>
     </div>
 </section>
+@endif
 
 @if($event->speakers->count() > 0)
 <section class="section" style="padding-top:0;">
