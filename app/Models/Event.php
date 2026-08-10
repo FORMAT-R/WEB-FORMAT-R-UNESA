@@ -18,6 +18,11 @@ class Event extends Model
         return $this->hasMany(EventCommittee::class);
     }
 
+    public function speakers()
+    {
+        return $this->hasMany(EventSpeaker::class);
+    }
+
     public function documentations()
     {
         return $this->hasMany(EventDocumentation::class);

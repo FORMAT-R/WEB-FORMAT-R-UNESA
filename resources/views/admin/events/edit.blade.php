@@ -177,6 +177,62 @@
                 </div>
             </div>
 
+            {{-- Pemateri --}}
+            <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Susunan Pemateri</h3>
+                    <button type="button" @click="addSpeaker()" class="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200">
+                        + Tambah Pemateri
+                    </button>
+                </div>
+                <div class="space-y-4" id="speakers-container">
+                    <template x-for="(s, idx) in speakers" :key="s.id || ('s'+idx)">
+                        <div class="speaker-item grid grid-cols-1 md:grid-cols-12 gap-4 items-end bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700 relative pl-10" :data-id="idx">
+                            <!-- Drag Handle -->
+                            <div class="absolute left-3 top-1/2 -translate-y-1/2 cursor-move text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 handle-speaker">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
+                            </div>
+                            
+                            <input type="hidden" :name="`speakers[${idx}][id]`" :value="s.id">
+                            <!-- Hidden Sort Order -->
+                            <input type="hidden" :name="`speakers[${idx}][sort_order]`" :value="idx">
+
+                            <div class="md:col-span-3">
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Nama Pemateri</label>
+                                <input type="text" :name="`speakers[${idx}][name]`" x-model="s.name" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm">
+                            </div>
+                            <div class="md:col-span-3">
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Role (Opsional)</label>
+                                <input type="text" :name="`speakers[${idx}][role]`" x-model="s.role" placeholder="Cth: Narasumber" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm">
+                            </div>
+                            <div class="md:col-span-3">
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Topik (Opsional)</label>
+                                <input type="text" :name="`speakers[${idx}][topic]`" x-model="s.topic" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Foto</label>
+                                <div class="flex items-center gap-3">
+                                    <template x-if="s.photo && s.photo !== ''">
+                                        <div class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
+                                            <img :src="`/storage/${s.photo}`" class="w-full h-full object-cover object-top">
+                                        </div>
+                                    </template>
+                                    <template x-if="!s.photo || s.photo === ''">
+                                        <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-400">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2a5 5 0 100 10 5 5 0 000-10zm-7 14a7 7 0 1114 0H5z" clip-rule="evenodd" /></svg>
+                                        </div>
+                                    </template>
+                                    <input type="file" :name="`speakers[${idx}][photo]`" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-blue-50 file:text-blue-700">
+                                </div>
+                            </div>
+                            <div class="md:col-span-1 flex justify-end pb-1">
+                                <button type="button" @click="removeSpeaker(idx)" class="text-red-500 hover:text-red-700 p-2">Hapus</button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
             {{-- Dokumentasi (Hanya untuk Ongoing & Completed) --}}
             <div x-show="status === 'ongoing' || status === 'completed'" class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700" style="display: none;">
                 <div class="flex items-center justify-between mb-4">
@@ -230,9 +286,12 @@
             isSubmitting: false,
             status: '{{ old('status', $event->status) }}',
             committees: {!! json_encode(old('committees', $event->committees->count() ? $event->committees()->orderBy('sort_order')->get()->toArray() : [['name' => '', 'role' => '', 'photo' => null, 'sort_order' => 0]])) !!}.map((c, i) => ({...c, id: c.id || Date.now() + i})),
+            speakers: {!! json_encode(old('speakers', $event->speakers->count() ? $event->speakers()->orderBy('sort_order')->get()->toArray() : [['name' => '', 'role' => '', 'topic' => '', 'photo' => null, 'sort_order' => 0]])) !!}.map((s, i) => ({...s, id: s.id || Date.now() + i + 1000})),
             documentations: {!! json_encode(old('documentations', $event->documentations->count() ? $event->documentations->toArray() : [['title' => '', 'photo' => null]])) !!},
             addCommittee() { this.committees.push({id: Date.now(), name: '', role: '', photo: null, sort_order: this.committees.length}); },
             removeCommittee(idx) { this.committees.splice(idx, 1); },
+            addSpeaker() { this.speakers.push({id: Date.now() + 1000, name: '', role: '', topic: '', photo: null, sort_order: this.speakers.length}); },
+            removeSpeaker(idx) { this.speakers.splice(idx, 1); },
             addDoc() { if(this.documentations.length < 15) this.documentations.push({title: '', photo: null}); },
             removeDoc(idx) { this.documentations.splice(idx, 1); },
             initSortable() {
@@ -255,6 +314,27 @@
                                 let movedItem = this.committees.splice(oldIndex, 1)[0];
                                 // Insert it at the new position
                                 this.committees.splice(newIndex, 0, movedItem);
+                            }
+                        }
+                    });
+                }
+                
+                let elSpeakers = document.getElementById('speakers-container');
+                if (elSpeakers) {
+                    Sortable.create(elSpeakers, {
+                        handle: '.handle-speaker',
+                        animation: 150,
+                        forceFallback: true,
+                        scroll: true,
+                        scrollSensitivity: 80,
+                        scrollSpeed: 20,
+                        bubbleScroll: true,
+                        onEnd: (evt) => {
+                            let oldIndex = evt.oldIndex;
+                            let newIndex = evt.newIndex;
+                            if (oldIndex !== newIndex) {
+                                let movedItem = this.speakers.splice(oldIndex, 1)[0];
+                                this.speakers.splice(newIndex, 0, movedItem);
                             }
                         }
                     });

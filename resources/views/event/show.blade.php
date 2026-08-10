@@ -569,6 +569,46 @@
 </section>
 @endif
 
+{{-- ===== SUSUNAN PEMATERI ===== --}}
+@if($event->speakers->count() > 0)
+<section class="section" style="padding-top:0;">
+    <div class="wrap">
+        <div class="section-head">
+            <div class="wheat-divider">
+                <div class="stem"></div>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
+                <div class="stem"></div>
+            </div>
+            <div class="eyebrow">Berbagi Ilmu</div>
+            <h2>Susunan Pemateri</h2>
+        </div>
+
+        <div class="team-grid">
+            @foreach($event->speakers()->orderBy('sort_order')->get() as $s)
+            <div class="team-card lead" style="background: linear-gradient(160deg, #1B3E9E, #0E2340);">
+                <div class="avatar" style="border-color: #2A5CDB;">
+                    @if($s->photo)
+                        <img src="{{ Storage::url($s->photo) }}" alt="{{ $s->name }}">
+                    @else
+                        {{ substr($s->name, 0, 2) }}
+                    @endif
+                </div>
+                <div class="team-info">
+                    <div class="team-name" style="color: #fff;">{{ $s->name }}</div>
+                    <div class="team-role" style="color: #A9C2EF;">{{ $s->role ?? 'Narasumber' }}</div>
+                    @if($s->topic)
+                    <div style="font-size: 11px; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.1); color: #fff; font-style: italic;">
+                        "{{ $s->topic }}"
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
 {{-- ===== SUSUNAN PANITIA ===== --}}
 @if($event->committees->count() > 0)
 <section class="section" style="padding-top:0;">

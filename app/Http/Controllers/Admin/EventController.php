@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use App\Models\EventCommittee;
 use App\Models\EventDocumentation;
+use App\Models\EventSpeaker;
 
 class EventController extends Controller
 {
@@ -232,6 +233,51 @@ class EventController extends Controller
                 if ($d) {
                     if ($d->photo) Storage::disk('public')->delete($d->photo);
                     $d->delete();
+                }
+            }
+        }
+
+        // Save Speakers
+        if ($request->has('speakers')) {
+            $existingSpeakerIds = $event->speakers->pluck('id')->toArray();
+            $updatedSpeakerIds = [];
+
+            foreach ($request->speakers as $idx => $s) {
+                if (empty($s['name'])) continue;
+
+                $data = [
+                    'name' => $s['name'],
+                    'role' => $s['role'] ?? null,
+                    'topic' => $s['topic'] ?? null,
+                    'sort_order' => $s['sort_order'] ?? $idx,
+                ];
+
+                if (isset($s['photo']) && $request->hasFile("speakers.{$idx}.photo")) {
+                    $data['photo'] = $this->uploadImageWebp($s['photo'], 'events/speakers');
+                }
+
+                if (isset($s['id']) && $s['id'] && !str_starts_with($s['id'], '17')) { // exclude mock IDs created by Date.now() from JS
+                    $speaker = EventSpeaker::find($s['id']);
+                    if ($speaker) {
+                        $speaker->update($data);
+                        $updatedSpeakerIds[] = $speaker->id;
+                    } else {
+                        $newSpeaker = $event->speakers()->create($data);
+                        $updatedSpeakerIds[] = $newSpeaker->id;
+                    }
+                } else {
+                    $newSpeaker = $event->speakers()->create($data);
+                    $updatedSpeakerIds[] = $newSpeaker->id;
+                }
+            }
+
+            // Delete removed speakers
+            $toDeleteSpeakers = array_diff($existingSpeakerIds, $updatedSpeakerIds);
+            foreach ($toDeleteSpeakers as $id) {
+                $s = EventSpeaker::find($id);
+                if ($s) {
+                    if ($s->photo) Storage::disk('public')->delete($s->photo);
+                    $s->delete();
                 }
             }
         }
