@@ -88,7 +88,7 @@ class HomeController extends Controller
             ],
             [
                 'pertanyaan' => 'Apakah ada iuran keanggotaan?',
-                'jawaban'    => 'Tidak ada iuran wajib. Pendanaan kegiatan berasal dari kas organisasi dan dana kemahasiswaan.',
+                'jawaban'    => 'Ada iuran uang kas setiap sebulan sekali dan ketentuannya disepakati oleh periode yang sedang berjalan.',
                 'open'       => false,
             ],
             [
