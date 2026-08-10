@@ -442,9 +442,6 @@
                       @if(!empty($event->output))
                       <div class="event-output" style="margin-top: 28px; margin-bottom: 28px; background: var(--bg-card); border: 1px solid var(--line); border-radius: 20px; padding: 24px; box-shadow: 0 10px 24px rgba(14,35,64,0.04);">
                           <div style="display: flex; items-center; gap: 10px; margin-bottom: 16px;">
-                              <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(42,92,219,0.1); color: var(--blue); display: flex; align-items: center; justify-content: center;">
-                                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 18px; height: 18px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                              </div>
                               <h4 style="font-size: 1.15rem; color: var(--navy); font-weight: 700; margin: 0; line-height: 32px;">Output Kegiatan</h4>
                           </div>
                           <div style="color: var(--ink-soft); font-size: 0.95rem; line-height: 1.7; border-top: 1px dashed var(--line); padding-top: 16px;">
