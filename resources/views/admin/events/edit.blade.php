@@ -3,7 +3,7 @@
 @section('page-title', 'Edit Event')
 
 @section('content')
-<div class="space-y-8" x-data="eventFormEdit()">
+<div class="space-y-8" x-data="eventFormEdit()" x-init="initSortable()">
     {{-- Page Header --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -134,10 +134,17 @@
                         + Tambah Panitia
                     </button>
                 </div>
-                <div class="space-y-4">
-                    <template x-for="(c, idx) in committees" :key="idx">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                <div class="space-y-4" id="committees-container">
+                    <template x-for="(c, idx) in committees" :key="c.id || idx">
+                        <div class="committee-item grid grid-cols-1 md:grid-cols-4 gap-4 items-end bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700 relative pl-10" :data-id="idx">
+                            <!-- Drag Handle -->
+                            <div class="absolute left-3 top-1/2 -translate-y-1/2 cursor-move text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 handle">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
+                            </div>
+                            
                             <input type="hidden" :name="`committees[${idx}][id]`" :value="c.id">
+                            <!-- Hidden Sort Order -->
+                            <input type="hidden" :name="`committees[${idx}][sort_order]`" :value="idx">
                             <div>
                                 <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Nama</label>
                                 <input type="text" :name="`committees[${idx}][name]`" x-model="c.name" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm">
@@ -222,17 +229,32 @@
         return {
             isSubmitting: false,
             status: '{{ old('status', $event->status) }}',
-            committees: {!! json_encode(old('committees', $event->committees->count() ? $event->committees->toArray() : [['name' => '', 'role' => '', 'photo' => null]])) !!},
+            committees: {!! json_encode(old('committees', $event->committees->count() ? $event->committees->orderBy('sort_order')->get()->toArray() : [['name' => '', 'role' => '', 'photo' => null, 'sort_order' => 0]])) !!}.map((c, i) => ({...c, id: c.id || Date.now() + i})),
             documentations: {!! json_encode(old('documentations', $event->documentations->count() ? $event->documentations->toArray() : [['title' => '', 'photo' => null]])) !!},
-            addCommittee() { this.committees.push({name: '', role: '', photo: null}); },
+            addCommittee() { this.committees.push({id: Date.now(), name: '', role: '', photo: null, sort_order: this.committees.length}); },
             removeCommittee(idx) { this.committees.splice(idx, 1); },
             addDoc() { if(this.documentations.length < 10) this.documentations.push({title: '', photo: null}); },
-            removeDoc(idx) { this.documentations.splice(idx, 1); }
-        }
-    }
-    function obsoleteEventFormEdit() {
-        return {
-            isSubmitting: false,
+            removeDoc(idx) { this.documentations.splice(idx, 1); },
+            initSortable() {
+                let el = document.getElementById('committees-container');
+                if (el) {
+                    Sortable.create(el, {
+                        handle: '.handle',
+                        animation: 150,
+                        onEnd: (evt) => {
+                            // Update the array order based on DOM changes
+                            let oldIndex = evt.oldIndex;
+                            let newIndex = evt.newIndex;
+                            if (oldIndex !== newIndex) {
+                                // Extract the moved item
+                                let movedItem = this.committees.splice(oldIndex, 1)[0];
+                                // Insert it at the new position
+                                this.committees.splice(newIndex, 0, movedItem);
+                            }
+                        }
+                    });
+                }
+            }
         }
     }
 </script>

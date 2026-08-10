@@ -146,6 +146,7 @@
 
     <!-- Alpine.js untuk interaksi UI (Sidebar, Dropdown) -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <!-- Chart.js (Untuk Chart di Dashboard) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 

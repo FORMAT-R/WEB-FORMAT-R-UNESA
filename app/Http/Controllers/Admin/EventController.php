@@ -159,17 +159,21 @@ class EventController extends Controller
                 $data = [
                     'name' => $c['name'],
                     'role' => $c['role'],
+                    'sort_order' => $c['sort_order'] ?? $idx,
                 ];
 
                 if (isset($c['photo']) && $request->hasFile("committees.{$idx}.photo")) {
                     $data['photo'] = $this->uploadImageWebp($c['photo'], 'events/committees');
                 }
 
-                if (isset($c['id']) && $c['id']) {
+                if (isset($c['id']) && $c['id'] && !str_starts_with($c['id'], '17')) { // exclude mock IDs created by Date.now() from JS
                     $committee = EventCommittee::find($c['id']);
                     if ($committee) {
                         $committee->update($data);
                         $updatedCommitteeIds[] = $committee->id;
+                    } else {
+                        $newCommittee = $event->committees()->create($data);
+                        $updatedCommitteeIds[] = $newCommittee->id;
                     }
                 } else {
                     $newCommittee = $event->committees()->create($data);

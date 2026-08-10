@@ -579,11 +579,10 @@
             </div>
             <div class="eyebrow">Di Balik Layar</div>
             <h2>Susunan Panitia</h2>
-            <p>Tim yang menjalankan setiap program kerja, dari perencanaan hingga pelaksanaan di lapangan.</p>
         </div>
 
         <div class="team-grid">
-            @foreach($event->committees as $i => $p)
+            @foreach($event->committees()->orderBy('sort_order')->get() as $i => $p)
             <div class="team-card {{ $i < 2 ? 'lead' : '' }}">
                 <div class="avatar">
                     @if($p->photo)
