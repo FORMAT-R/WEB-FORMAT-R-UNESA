@@ -328,27 +328,56 @@
   }
 
   /* ===== GALLERY / DOKUMENTASI ===== */
-  .gallery-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px;flex-wrap:wrap;gap:20px;}
-  .gallery-head h2{font-size:clamp(28px,3.4vw,38px);}
-  .gallery{
-    display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
-    grid-auto-rows:220px;
-    gap:16px;
-  }
-  .g{
-    border-radius:18px;position:relative;overflow:hidden;
-    display:flex;align-items:flex-end;padding:16px;
-    color:#F4F8FF;font-weight:700;font-size:13px;
-    box-shadow:inset 0 -60px 50px -30px rgba(6,15,28,0.55);
-    background-color: var(--blue-pale);
-    transition: transform 0.3s ease;
-  }
-  .g:hover {
-      transform: translateY(-4px);
-  }
-  .g span{position:relative;z-index:2;letter-spacing:0.02em; text-shadow: 0 2px 4px rgba(0,0,0,0.6);}
+.gallery-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px;flex-wrap:wrap;gap:20px;}
+.gallery-head h2{font-size:clamp(28px,3.4vw,38px);}
 
+.gallery{
+    column-count:4;
+    column-gap:16px;
+}
+.g{
+    break-inside:avoid;
+    -webkit-column-break-inside:avoid;
+    margin-bottom:16px;
+    border-radius:18px;
+    position:relative;
+    overflow:hidden;
+    display:block;
+    background:var(--blue-pale);
+    box-shadow:0 10px 24px rgba(14,35,64,0.08);
+    transition:transform .3s ease, box-shadow .3s ease;
+}
+.g img{
+    width:100%;
+    height:auto;
+    display:block;
+    transition:transform .5s ease;
+}
+.g::after{
+    content:"";
+    position:absolute;inset:0;
+    background:linear-gradient(0deg, rgba(6,15,28,0.45), transparent 55%);
+    opacity:0;
+    transition:opacity .3s ease;
+}
+.g:hover{
+    transform:translateY(-5px);
+    box-shadow:0 20px 36px -16px rgba(14,35,64,0.3);
+}
+.g:hover img{
+  transform:scale(1.05);
+}
+.g:hover::after{
+  opacity:1;
+}
+
+@media(max-width:1100px){
+  .gallery{ column-count:3; }
+}
+@media(max-width:600px){
+  .gallery{ column-count:2; column-gap:10px; }
+  .g{ margin-bottom:10px; border-radius:14px; }
+}
   /* ===== CTA STRIP ===== */
   .cta-strip{
     background:var(--navy);
@@ -603,7 +632,9 @@
         </div>
         <div class="gallery">
             @foreach($event->documentations as $doc)
-            <div class="g" style="background-image: url('{{ Storage::url($doc->photo) }}'); background-size: cover; background-position: center;"></div>
+            <div class="g">
+                <img src="{{ Storage::url($doc->photo) }}" alt="Dokumentasi {{ $event->title }}" loading="lazy">
+            </div>
             @endforeach
         </div>
     </div>

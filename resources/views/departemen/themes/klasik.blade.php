@@ -371,7 +371,6 @@
       .spotlight-foto {
         width: 250px; height: 420px;
         object-fit: cover; object-position: top center; display: block;
-        filter: drop-shadow(2px 0 0 white) drop-shadow(-2px 0 0 white) drop-shadow(0 2px 0 white) drop-shadow(0 -2px 0 white) drop-shadow(1.5px 1.5px 0 white) drop-shadow(-1.5px -1.5px 0 white) drop-shadow(1.5px -1.5px 0 white) drop-shadow(-1.5px 1.5px 0 white);
         transition: all 0.3s ease;
         margin-bottom: 0;
         will-change: transform, filter; /* Optimasi render */
@@ -379,7 +378,7 @@
       }
       .spotlight-orang.active { transform: translateY(-5px) scale(1.08) translateZ(0); z-index: 25 !important; opacity: 1 !important; }
     .spotlight-orang.active .spotlight-foto {
-      filter: drop-shadow(2px 0 0 white) drop-shadow(-2px 0 0 white) drop-shadow(0 2px 0 white) drop-shadow(0 -2px 0 white) drop-shadow(1.5px 1.5px 0 white) drop-shadow(-1.5px -1.5px 0 white) drop-shadow(1.5px -1.5px 0 white) drop-shadow(-1.5px 1.5px 0 white);
+      
     }
   .spotlight-svg-fallback {
     width: 250px; height: 420px; display: block;
