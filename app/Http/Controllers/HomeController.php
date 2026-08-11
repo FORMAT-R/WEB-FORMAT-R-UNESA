@@ -8,8 +8,10 @@ use App\Models\Event;
 use App\Models\News;
 use App\Models\BestOfficer;
 use App\Models\Birthday;
+use App\Jobs\SendContactEmail;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 
 class HomeController extends Controller
@@ -64,16 +66,20 @@ class HomeController extends Controller
 
     public function index()
     {
-        $stats = [
-            ['value' => Department::count(),   'label' => 'Departemen Aktif', 'suffix' => ''],
-            ['value' => Member::count(), 'label' => 'Fungsionaris Aktif', 'suffix' => ''],
-            ['value' => 2000, 'label' => 'Anggota Format-R', 'suffix' => '+'],
-            ['value' => 30,  'label' => 'Program Kerja', 'suffix' => '+'],
-        ];
+        $stats = Cache::remember('home_stats', 600, function () {
+            return [
+                ['value' => Department::count(),   'label' => 'Departemen Aktif', 'suffix' => ''],
+                ['value' => Member::count(), 'label' => 'Fungsionaris Aktif', 'suffix' => ''],
+                ['value' => 2000, 'label' => 'Anggota Format-R', 'suffix' => '+'],
+                ['value' => 30,  'label' => 'Program Kerja', 'suffix' => '+'],
+            ];
+        });
 
         $berita = News::with('author')->where('status', 'published')->latest()->paginate(3);
 
-        $arsip = Event::where('status', 'completed')->latest('end_date')->take(4)->get();
+        $arsip = Cache::remember('home_arsip', 600, function () {
+            return Event::where('status', 'completed')->latest('end_date')->take(4)->get();
+        });
 
         $faq = [
             [
@@ -99,48 +105,56 @@ class HomeController extends Controller
         ];
 
         // Penghargaan
-        $bestOfficers = BestOfficer::orderBy('year', 'desc')->orderBy('month', 'desc')->get();
-        $latestBestOfficers = collect();
-        $historyBestOfficers = collect();
+        $penghargaan = Cache::remember('home_penghargaan', 600, function () {
+            $bestOfficers = BestOfficer::orderBy('year', 'desc')->orderBy('month', 'desc')->get();
+            $latestBestOfficers = collect();
+            $historyBestOfficers = collect();
 
-        if ($bestOfficers->count() > 0) {
-            $first = $bestOfficers->first();
-            $latestYear = $first->year;
-            $latestMonth = $first->month;
-            
-            $latestGroup = $bestOfficers->where('year', $latestYear)->where('month', $latestMonth);
-            $historyGroup = $bestOfficers->filter(function($item) use ($latestYear, $latestMonth) {
-                return $item->year != $latestYear || $item->month != $latestMonth;
-            });
+            if ($bestOfficers->count() > 0) {
+                $first = $bestOfficers->first();
+                $latestYear = $first->year;
+                $latestMonth = $first->month;
 
-            // Akan hilang dari homepage setelah 30 hari sejak diupdate
-            if ($first->updated_at && $first->updated_at->diffInDays(Carbon::now()) <= 30) {
-                $latestBestOfficers = $latestGroup->take(3);
-                $historyBestOfficers = $historyGroup->take(3);
-            } else {
-                $historyBestOfficers = $bestOfficers->take(3);
+                $latestGroup = $bestOfficers->where('year', $latestYear)->where('month', $latestMonth);
+                $historyGroup = $bestOfficers->filter(function($item) use ($latestYear, $latestMonth) {
+                    return $item->year != $latestYear || $item->month != $latestMonth;
+                });
+
+                if ($first->updated_at && $first->updated_at->diffInDays(Carbon::now()) <= 30) {
+                    $latestBestOfficers = $latestGroup->take(3);
+                    $historyBestOfficers = $historyGroup->take(3);
+                } else {
+                    $historyBestOfficers = $bestOfficers->take(3);
+                }
             }
-        }
-        
-        $penghargaan = [
-            'bulan_ini' => $latestBestOfficers,
-            'riwayat' => $historyBestOfficers,
-        ];
 
-        // Ulang Tahun
+            return [
+                'bulan_ini' => $latestBestOfficers,
+                'riwayat' => $historyBestOfficers,
+            ];
+        });
+
+        // Ulang Tahun - cache per bulan agar tidak membebani query tiap menit
         $currentMonth = Carbon::now()->month;
-        $ultahData = Birthday::whereMonth('birth_date', $currentMonth)
-            ->orderByRaw('DAY(birth_date) ASC')
-            ->get();
-            
+        $cacheKeyUltah = 'home_ultah_' . $currentMonth;
+        $ultahData = Cache::remember($cacheKeyUltah, 1800, function () use ($currentMonth) {
+            return Birthday::whereMonth('birth_date', $currentMonth)
+                ->orderByRaw('DAY(birth_date) ASC')
+                ->get();
+        });
+
         $todayStr = Carbon::now()->format('m-d');
-        // Hanya menampilkan yang benar-benar berulang tahun HARI INI
-        $ultahHariIni = Birthday::whereRaw("DATE_FORMAT(birth_date, '%m-%d') = ?", [$todayStr])
-            ->get();
+        $ultahHariIni = Cache::remember('home_ultah_today_' . $todayStr, 1800, function () use ($todayStr) {
+            return Birthday::whereRaw("DATE_FORMAT(birth_date, '%m-%d') = ?", [$todayStr])->get();
+        });
 
-        $events = Event::whereIn('status', ['upcoming', 'ongoing'])->orderBy('start_date', 'asc')->take(3)->get();
+        $events = Cache::remember('home_events_upcoming', 600, function () {
+            return Event::whereIn('status', ['upcoming', 'ongoing'])->orderBy('start_date', 'asc')->take(3)->get();
+        });
 
-        $pembina = \App\Models\Pembina::where('is_active', true)->first();
+        $pembina = Cache::remember('home_pembina_active', 1800, function () {
+            return \App\Models\Pembina::where('is_active', true)->first();
+        });
 
         return view('home.index', compact(
             'stats', 'berita', 'arsip', 'faq', 'penghargaan', 'ultahData', 'ultahHariIni', 'events', 'pembina'
@@ -149,7 +163,7 @@ class HomeController extends Controller
 
     public function kirimPesan(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'pesan' => 'required|string',
@@ -158,15 +172,16 @@ class HomeController extends Controller
         $emailTujuan = get_setting('contactEmail', 'formatr@unesa.ac.id');
 
         try {
-            Mail::raw("Nama: {$request->nama}\nEmail: {$request->email}\n\nPesan:\n{$request->pesan}", function ($message) use ($emailTujuan, $request) {
-                $message->to($emailTujuan)
-                        ->subject('Pesan Baru dari Website FORMAT-R UNESA')
-                        ->replyTo($request->email, $request->nama);
-            });
+            SendContactEmail::dispatch(
+                $validated['nama'],
+                $validated['email'],
+                $validated['pesan'],
+                $emailTujuan,
+            );
 
             return response()->json(['success' => true, 'message' => 'Pesan berhasil dikirim! Kami akan segera merespons.']);
         } catch (\Exception $e) {
-            \Log::error('Gagal mengirim email kontak: ' . $e->getMessage());
+            \Log::error('Gagal mengantrikan email kontak: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Gagal mengirim pesan. Silakan coba beberapa saat lagi.'], 500);
         }
     }

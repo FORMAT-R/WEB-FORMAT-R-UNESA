@@ -95,8 +95,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         
 Route::get('/debug-member', function() {
     $m = \App\Models\Member::with('department')->get();
-    foreach($m as $x) { echo $x->department->slug . ' - ' . $x->position . '<br>'; }
-});
+    $rows = [];
+    foreach($m as $x) {
+        $rows[] = ($x->department->slug ?? '-') . ' - ' . ($x->position ?? '-');
+    }
+    return response()->json($rows);
+})->middleware('can:is-superadmin');
         Route::resource('departemen', DepartmentController::class)->parameters([
             'departemen' => 'department'
         ]);

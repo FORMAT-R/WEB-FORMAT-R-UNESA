@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="{{ Str::limit(strip_tags($berita->content ?? ''), 160, '...') }}">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{ $berita->title ?? 'FORMAT NEWS' }}">
+<meta property="og:description" content="{{ Str::limit(strip_tags($berita->content ?? ''), 160, '...') }}">
+@if($berita->image)
+<meta property="og:image" content="{{ Storage::url($berita->image) }}">
+@endif
 <title>{{ $berita->title ?? 'FORMAT NEWS' }} | FORMAT NEWS</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap');
@@ -277,6 +285,8 @@
 </style>
 </head>
 <body>
+<main>
+<article>
 <div class="page">
 
   <!-- UTILITY NAV -->
@@ -456,6 +466,8 @@
     Download PDF
   </button>
 </div>
+</article>
+</main>
 
 <!-- html2canvas + jsPDF CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>

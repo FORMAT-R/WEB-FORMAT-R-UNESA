@@ -6,11 +6,24 @@ use App\Http\Controllers\Controller;
 use App\Models\Birthday;
 use App\Models\Member;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class UltahController extends Controller
 {
     use \App\Traits\ImageUploadTrait;
+
+    /**
+     * Bersihkan cache ulang tahun di homepage agar data baru langsung muncul pada hari H.
+     */
+    private function forgetUltahCache(): void
+    {
+        $todayKey = 'home_ultah_today_' . Carbon::now()->format('m-d');
+        $monthKey = 'home_ultah_' . Carbon::now()->month;
+        Cache::forget($todayKey);
+        Cache::forget($monthKey);
+    }
 
     /**
      * Display a listing of the resource.
@@ -50,6 +63,8 @@ class UltahController extends Controller
         }
 
         Birthday::create($validated);
+
+        $this->forgetUltahCache();
 
         return redirect()->route('admin.ultah.index')->with('success', 'Data ulang tahun berhasil ditambahkan.');
     }
@@ -100,6 +115,8 @@ class UltahController extends Controller
 
         $birthday->update($validated);
 
+        $this->forgetUltahCache();
+
         return redirect()->route('admin.ultah.index')->with('success', 'Data ulang tahun berhasil diperbarui.');
     }
 
@@ -115,6 +132,8 @@ class UltahController extends Controller
         }
         
         $birthday->delete();
+
+        $this->forgetUltahCache();
 
         return redirect()->route('admin.ultah.index')->with('success', 'Data ulang tahun berhasil dihapus.');
     }

@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
+<html lang="id" class="scroll-smooth">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Website Resmi FORMAT-R (Forum Mahasiswa Trunojoyo - Rantau) UNESA. Wadah silaturahmi, informasi, dan pengembangan diri mahasiswa rantau di Universitas Negeri Surabaya.">
+    <meta name="keywords" content="FORMAT-R, FORMAT-R UNESA, Mahasiswa Rantau UNESA, Forum Mahasiswa Trunojoyo, UNESA, Organisasi Mahasiswa UNESA">
+    <meta name="robots" content="index, follow">
     <title>{{ get_setting('cabinetName', 'Kabinet') }} - FORMAT R UNESA</title>
 
     <!-- Google Fonts -->
