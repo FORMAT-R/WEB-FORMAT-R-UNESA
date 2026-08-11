@@ -966,7 +966,7 @@
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:32px; margin: 0 auto;">
                 @foreach($ultahHariIni as $ultah)
                 <div style="width: 280px; background:#fff; border:1px solid var(--line); border-radius:24px; overflow:hidden; box-shadow:0 20px 40px rgba(11,37,69,0.08); display:flex; flex-direction:column;">
-                    <div style="aspect-ratio: 9/16; background:linear-gradient(135deg, var(--yellow), var(--yellow-deep)); position: relative; display:flex; align-items:center; justify-content:center; font-family:'Sora', sans-serif; font-size:4rem; color:rgba(255,255,255,0.8);">
+                    <div style="aspect-ratio: 4/5; background:linear-gradient(135deg, var(--yellow), var(--yellow-deep)); position: relative; display:flex; align-items:center; justify-content:center; font-family:'Sora', sans-serif; font-size:4rem; color:rgba(255,255,255,0.8);">
                         @if($ultah->photo)
                             <img src="{{ Storage::url($ultah->photo) }}" alt="{{ $ultah->name }}" style="width:100%; height:100%; object-fit:cover; position:absolute; inset:0;">
                         @else
