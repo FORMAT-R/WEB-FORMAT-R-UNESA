@@ -1,5 +1,12 @@
 <?php
 
+// Tampilkan error murni PHP ke layar (HANYA UNTUK DEBUGGING SEMENTARA)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/../storage/logs/php_native_error.log');
+
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
