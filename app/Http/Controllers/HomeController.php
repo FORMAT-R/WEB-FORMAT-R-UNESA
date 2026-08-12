@@ -10,6 +10,7 @@ use App\Models\BestOfficer;
 use App\Models\Birthday;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class HomeController extends Controller
@@ -127,23 +128,35 @@ class HomeController extends Controller
             'riwayat' => $historyBestOfficers,
         ];
 
-        // Ulang Tahun
+        // Ulang Tahun — tampilkan 3 tanggal terbaru di bulan ini s/d hari ini
         $currentMonth = Carbon::now()->month;
-        $ultahData = Birthday::whereMonth('birth_date', $currentMonth)
+        $currentDay   = Carbon::now()->day;
+
+        // Ambil 3 tanggal TERBARU (terbesar) yang sudah lewat/hari ini di bulan berjalan
+        $latest3Days = Birthday::whereMonth('birth_date', $currentMonth)
+            ->whereDay('birth_date', '<=', $currentDay)
+            ->selectRaw('DAY(birth_date) as birth_day')
+            ->distinct()
+            ->orderByRaw('DAY(birth_date) DESC')
+            ->limit(3)
+            ->pluck('birth_day');
+
+        // Ambil SEMUA orang yang ultahnya jatuh di 3 tanggal tersebut, urut ASC
+        $ultahBulanIni = Birthday::whereMonth('birth_date', $currentMonth)
+            ->whereIn(DB::raw('DAY(birth_date)'), $latest3Days)
             ->orderByRaw('DAY(birth_date) ASC')
             ->get();
-            
-        $todayStr = Carbon::now()->format('m-d');
-        // Hanya menampilkan yang benar-benar berulang tahun HARI INI
-        $ultahHariIni = Birthday::whereRaw("DATE_FORMAT(birth_date, '%m-%d') = ?", [$todayStr])
-            ->get();
+
+        // Variabel lama dipertahankan agar tidak ada breaking change di tempat lain
+        $ultahData    = $ultahBulanIni;
+        $ultahHariIni = $ultahBulanIni;
 
         $events = Event::whereIn('status', ['upcoming', 'ongoing'])->orderBy('start_date', 'asc')->take(3)->get();
 
         $pembina = \App\Models\Pembina::where('is_active', true)->first();
 
         return view('home.index', compact(
-            'stats', 'berita', 'arsip', 'faq', 'penghargaan', 'ultahData', 'ultahHariIni', 'events', 'pembina'
+            'stats', 'berita', 'arsip', 'faq', 'penghargaan', 'ultahData', 'ultahHariIni', 'ultahBulanIni', 'events', 'pembina'
         ));
     }
 

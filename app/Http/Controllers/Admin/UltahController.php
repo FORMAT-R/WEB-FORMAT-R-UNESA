@@ -19,9 +19,8 @@ class UltahController extends Controller
      */
     private function forgetUltahCache(): void
     {
-        $todayKey = 'home_ultah_today_' . Carbon::now()->format('m-d');
+        // Invalidate cache bulanan (logika harian sudah tidak digunakan)
         $monthKey = 'home_ultah_' . Carbon::now()->month;
-        Cache::forget($todayKey);
         Cache::forget($monthKey);
     }
 

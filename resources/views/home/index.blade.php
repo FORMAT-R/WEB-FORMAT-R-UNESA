@@ -390,10 +390,41 @@
   body.dark .history_name{color:#fff;}
 
   /* ===== ULTAH CARD STYLES ===== */
-  .ultah-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 18px;
+  .ultah-scroll-wrapper {
+    overflow-x: auto;
+    padding-bottom: 12px;
+    /* Custom scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--yellow-deep) transparent;
+  }
+  .ultah-scroll-wrapper::-webkit-scrollbar {
+    height: 5px;
+  }
+  .ultah-scroll-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .ultah-scroll-wrapper::-webkit-scrollbar-thumb {
+    background: var(--yellow-deep);
+    border-radius: 10px;
+  }
+  /* Wrapper per kelompok tanggal */
+  .ultah-date-group {
+    display: flex;
+    gap: 14px;
+    align-items: stretch;
+    min-width: max-content;
+  }
+  /* Separator antar tanggal */
+  .ultah-date-separator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 2px;
+    background: linear-gradient(180deg, transparent, var(--yellow-deep), transparent);
+    border-radius: 2px;
+    margin: 0 4px;
+    opacity: 0.4;
   }
   .ultah-card {
     background: #fff;
@@ -408,6 +439,8 @@
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     min-height: 150px;
+    width: 300px;
+    flex-shrink: 0;
   }
   .ultah-card:hover {
     transform: translateY(-4px);
@@ -419,6 +452,22 @@
     top: 0; left: 0; right: 0;
     height: 4px;
     background: linear-gradient(90deg, var(--yellow), var(--yellow-deep), var(--accent-red));
+  }
+  /* Badge tanggal di pojok kanan atas card */
+  .ultah-badge-date {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    background: linear-gradient(135deg, var(--yellow), var(--yellow-deep));
+    color: var(--navy);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+    z-index: 2;
+    box-shadow: 0 2px 8px rgba(232,164,0,0.3);
   }
   .ultah-avatar {
     width: 72px;
@@ -931,7 +980,7 @@
             {{-- Switcher --}}
             <div class="apresiasi-tabs" style="display:inline-flex; background:#fff; padding:6px; border-radius:100px; margin-top:20px; box-shadow:0 4px 12px rgba(11,37,69,0.05);">
                 <button class="apresiasi-tab active" data-target="penghargaan-content" style="padding:10px 24px; border-radius:100px; border:none; font-weight:700; font-family:'Inter', sans-serif; cursor:pointer; background:var(--navy); color:#fff; transition:0.3s;">Fungsionaris Terbaik</button>
-                <button class="apresiasi-tab" data-target="ultah-content" style="padding:10px 24px; border-radius:100px; border:none; font-weight:700; font-family:'Inter', sans-serif; cursor:pointer; background:transparent; color:var(--ink-soft); transition:0.3s;">Ultah Hari Ini</button>
+                <button class="apresiasi-tab" data-target="ultah-content" style="padding:10px 24px; border-radius:100px; border:none; font-weight:700; font-family:'Inter', sans-serif; cursor:pointer; background:transparent; color:var(--ink-soft); transition:0.3s;">Ultah Bulan Ini</button>
             </div>
         </div>
         {{-- TAB: PENGHARGAAN --}}
@@ -960,29 +1009,53 @@
             @endif
         </div>
 
-        {{-- TAB: ULANG TAHUN HARI INI --}}
+        {{-- TAB: ULANG TAHUN BULAN INI (3 tanggal terbaru, scroll horizontal) --}}
         <div id="ultah-content" class="apresiasi-pane" style="display:none;">
-            @if($ultahHariIni->count() > 0)
-            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:32px; margin: 0 auto;">
-                @foreach($ultahHariIni as $ultah)
-                <div style="width: 280px; background:#fff; border:1px solid var(--line); border-radius:24px; overflow:hidden; box-shadow:0 20px 40px rgba(11,37,69,0.08); display:flex; flex-direction:column;">
-                    <div style="aspect-ratio: 4/5; background:linear-gradient(135deg, var(--yellow), var(--yellow-deep)); position: relative; display:flex; align-items:center; justify-content:center; font-family:'Sora', sans-serif; font-size:4rem; color:rgba(255,255,255,0.8);">
-                        @if($ultah->photo)
-                            <img src="{{ Storage::url($ultah->photo) }}" alt="{{ $ultah->name }}" style="width:100%; height:100%; object-fit:cover; position:absolute; inset:0;">
-                        @else
-                            {{ strtoupper(substr($ultah->name, 0, 2)) }}
+            @if($ultahBulanIni->count() > 0)
+            @php
+                // Kelompokkan per tanggal untuk rendering separator
+                $ultahGrouped = $ultahBulanIni->groupBy(fn($u) => $u->birth_date->format('d'));
+            @endphp
+            <div class="ultah-scroll-wrapper">
+                <div class="ultah-date-group">
+                    @foreach($ultahGrouped as $day => $group)
+                        {{-- Separator antar tanggal --}}
+                        @if(!$loop->first)
+                        <div class="ultah-date-separator"></div>
                         @endif
-                    </div>
-                    <div style="padding:20px; display:flex; flex-direction:column; gap:6px; text-align:center;">
-                        <span class="spotlight-icon" style="font-size:1.4rem;">🎂</span>
-                        <p style="font-size:1rem; color:var(--navy); font-weight: 500; font-style:italic;">"{{ $ultah->message ? $ultah->message : 'Selamat bertambah usia!' }}"</p>
-                    </div>
+
+                        {{-- Semua card pada tanggal ini --}}
+                        @foreach($group as $ultah)
+                        <div class="ultah-card">
+                            {{-- Badge tanggal --}}
+                            <span class="ultah-badge-date">{{ $ultah->birth_date->translatedFormat('j M') }}</span>
+
+                            {{-- Avatar --}}
+                            <div class="ultah-avatar">
+                                @if($ultah->photo)
+                                    <img src="{{ Storage::url($ultah->photo) }}" alt="{{ $ultah->name }}">
+                                @else
+                                    <span class="init">{{ strtoupper(substr($ultah->name, 0, 2)) }}</span>
+                                @endif
+                            </div>
+
+                            {{-- Info --}}
+                            <div class="ultah-info">
+                                <span class="ultah-date">🎂 Ulang Tahun</span>
+                                <p class="ultah-name" style="font-weight:700;">{{ $ultah->name }}</p>
+                                <span class="ultah-dept">{{ $ultah->position ?? $ultah->department }}</span>
+                                <p class="ultah-message">"{{ $ultah->message ?: 'Selamat bertambah usia!' }}"</p>
+                            </div>
+
+                            <div class="ultah-photo-placeholder">🎉</div>
+                        </div>
+                        @endforeach
+                    @endforeach
                 </div>
-                @endforeach
             </div>
             @else
             <div style="text-align: center; color: var(--ink-soft); padding: 40px;">
-                Belum ada yang berulang tahun hari ini.
+                Belum ada yang berulang tahun di bulan ini.
             </div>
             @endif
         </div>
