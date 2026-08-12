@@ -428,140 +428,62 @@
   }
   .ultah-card {
     background: #fff;
-    border-radius: 18px;
-    padding: 20px;
-    display: flex;
-    gap: 16px;
-    align-items: flex-start;
-    box-shadow: 0 6px 20px rgba(11,37,69,0.05);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(11,37,69,0.08);
     border: 1px solid var(--line);
     position: relative;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    min-height: 150px;
-    width: 300px;
+    width: 260px;
     flex-shrink: 0;
   }
   .ultah-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 28px rgba(11,37,69,0.1);
+    box-shadow: 0 28px 50px rgba(11,37,69,0.14);
   }
-  .ultah-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--yellow), var(--yellow-deep), var(--accent-red));
-  }
-  /* Badge tanggal di pojok kanan atas card */
+  /* Badge tanggal di pojok kanan atas foto */
   .ultah-badge-date {
     position: absolute;
-    top: 10px;
-    right: 14px;
-    background: linear-gradient(135deg, var(--yellow), var(--yellow-deep));
-    color: var(--navy);
+    top: 12px;
+    right: 12px;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(6px);
+    color: #fff;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    padding: 3px 9px;
+    padding: 4px 10px;
     border-radius: 20px;
     letter-spacing: 0.05em;
-    z-index: 2;
-    box-shadow: 0 2px 8px rgba(232,164,0,0.3);
+    z-index: 3;
   }
-  .ultah-avatar {
-    width: 72px;
-    height: 72px;
-    border-radius: 14px;
+  .ultah-photo {
+    aspect-ratio: 4/5;
     background: linear-gradient(135deg, var(--yellow), var(--yellow-deep));
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: 'Sora', sans-serif;
-    font-weight: 700;
-    font-size: 1.4rem;
-    color: var(--navy);
-    flex-shrink: 0;
+    font-size: 4rem;
+    color: rgba(255,255,255,0.8);
     overflow: hidden;
-    position: relative;
-    z-index: 1;
-    box-shadow: 0 4px 12px rgba(232, 164, 0, 0.3);
   }
-  .ultah-avatar img {
+  .ultah-photo img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 14px;
-  }
-  .ultah-avatar .init {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Sora', sans-serif;
-    font-weight: 700;
-    font-size: 1.6rem;
-    color: var(--navy);
-  }
-  .ultah-info { flex: 1; min-width: 0; }
-  .ultah-date {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.68rem;
-    font-weight: 700;
-    color: var(--blue);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .ultah-name {
-    font-size: 1.1rem;
-    color: var(--navy);
-    margin-bottom: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .ultah-dept {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--ink-soft);
-    display: block;
-    margin-bottom: 10px;
-  }
-  .ultah-message {
-    font-size: 0.88rem;
-    color: var(--ink-soft);
-    font-style: italic;
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .ultah-card .ultah-photo-placeholder {
     position: absolute;
-    bottom: 12px;
-    right: 12px;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: rgba(232, 164, 0, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--yellow-deep);
-    font-size: 12px;
-    opacity: 0.7;
-    transition: opacity 0.2s, background 0.2s, color 0.2s;
+    inset: 0;
   }
-  .ultah-card:hover .ultah-photo-placeholder {
-    opacity: 1;
-    background: var(--yellow);
-    color: var(--navy);
+  .ultah-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: center;
   }
 
   /* ===== BERITA ===== */
@@ -1030,24 +952,24 @@
                             {{-- Badge tanggal --}}
                             <span class="ultah-badge-date">{{ $ultah->birth_date->translatedFormat('j M') }}</span>
 
-                            {{-- Avatar --}}
-                            <div class="ultah-avatar">
+                            {{-- Foto 4/5 --}}
+                            <div class="ultah-photo">
                                 @if($ultah->photo)
                                     <img src="{{ Storage::url($ultah->photo) }}" alt="{{ $ultah->name }}">
                                 @else
-                                    <span class="init">{{ strtoupper(substr($ultah->name, 0, 2)) }}</span>
+                                    {{ strtoupper(substr($ultah->name, 0, 2)) }}
                                 @endif
                             </div>
 
-                            {{-- Info --}}
-                            <div class="ultah-info">
-                                <span class="ultah-date">🎂 Ulang Tahun</span>
-                                <p class="ultah-name" style="font-weight:700;">{{ $ultah->name }}</p>
-                                <span class="ultah-dept">{{ $ultah->position ?? $ultah->department }}</span>
-                                <p class="ultah-message">"{{ $ultah->message ?: 'Selamat bertambah usia!' }}"</p>
+                            {{-- Teks bawah --}}
+                            <div class="ultah-body">
+                                <span style="font-size:1.4rem;">🎂</span>
+                                <p style="font-size:1rem; font-weight:700; color:var(--navy); margin:0;">{{ $ultah->name }}</p>
+                                <span style="font-size:0.8rem; color:var(--ink-soft); font-weight:600;">{{ $ultah->position ?? $ultah->department }}</span>
+                                <p style="font-size:0.9rem; color:var(--ink-soft); font-style:italic; margin:0;">
+                                    "{{ $ultah->message ?: 'Selamat bertambah usia!' }}"
+                                </p>
                             </div>
-
-                            <div class="ultah-photo-placeholder">🎉</div>
                         </div>
                         @endforeach
                     @endforeach
