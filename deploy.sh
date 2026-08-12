@@ -56,6 +56,11 @@ if [ ! -f "$COMPOSER_BIN" ]; then
 fi
 php "$COMPOSER_BIN" install --no-dev --optimize-autoloader --no-interaction
 
+# Regenerate autoloader dari awal — mencegah error "incomplete object"
+# saat unserialize cache lama yang classmap-nya sudah berubah
+echo "Regenerate autoloader..."
+php "$COMPOSER_BIN" dump-autoload -o
+
 # Uncomment kalau butuh build frontend juga:
 # echo "Update dependency npm & build assets..."
 # npm ci
@@ -109,9 +114,14 @@ else
     echo "✅ Symlink storage sudah ada."
 fi
 
-# --- Bersihkan cache Laravel supaya perubahan config/route langsung kepakai ---
+# --- Bersihkan SEMUA cache dulu (application, config, route, view, compiled) ---
+# supaya tidak ada cache basi/corrupt yang nyangkut setelah update kode
 echo ""
-echo "Membersihkan & membangun ulang cache Laravel..."
+echo "Membersihkan seluruh cache lama..."
+php artisan optimize:clear
+
+# --- Bangun ulang cache config/route/view untuk performa ---
+echo "Membangun ulang cache Laravel..."
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
