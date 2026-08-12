@@ -48,7 +48,13 @@ echo "✅ Pull berhasil."
 # --- 3. Install dependency (kalau composer.json / package.json berubah) ---
 echo ""
 echo "[3/6] Update dependency composer..."
-composer install --no-dev --optimize-autoloader --no-interaction
+COMPOSER_BIN="$HOME/composer.phar"
+if [ ! -f "$COMPOSER_BIN" ]; then
+    echo "❌ composer.phar tidak ditemukan di $COMPOSER_BIN"
+    echo "   Install dulu dengan: curl -sS https://getcomposer.org/installer | php"
+    exit 1
+fi
+php "$COMPOSER_BIN" install --no-dev --optimize-autoloader --no-interaction
 
 # Uncomment kalau butuh build frontend juga:
 # echo "Update dependency npm & build assets..."
