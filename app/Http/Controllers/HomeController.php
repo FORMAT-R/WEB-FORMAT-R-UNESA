@@ -153,8 +153,10 @@ class HomeController extends Controller
         });
 
         $pembina = Cache::remember('home_pembina_active', 1800, function () {
-            return \App\Models\Pembina::where('is_active', true)->first();
+            $data = \App\Models\Pembina::where('is_active', true)->first();
+            return $data ? $data->toArray() : null;
         });
+        $pembina = $pembina ? (object) $pembina : null;
 
         return view('home.index', compact(
             'stats', 'berita', 'arsip', 'faq', 'penghargaan', 'ultahData', 'ultahHariIni', 'events', 'pembina'
