@@ -393,6 +393,7 @@
   .ultah-scroll-wrapper {
     overflow-x: auto;
     padding-bottom: 12px;
+    text-align: center;
     /* Custom scrollbar */
     scrollbar-width: thin;
     scrollbar-color: var(--yellow-deep) transparent;
@@ -409,10 +410,9 @@
   }
   /* Wrapper per kelompok tanggal */
   .ultah-date-group {
-    display: flex;
+    display: inline-flex;
     gap: 14px;
     align-items: stretch;
-    min-width: max-content;
   }
   /* Separator antar tanggal */
   .ultah-date-separator {
