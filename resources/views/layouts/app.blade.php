@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'FORMAT-R UNESA — Forum Mahasiswa')</title>
     <meta name="description" content="@yield('description', 'Website Resmi FORMAT-R (Forum Mahasiswa Tuban - Ronggolawe) UNESA. Wadah silaturahmi, informasi, dan pengembangan diri mahasiswa Tuban - Ronggolawe di Universitas Negeri Surabaya.')">
-    <meta name="keywords" content="FORMAT-R, FORMAT-R UNESA, Mahasiswa Tuban - Ronggolawe UNESA, Forum Mahasiswa Trunojoyo, UNESA, Organisasi Mahasiswa UNESA, Berita Mahasiswa">
+    <meta name="keywords" content="FORMAT-R, FORMAT-R UNESA, Mahasiswa Tuban - Ronggolawe UNESA, Forum Mahasiswa Tuban - Ronggolawe, UNESA, Organisasi Mahasiswa UNESA, Berita Mahasiswa">
     <meta name="author" content="FORMAT-R UNESA">
     <meta name="google-site-verification" content="un3u9nhJOS7PGtAUphZ9a1s4CyZzUUn14aixFHtyxVI" />
     <meta name="robots" content="index, follow">
