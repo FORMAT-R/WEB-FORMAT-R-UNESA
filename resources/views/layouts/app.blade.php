@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'FORMAT-R UNESA — Forum Mahasiswa')</title>
-    <meta name="description" content="@yield('description', 'Website Resmi FORMAT-R (Forum Mahasiswa Trunojoyo - Rantau) UNESA. Wadah silaturahmi, informasi, dan pengembangan diri mahasiswa rantau di Universitas Negeri Surabaya.')">
-    <meta name="keywords" content="FORMAT-R, FORMAT-R UNESA, Mahasiswa Rantau UNESA, Forum Mahasiswa Trunojoyo, UNESA, Organisasi Mahasiswa UNESA, Berita Mahasiswa">
+    <meta name="description" content="@yield('description', 'Website Resmi FORMAT-R (Forum Mahasiswa Tuban - Ronggolawe) UNESA. Wadah silaturahmi, informasi, dan pengembangan diri mahasiswa Tuban - Ronggolawe di Universitas Negeri Surabaya.')">
+    <meta name="keywords" content="FORMAT-R, FORMAT-R UNESA, Mahasiswa Tuban - Ronggolawe UNESA, Forum Mahasiswa Trunojoyo, UNESA, Organisasi Mahasiswa UNESA, Berita Mahasiswa">
     <meta name="author" content="FORMAT-R UNESA">
     <meta name="google-site-verification" content="un3u9nhJOS7PGtAUphZ9a1s4CyZzUUn14aixFHtyxVI" />
     <meta name="robots" content="index, follow">
@@ -14,13 +14,13 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ request()->url() }}">
     <meta property="og:title" content="@yield('title', 'FORMAT-R UNESA')">
-    <meta property="og:description" content="@yield('description', 'Website Resmi FORMAT-R (Forum Mahasiswa Trunojoyo - Rantau) UNESA.')">
+    <meta property="og:description" content="@yield('description', 'Website Resmi FORMAT-R (Forum Mahasiswa Tuban - Ronggolawe) UNESA.')">
     <meta property="og:image" content="{{ asset('images/logo_format.png') }}">
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="@yield('title', 'FORMAT-R UNESA')">
-    <meta name="twitter:description" content="@yield('description', 'Website Resmi FORMAT-R (Forum Mahasiswa Trunojoyo - Rantau) UNESA.')">
+    <meta name="twitter:description" content="@yield('description', 'Website Resmi FORMAT-R (Forum Mahasiswa Tuban - Ronggolawe) UNESA.')">
     <meta name="twitter:image" content="{{ asset('images/logo_format.png') }}">
 
     <link rel="icon" type="image/png" href="{{ asset('images/logo_format.png') }}">
