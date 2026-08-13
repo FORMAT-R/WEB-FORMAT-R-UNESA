@@ -49,22 +49,29 @@ import './scroll-animations.js';
         mobileMenu.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', closeMenu); });
     }
 
-    /* ========== Scroll: Nav Shrink + Back-to-Top (progress bar handled by GSAP on homepage) ========== */
+    /* ========== Scroll: Nav Shrink + Back-to-Top (Optimized with requestAnimationFrame) ========== */
     const progress = document.getElementById('scrollProgress');
     const navWrap  = document.getElementById('navWrap');
     const toTop    = document.getElementById('toTop');
     const hasGsapHome = window.innerWidth >= 768 && !!document.querySelector('#home .stack-section, #home.stack-section, .stack-section');
 
+    let scrollTicking = false;
     function onScroll() {
-        const h          = document.documentElement;
-        const scrollTop  = h.scrollTop || document.body.scrollTop;
-        const scrollHeight = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
-        const pct        = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+        if (!scrollTicking) {
+            requestAnimationFrame(function () {
+                const h          = document.documentElement;
+                const scrollTop  = h.scrollTop || document.body.scrollTop;
+                const scrollHeight = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
+                const pct        = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
 
-        // Only drive the progress bar via width when GSAP stack-scroll is NOT in charge (admin pages etc.)
-        if (progress && !hasGsapHome) progress.style.width = pct + '%';
-        if (navWrap)  navWrap.classList.toggle('scrolled', scrollTop > 40);
-        if (toTop)    toTop.classList.toggle('show', scrollTop > 500);
+                if (progress && !hasGsapHome) progress.style.width = pct + '%';
+                if (navWrap)  navWrap.classList.toggle('scrolled', scrollTop > 40);
+                if (toTop)    toTop.classList.toggle('show', scrollTop > 500);
+
+                scrollTicking = false;
+            });
+            scrollTicking = true;
+        }
     }
 
     document.addEventListener('scroll', onScroll, { passive: true });
@@ -77,7 +84,6 @@ import './scroll-animations.js';
     }
 
     /* ========== Scroll Reveal (IntersectionObserver) ========== */
-    // Only for '.reveal' elements not managed by GSAP (avoids double-driving data-reveal)
     const revealEls = document.querySelectorAll('.reveal:not([data-reveal]):not([data-stagger-child])');
     if (revealEls.length && 'IntersectionObserver' in window) {
         const io = new IntersectionObserver(function (entries) {
@@ -93,23 +99,38 @@ import './scroll-animations.js';
         revealEls.forEach(function (el) { el.classList.add('visible'); });
     }
 
-    /* ========== Scrollspy — Active Nav Link (fallback only; GSAP drives homepage) ========== */
-    // Only run this manual scrollspy if GSAP stack-scroll is NOT active on this page.
+    /* ========== Scrollspy — Active Nav Link (Optimized: Cached offsets + requestAnimationFrame) ========== */
     if (!hasGsapHome) {
         const sectionIds = ['home', 'tentang', 'visimisi', 'pembina', 'berita', 'apresiasi', 'arsip', 'penghargaan', 'faq', 'kontak'];
         const sections   = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
         const navItems   = document.querySelectorAll('#navLinks > li[data-sec]');
 
+        let cachedOffsets = [];
+        function updateCachedOffsets() {
+            cachedOffsets = sections.map(sec => ({ id: sec.id, top: sec.offsetTop }));
+        }
+        updateCachedOffsets();
+        window.addEventListener('resize', updateCachedOffsets, { passive: true });
+
+        let navTicking = false;
         function updateActiveNav() {
-            const scrollPos  = window.scrollY + 140;
-            let currentId    = sections[0] ? sections[0].id : null;
-            sections.forEach(function (sec) {
-                if (sec.offsetTop <= scrollPos) currentId = sec.id;
-            });
-            const mapId = (currentId === 'visimisi' || currentId === 'pembina') ? 'tentang' : currentId;
-            navItems.forEach(function (li) {
-                li.classList.toggle('active', li.getAttribute('data-sec') === mapId);
-            });
+            if (!navTicking) {
+                requestAnimationFrame(function () {
+                    const scrollPos = window.scrollY + 140;
+                    let currentId   = cachedOffsets[0] ? cachedOffsets[0].id : null;
+                    for (let i = 0; i < cachedOffsets.length; i++) {
+                        if (cachedOffsets[i].top <= scrollPos) {
+                            currentId = cachedOffsets[i].id;
+                        }
+                    }
+                    const mapId = (currentId === 'visimisi' || currentId === 'pembina') ? 'tentang' : currentId;
+                    navItems.forEach(function (li) {
+                        li.classList.toggle('active', li.getAttribute('data-sec') === mapId);
+                    });
+                    navTicking = false;
+                });
+                navTicking = true;
+            }
         }
 
         if (sections.length > 0) {

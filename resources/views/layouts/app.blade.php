@@ -24,11 +24,13 @@
     <meta name="twitter:image" content="{{ asset('images/logo_format.png') }}">
 
     <link rel="icon" type="image/png" href="{{ asset('images/logo_format.png') }}">
+    <link rel="preload" as="image" href="{{ asset('images/logo_format.png') }}" fetchpriority="high">
 
     {{-- Google Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
 
     {{-- Vite Assets --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -48,7 +50,7 @@
 <div class="nav-wrap" id="navWrap">
     <nav class="navbar">
         <a href="{{ route('home') }}" class="brand">
-            <img src="{{ asset('images/logo_format.png') }}" alt="Logo FORMAT-R" class="brand-logo">
+            <img src="{{ asset('images/logo_format.png') }}" alt="Logo FORMAT-R" class="brand-logo" fetchpriority="high">
             <span><span class="org">FORMAT-R</span> <span class="unesa">UNESA</span></span>
         </a>
 
@@ -138,7 +140,7 @@
                 </p>
             </div>
             <div class="foot-col">
-                <h5>Navigasi</h5>
+                <p class="foot-title">Navigasi</p>
                 <ul>
                     <li><a href="{{ route('home') }}">Beranda</a></li>
                     <li><a href="{{ route('home') }}#tentang">Tentang</a></li>
@@ -147,7 +149,7 @@
                 </ul>
             </div>
             <div class="foot-col">
-                <h5>Lainnya</h5>
+                <p class="foot-title">Lainnya</p>
                 <ul>
                     <li><a href="{{ route('event.index') }}">Event</a></li>
                     <li><a href="{{ route('home') }}#apresiasi">Apresiasi</a></li>
@@ -157,7 +159,7 @@
                 </ul>
             </div>
             <div class="foot-col">
-                <h5>Sosial Media</h5>
+                <p class="foot-title">Sosial Media</p>
                 <ul>
                     <li><a href="{{ get_setting('instagram', '#') }}" target="_blank">Instagram</a></li>
                     <li><a href="{{ get_setting('tiktok', '#') }}" target="_blank">TikTok</a></li>
@@ -165,7 +167,7 @@
                 </ul>
             </div>
             <div class="foot-col">
-            <h5>Kabinet</h5>
+            <p class="foot-title">Kabinet</p>
                 <ul>
                     <li><img src="{{ get_setting('cabinetLogo') ? Storage::url(get_setting('cabinetLogo')) : asset('images/logo_kabinet.jpeg') }}" alt="Logo Kabinet" style="width:120px;height:auto;border-radius:8px;"></li>
                 </ul>

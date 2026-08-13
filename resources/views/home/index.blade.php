@@ -20,7 +20,7 @@
   .hero-grid{display:flex;flex-direction:column;align-items:center;text-align:center;}
   .hero h1{font-size:3.4rem;line-height:1.06;margin:18px 0 22px;color:var(--navy);}
   body.dark .hero h1{color:#fff;}
-  .hero h1 .hl{color:var(--yellow-deep);position:relative;}
+  .hero h1 .hl{color:#8F5C00;position:relative;}
   body.dark .hero h1 .hl{color:var(--yellow);}
   .hero p.lede{font-size:1.08rem;color:var(--ink-soft);max-width:600px;margin-bottom:32px;}
 
@@ -869,13 +869,13 @@
         
         @if($berita->lastPage() > 1)
         <div style="display: flex; justify-content: center; gap: 16px; margin-top: 40px;" data-reveal id="beritaPaginationControls">
-            <button id="btnPrevBerita" disabled class="btn" style="background: var(--surface); color: var(--ink); border: 1px solid var(--line); display: inline-flex; align-items: center; justify-content:center; gap: 8px; cursor: not-allowed; opacity: 0.5; width: 48px; padding: 0;">
+            <button id="btnPrevBerita" aria-label="Halaman Berita Sebelumnya" disabled class="btn" style="background: var(--surface); color: var(--ink); border: 1px solid var(--line); display: inline-flex; align-items: center; justify-content:center; gap: 8px; cursor: not-allowed; opacity: 0.5; width: 48px; padding: 0;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
             </button>
             <a href="{{ route('berita.index') }}" class="btn" style="background: var(--surface); color: var(--ink); border: 1px solid var(--line); display: inline-flex; align-items: center; gap: 8px;">
                 Lihat Semua Berita
             </a>
-            <button id="btnNextBerita" data-page="2" class="btn" style="background: var(--surface); color: var(--ink); border: 1px solid var(--line); display: inline-flex; align-items: center; justify-content:center; gap: 8px; width: 48px; padding: 0;">
+            <button id="btnNextBerita" aria-label="Halaman Berita Selanjutnya" data-page="2" class="btn" style="background: var(--surface); color: var(--ink); border: 1px solid var(--line); display: inline-flex; align-items: center; justify-content:center; gap: 8px; width: 48px; padding: 0;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
             </button>
         </div>

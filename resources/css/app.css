@@ -120,7 +120,8 @@ body.dark .navbar { background: rgba(10,26,48,0.82); }
 }
 .brand .org { color: var(--navy); }
 body.dark .brand .org { color: #fff; }
-.brand .unesa { color: var(--yellow-deep); }
+.brand .unesa { color: #8F5C00; }
+body.dark .brand .unesa { color: var(--yellow); }
 
 .nav-links { display: flex; align-items: center; gap: 6px; }
 .nav-links > li { position: relative; }
@@ -265,9 +266,10 @@ footer { padding: 60px 0 30px; }
     display: flex; align-items: center; gap: 10px;
     font-family: 'Sora', sans-serif; font-weight: 700; margin-bottom: 14px;
 }
-.foot-col h5 {
+.foot-col h5, .foot-col .foot-title {
     font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
     letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 16px;
+    font-weight: 600;
 }
 .foot-col ul { display: grid; gap: 10px; }
 .foot-col a { font-size: 0.9rem; color: var(--ink-soft); }
