@@ -35,4 +35,16 @@ return [
         ],
     ],
 
+    'clipdrop' => [
+        'key_1' => env('CLIPDROP_KEY_1'),
+        'key_2' => env('CLIPDROP_KEY_2'),
+        'key_3' => env('CLIPDROP_KEY_3'),
+    ],
+
+    'remove_bg' => [
+        'key_1' => env('REMOVE_BG_KEY_1'),
+        'key_2' => env('REMOVE_BG_KEY_2'),
+        'key_3' => env('REMOVE_BG_KEY_3'),
+    ],
+
 ];

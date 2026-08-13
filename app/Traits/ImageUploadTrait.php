@@ -214,9 +214,9 @@ trait ImageUploadTrait
         if (!$localRembgSuccess) {
             \Log::info("Mencoba menggunakan Clipdrop API (High-Res) sebagai fallback pertama...");
             $clipdropKeys = [
-                env('CLIPDROP_KEY_1'),
-                env('CLIPDROP_KEY_2'),
-                env('CLIPDROP_KEY_3'),
+                config('services.clipdrop.key_1'),
+                config('services.clipdrop.key_2'),
+                config('services.clipdrop.key_3'),
             ];
             
             $clipdropKeys = array_filter($clipdropKeys);
@@ -256,9 +256,9 @@ trait ImageUploadTrait
         if (!$localRembgSuccess && !$clipdropSuccess) {
             \Log::info("Clipdrop gagal, menggunakan Remove.bg API sebagai fallback terakhir...");
             $keys = [
-                env('REMOVE_BG_KEY_1'),
-                env('REMOVE_BG_KEY_2'),
-                env('REMOVE_BG_KEY_3'),
+                config('services.remove_bg.key_1'),
+                config('services.remove_bg.key_2'),
+                config('services.remove_bg.key_3'),
             ];
             
             $keys = array_filter($keys); // Hapus key yang kosong
