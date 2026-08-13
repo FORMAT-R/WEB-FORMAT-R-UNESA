@@ -25,7 +25,7 @@ class SetCacheHeaders
 
         // Atur browser cache 1 hari (86400 detik) untuk halaman frontend publik
         if (!$response->headers->has('Cache-Control') || str_contains($response->headers->get('Cache-Control', ''), 'no-cache')) {
-            $response->headers->set('Cache-Control', 'public, max-age=86400, s-maxage=86400');
+            if ($request->routeIs('home')) { $response->headers->set('Cache-Control', 'no-cache, private, must-revalidate'); } else { $response->headers->set('Cache-Control', 'public, max-age=86400, s-maxage=86400'); }
         }
 
         return $response;

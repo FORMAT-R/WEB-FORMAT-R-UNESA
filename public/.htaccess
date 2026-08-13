@@ -31,3 +31,9 @@
     </FilesMatch>
 </IfModule>
 
+
+
+
+<IfModule LiteSpeed>
+    CacheDisable public /
+</IfModule>
