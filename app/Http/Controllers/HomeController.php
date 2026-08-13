@@ -128,24 +128,28 @@ class HomeController extends Controller
             'riwayat' => $historyBestOfficers,
         ];
 
-        // Ulang Tahun — tampilkan 3 tanggal terbaru di bulan ini s/d hari ini
-        $currentMonth = Carbon::now()->month;
-        $currentDay   = Carbon::now()->day;
+        // Ulang Tahun — tampilkan maksimal 3 tanggal terbaru di bulan ini s/d hari ini (tanggal terbaru di paling kanan)
+        $now          = Carbon::now('Asia/Jakarta');
+        $currentMonth = $now->month;
+        $currentDay   = $now->day;
 
-        // Ambil 3 tanggal TERBARU (terbesar) yang sudah lewat/hari ini di bulan berjalan
-        $latest3Days = Birthday::whereMonth('birth_date', $currentMonth)
-            ->whereDay('birth_date', '<=', $currentDay)
-            ->selectRaw('DAY(birth_date) as birth_day')
-            ->distinct()
-            ->orderByRaw('DAY(birth_date) DESC')
-            ->limit(3)
-            ->pluck('birth_day');
-
-        // Ambil SEMUA orang yang ultahnya jatuh di 3 tanggal tersebut, urut ASC
-        $ultahBulanIni = Birthday::whereMonth('birth_date', $currentMonth)
-            ->whereIn(DB::raw('DAY(birth_date)'), $latest3Days)
+        $allUltah = Birthday::whereMonth('birth_date', $currentMonth)
+            ->whereRaw('DAY(birth_date) <= ?', [$currentDay])
             ->orderByRaw('DAY(birth_date) ASC')
             ->get();
+
+        $latest3Days = $allUltah->pluck('birth_date')
+            ->map(fn($d) => (int)$d->format('d'))
+            ->unique()
+            ->sortDesc()
+            ->take(3)
+            ->sort()
+            ->values()
+            ->toArray();
+
+        $ultahBulanIni = $allUltah->filter(function($u) use ($latest3Days) {
+            return in_array((int)$u->birth_date->format('d'), $latest3Days);
+        })->values();
 
         // Variabel lama dipertahankan agar tidak ada breaking change di tempat lain
         $ultahData    = $ultahBulanIni;
