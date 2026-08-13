@@ -427,12 +427,12 @@
     // ========================================================
     // KONSTANTA KONFIGURASI FACE-CROP
     // Target rasio output: portrait setengah badan (1 : 1.5)
-    // Kepala akan diposisikan ~15% dari atas frame
+    // Kepala akan diposisikan ~8% dari atas frame dan lebih di-zoom (setengah badan)
     // ========================================================
     const TARGET_W = 600;        // lebar output (px)
     const TARGET_H = 900;        // tinggi output = rasio 1:1.5
-    const HEAD_TOP_RATIO = 0.10; // kepala mulai dari 10% dari atas
-    const HEAD_SIZE_RATIO = 0.35; // lebar kepala ~35% dari lebar frame
+    const HEAD_TOP_RATIO = 0.08; // kepala mulai dari 8% dari atas
+    const HEAD_SIZE_RATIO = 0.48; // lebar kepala ~48% dari lebar frame (lebih zoom, setengah badan)
 
     let modelsLoaded = false;
     let modelsLoading = false;
@@ -510,16 +510,22 @@
             let cropX = faceCenterX - cropW / 2;
 
             // Posisi vertikal: kepala dimulai HEAD_TOP_RATIO dari atas output
-            // Jadi di foto asli: bagian atas kepala ada di (cropH * HEAD_TOP_RATIO) dari atas crop
             let cropY = box.y - (cropH * HEAD_TOP_RATIO);
 
-            // Clamp agar tidak keluar batas foto
-            cropX = Math.max(0, Math.min(cropX, iW - cropW));
-            cropY = Math.max(0, Math.min(cropY, iH - cropH));
+            // Batasi agar tidak minus (keluar batas atas/kiri foto)
+            cropX = Math.max(0, cropX);
+            cropY = Math.max(0, cropY);
 
-            // Jika cropW atau cropH melebihi foto asli, sesuaikan
-            const actualCropW = Math.min(cropW, iW);
-            const actualCropH = Math.min(cropH, iH);
+            // Geser X jika melebihi batas kanan foto
+            if (cropX + cropW > iW) {
+                cropX = Math.max(0, iW - cropW);
+            }
+
+            // Untuk Y: JANGAN geser Y ke bawah jika melebihi batas bawah foto!
+            // Menggeser Y ke bawah akan mengambil area kaki pada foto full-body.
+            // Cukup gunakan cropY yang dihitung dari kepala dan ambil tinggi seadanya jika foto kurang tinggi.
+            const actualCropW = Math.min(cropW, iW - cropX);
+            const actualCropH = Math.min(cropH, iH - cropY);
 
             // ── Gambar ke canvas output ────────────────────────────────────
             const canvas  = document.createElement('canvas');
