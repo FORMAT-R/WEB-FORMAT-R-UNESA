@@ -431,8 +431,8 @@
     // ========================================================
     const TARGET_W = 600;        // lebar output (px)
     const TARGET_H = 900;        // tinggi output = rasio 1:1.5
-    const HEAD_TOP_RATIO = 0.08; // kepala mulai dari 8% dari atas
-    const HEAD_SIZE_RATIO = 0.48; // lebar kepala ~48% dari lebar frame (lebih zoom, setengah badan)
+    const HEAD_TOP_RATIO = 0.15; // kepala mulai dari 15% dari atas (memberi ruang cukup untuk rambut/hijab)
+    const HEAD_SIZE_RATIO = 0.42; // lebar kepala ~42% dari lebar frame (seimbang untuk foto jarak jauh maupun dekat)
 
     let modelsLoaded = false;
     let modelsLoading = false;
@@ -496,36 +496,38 @@
             const iH   = img.naturalHeight;
 
             // ── Hitung area crop di foto asli ──────────────────────────────
-            // Kita ingin: kepala memiliki lebar = HEAD_SIZE_RATIO * TARGET_W
-            // di output canvas. Maka scale factor:
-            const faceTargetW = TARGET_W * HEAD_SIZE_RATIO;         // px di output
-            const scale       = faceTargetW / box.width;             // faktor zoom
+            const faceTargetW = TARGET_W * HEAD_SIZE_RATIO;
+            const scale       = faceTargetW / box.width;
 
-            // Ukuran crop di foto asli
-            const cropW = TARGET_W / scale;
-            const cropH = TARGET_H / scale;
+            let cropW = TARGET_W / scale;
+            let cropH = TARGET_H / scale;
 
-            // Posisi horizontal: pusatkan wajah
+            const targetRatio = TARGET_W / TARGET_H;
+
+            // Pastikan crop box tidak melebihi dimensi foto asli sambil menjaga rasio 1:1.5
+            if (cropW > iW || cropH > iH) {
+                if (iW / iH < targetRatio) {
+                    cropW = iW;
+                    cropH = cropW / targetRatio;
+                } else {
+                    cropH = iH;
+                    cropW = cropH * targetRatio;
+                }
+            }
+
+            // Posisi horizontal: pusatkan pada wajah
             const faceCenterX = box.x + box.width / 2;
             let cropX = faceCenterX - cropW / 2;
 
-            // Posisi vertikal: kepala dimulai HEAD_TOP_RATIO dari atas output
+            // Posisi vertikal: beri margin atas HEAD_TOP_RATIO dari posisi dahi/wajah
             let cropY = box.y - (cropH * HEAD_TOP_RATIO);
 
-            // Batasi agar tidak minus (keluar batas atas/kiri foto)
-            cropX = Math.max(0, cropX);
-            cropY = Math.max(0, cropY);
+            // Batasi posisi X & Y agar selalu berada di dalam batas foto asli (0 s.d. iW-cropW & iH-cropH)
+            if (cropX < 0) cropX = 0;
+            if (cropX + cropW > iW) cropX = Math.max(0, iW - cropW);
 
-            // Geser X jika melebihi batas kanan foto
-            if (cropX + cropW > iW) {
-                cropX = Math.max(0, iW - cropW);
-            }
-
-            // Untuk Y: JANGAN geser Y ke bawah jika melebihi batas bawah foto!
-            // Menggeser Y ke bawah akan mengambil area kaki pada foto full-body.
-            // Cukup gunakan cropY yang dihitung dari kepala dan ambil tinggi seadanya jika foto kurang tinggi.
-            const actualCropW = Math.min(cropW, iW - cropX);
-            const actualCropH = Math.min(cropH, iH - cropY);
+            if (cropY < 0) cropY = 0;
+            if (cropY + cropH > iH) cropY = Math.max(0, iH - cropH);
 
             // ── Gambar ke canvas output ────────────────────────────────────
             const canvas  = document.createElement('canvas');
@@ -533,14 +535,12 @@
             canvas.height = TARGET_H;
             const ctx = canvas.getContext('2d');
 
-            // Background transparan (agar remove.bg nanti dapat area bersih)
             ctx.clearRect(0, 0, TARGET_W, TARGET_H);
 
-            // Gambar potongan foto ke canvas dengan resampling
             ctx.drawImage(
                 img,
-                cropX, cropY, actualCropW, actualCropH,  // source rect
-                0, 0, TARGET_W, TARGET_H                  // dest rect
+                cropX, cropY, cropW, cropH,  // source rect
+                0, 0, TARGET_W, TARGET_H    // dest rect
             );
 
             return canvas.toDataURL('image/jpeg', 0.92);
