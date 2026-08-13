@@ -58,8 +58,8 @@
   .newspaper-editor .hero .byline{ font-family:var(--sans); font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--rule); display:flex; gap:4px; align-items:center;}
   .newspaper-editor .hero .byline b{color:var(--ink); font-weight:bold;}
   
-  .newspaper-editor .body-columns{ columns:2; column-gap:22px; font-size:13px; line-height:1.62; color:var(--ink); min-height:200px; padding-bottom: 20px; word-break: break-word; overflow-wrap: break-word; }
-  .newspaper-editor .body-columns p{ margin-bottom:10px; }
+  .newspaper-editor .body-columns{ columns:2; column-gap:22px; font-size:13px; line-height:1.62; color:var(--ink); min-height:200px; padding-bottom: 20px; word-break: break-word; overflow-wrap: break-word; text-align: justify; text-justify: inter-word; }
+  .newspaper-editor .body-columns p{ margin-bottom:10px; text-align: justify; text-justify: inter-word; }
   .newspaper-editor .body-columns p:first-of-type::first-letter{ font-family:var(--serif-display); font-size:46px; font-weight:900; float:left; line-height:.82; padding:4px 6px 0 0; color:var(--red); }
 
   /* Sidebars (Dummy) */

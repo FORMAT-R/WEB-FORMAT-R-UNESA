@@ -119,11 +119,13 @@
     columns:2; column-gap:22px; font-size:13px; line-height:1.62; color:var(--ink);
     overflow-wrap:break-word; word-break:break-word; word-wrap:break-word;
     -webkit-hyphens:auto; hyphens:auto;
+    text-align:justify; text-justify:inter-word;
   }
   .body-columns p{
     margin-bottom:10px;
     overflow-wrap:break-word; word-break:break-word; word-wrap:break-word;
     -webkit-hyphens:auto; hyphens:auto;
+    text-align:justify; text-justify:inter-word;
   }
   .body-columns p:first-of-type::first-letter{
     font-family:var(--serif-display); font-size:46px; font-weight:900; float:left; line-height:.82;
@@ -514,6 +516,55 @@
     // ─────────────────────────────────────────────────────────────────────────
 
     const target = getTarget();
+
+    // ── Object-fit cover fix untuk html2canvas (mencegah gambar gepeng) ───────
+    const replacedImages = [];
+    const images = target.querySelectorAll('img');
+
+    for (const img of images) {
+      if (!img.complete || img.naturalWidth === 0 || img.naturalHeight === 0) continue;
+
+      const rect = img.getBoundingClientRect();
+      const style = window.getComputedStyle(img);
+      const isCover = style.objectFit === 'cover' || img.closest('.hero-image');
+
+      if (isCover && rect.width > 0 && rect.height > 0) {
+        const offCanvas = document.createElement('canvas');
+        const dpr = 2;
+        offCanvas.width = rect.width * dpr;
+        offCanvas.height = rect.height * dpr;
+        const ctx = offCanvas.getContext('2d');
+
+        const imgRatio = img.naturalWidth / img.naturalHeight;
+        const targetRatio = rect.width / rect.height;
+
+        let sw, sh, sx, sy;
+        if (imgRatio > targetRatio) {
+          sh = img.naturalHeight;
+          sw = sh * targetRatio;
+          sx = (img.naturalWidth - sw) / 2;
+          sy = 0;
+        } else {
+          sw = img.naturalWidth;
+          sh = sw / targetRatio;
+          sx = 0;
+          sy = (img.naturalHeight - sh) / 2;
+        }
+
+        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, offCanvas.width, offCanvas.height);
+
+        replacedImages.push({
+          img: img,
+          originalSrc: img.src,
+          originalStyle: img.getAttribute('style') || ''
+        });
+
+        img.src = offCanvas.toDataURL('image/png');
+        img.style.objectFit = 'fill';
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     const canvas = await html2canvas(target, {
       scale: 2,
       useCORS: true,
@@ -525,6 +576,16 @@
       windowWidth: target.scrollWidth,
       windowHeight: target.scrollHeight,
     });
+
+    // Restore images after capture
+    for (const item of replacedImages) {
+      item.img.src = item.originalSrc;
+      if (item.originalStyle) {
+        item.img.setAttribute('style', item.originalStyle);
+      } else {
+        item.img.removeAttribute('style');
+      }
+    }
 
     // Restore drop-cap ke CSS pseudo-element (balikin tampilan browser normal)
     if (firstPara && savedParaHTML !== null) {
