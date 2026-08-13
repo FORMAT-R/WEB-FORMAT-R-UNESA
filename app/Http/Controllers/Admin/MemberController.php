@@ -18,29 +18,40 @@ class MemberController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'department_id' => 'required|exists:departments,id',
-            'cabinet_id' => 'required|exists:cabinets,id',
-            'name' => 'required|string|max:255',
-            'position' => 'required|string|max:255',
-            'photo' => 'nullable|image|max:10240',
-            'photo_sorotan' => 'nullable|image|max:10240',
+            'department_id'         => 'required|exists:departments,id',
+            'cabinet_id'            => 'required|exists:cabinets,id',
+            'name'                  => 'required|string|max:255',
+            'position'              => 'required|string|max:255',
+            'photo'                 => 'nullable|image|max:10240',
+            'photo_sorotan'         => 'nullable|image|max:10240',
+            'photo_sorotan_cropped' => 'nullable|string', // base64 dari browser face-crop
         ]);
 
+        $faceCropped   = $request->input('face_cropped') === '1';
         $hasNewSorotan = false;
 
         if ($request->hasFile('photo')) {
             $validated['photo'] = $this->uploadImageWebp($request->file('photo'), 'members');
         }
 
-        if ($request->hasFile('photo_sorotan')) {
+        // Jika foto sudah di-crop wajah di browser (base64), simpan dari base64
+        if ($faceCropped && $request->filled('photo_sorotan_cropped')) {
+            $saved = $this->saveBase64Webp($request->input('photo_sorotan_cropped'), 'members_sorotan');
+            if ($saved) {
+                $validated['photo_sorotan'] = $saved;
+                $hasNewSorotan = true;
+            }
+        } elseif ($request->hasFile('photo_sorotan')) {
+            // Fallback: foto asli tanpa face-crop di browser
             $validated['photo_sorotan'] = $this->uploadImageWebp($request->file('photo_sorotan'), 'members_sorotan');
             $hasNewSorotan = true;
+            $faceCropped   = false; // pastikan flag false untuk fallback
         }
 
         $member = Member::create($validated);
 
         if ($hasNewSorotan) {
-            ProcessMemberPhotoBackground::dispatch($member->id);
+            ProcessMemberPhotoBackground::dispatch($member->id, $faceCropped);
         }
 
         return redirect()->route('admin.departemen.show', $request->department_id)
@@ -55,14 +66,16 @@ class MemberController extends Controller
         $member = Member::findOrFail($id);
 
         $validated = $request->validate([
-            'department_id' => 'required|exists:departments,id',
-            'cabinet_id' => 'required|exists:cabinets,id',
-            'name' => 'required|string|max:255',
-            'position' => 'required|string|max:255',
-            'photo' => 'nullable|image|max:10240',
-            'photo_sorotan' => 'nullable|image|max:10240',
+            'department_id'         => 'required|exists:departments,id',
+            'cabinet_id'            => 'required|exists:cabinets,id',
+            'name'                  => 'required|string|max:255',
+            'position'              => 'required|string|max:255',
+            'photo'                 => 'nullable|image|max:10240',
+            'photo_sorotan'         => 'nullable|image|max:10240',
+            'photo_sorotan_cropped' => 'nullable|string',
         ]);
 
+        $faceCropped   = $request->input('face_cropped') === '1';
         $hasNewSorotan = false;
 
         if ($request->hasFile('photo')) {
@@ -72,23 +85,32 @@ class MemberController extends Controller
             $validated['photo'] = $this->uploadImageWebp($request->file('photo'), 'members');
         }
 
-        if ($request->hasFile('photo_sorotan')) {
-            if ($member->photo_sorotan) {
-                Storage::disk('public')->delete($member->photo_sorotan);
+        // Jika foto sudah di-crop wajah di browser (base64)
+        if ($faceCropped && $request->filled('photo_sorotan_cropped')) {
+            if ($member->photo_sorotan) Storage::disk('public')->delete($member->photo_sorotan);
+            if ($member->photo_nobg)    Storage::disk('public')->delete($member->photo_nobg);
+
+            $saved = $this->saveBase64Webp($request->input('photo_sorotan_cropped'), 'members_sorotan');
+            if ($saved) {
+                $validated['photo_sorotan'] = $saved;
+                $validated['photo_nobg']    = null;
+                $hasNewSorotan = true;
             }
-            if ($member->photo_nobg) {
-                Storage::disk('public')->delete($member->photo_nobg);
-            }
-            
-            $validated['photo_nobg'] = null;
+        } elseif ($request->hasFile('photo_sorotan')) {
+            // Fallback: foto asli tanpa face-crop
+            if ($member->photo_sorotan) Storage::disk('public')->delete($member->photo_sorotan);
+            if ($member->photo_nobg)    Storage::disk('public')->delete($member->photo_nobg);
+
+            $validated['photo_nobg']    = null;
             $validated['photo_sorotan'] = $this->uploadImageWebp($request->file('photo_sorotan'), 'members_sorotan');
             $hasNewSorotan = true;
+            $faceCropped   = false;
         }
 
         $member->update($validated);
 
         if ($hasNewSorotan) {
-            ProcessMemberPhotoBackground::dispatch($member->id);
+            ProcessMemberPhotoBackground::dispatch($member->id, $faceCropped);
         }
 
         return redirect()->route('admin.departemen.show', $request->department_id)

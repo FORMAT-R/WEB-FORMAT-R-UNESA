@@ -108,6 +108,8 @@
 <div class="space-y-8" x-data="{
     showModal: false,
     editingId: null,
+    sorotanStatus: '',
+    sorotanFaceCropped: false,
     form: {
         name: '',
         position: '',
@@ -117,38 +119,59 @@
     
     openAddModal() {
         this.editingId = null;
+        this.sorotanStatus = '';
+        this.sorotanFaceCropped = false;
         this.form = { name: '', position: 'Staff Muda', cabinet_id: '{{ $selectedCabinetId }}', photo: '', photo_sorotan: '' };
         this.showModal = true;
     },
     
     openEditModal(member) {
         this.editingId = member.id;
-        // Kita tidak bisa pre-fill input file, jadi biarkan photoPreview terisi dari db jika ada
+        this.sorotanStatus = member.photo_sorotan_url ? 'Foto sorotan sudah ada — upload baru untuk mengganti.' : '';
+        this.sorotanFaceCropped = false;
         this.form = { ...member, photo: member.photo_url, photo_sorotan: member.photo_sorotan_url };
         this.showModal = true;
     },
     
-      handlePhotoUpload(e) {
-          const file = e.target.files[0];
-          if (file) {
-              const reader = new FileReader();
-              reader.onload = (e) => {
-                  this.form.photo = e.target.result;
-              };
-              reader.readAsDataURL(file);
-          }
-      },
-      handleSorotanUpload(e) {
-          const file = e.target.files[0];
-          if (file) {
-              const reader = new FileReader();
-              reader.onload = (e) => {
-                  this.form.photo_sorotan = e.target.result;
-              };
-              reader.readAsDataURL(file);
-          }
-      },
-    
+    handlePhotoUpload(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                this.form.photo = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    },
+
+    async handleSorotanUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        this.sorotanStatus = '⏳ Mendeteksi wajah...';
+        this.sorotanFaceCropped = false;
+
+        // Baca file sebagai data URL untuk preview & deteksi
+        const dataUrl = await new Promise(res => {
+            const r = new FileReader();
+            r.onload = ev => res(ev.target.result);
+            r.readAsDataURL(file);
+        });
+
+        // Coba face detection via face-api.js
+        const cropped = await window.detectAndCropFace(dataUrl);
+
+        if (cropped) {
+            this.form.photo_sorotan = cropped;
+            this.sorotanFaceCropped = true;
+            this.sorotanStatus = '✅ Wajah terdeteksi — foto otomatis disesuaikan!';
+        } else {
+            this.form.photo_sorotan = dataUrl;
+            this.sorotanFaceCropped = false;
+            this.sorotanStatus = '⚠️ Wajah tidak terdeteksi — menggunakan foto asli (fallback).';
+        }
+    },
+
     deleteId: null,
     deleteMember(id) {
         if(confirm('Apakah Anda yakin ingin menghapus anggota ini?')) {
@@ -275,15 +298,18 @@
                     </button>
                 </div>
 
-                <form :action="editingId ? '/admin/members/' + editingId : '{{ route('admin.members.store') }}'" method="POST" enctype="multipart/form-data" class="space-y-4">
+                <form :action="editingId ? '/admin/members/' + editingId : '{{ route('admin.members.store') }}'" method="POST" enctype="multipart/form-data" class="space-y-4" id="memberForm" @submit="handleFormSubmit">
                     @csrf
                     <template x-if="editingId">
                         <input type="hidden" name="_method" value="PUT">
                     </template>
                     <input type="hidden" name="department_id" value="{{ $department->id }}">
                     <input type="hidden" name="cabinet_id" x-model="form.cabinet_id">
+                    <!-- Flag: apakah foto sorotan sudah di-crop face di browser -->
+                    <input type="hidden" name="face_cropped" :value="sorotanFaceCropped ? '1' : '0'">
+                    <!-- Input tersembunyi pembawa data foto sorotan hasil face-crop (base64) -->
+                    <input type="hidden" name="photo_sorotan_cropped" x-ref="sorotanCroppedInput" :value="sorotanFaceCropped ? form.photo_sorotan : ''">
 
-                    <!-- Foto -->
                     <!-- Foto Profil -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Foto Profil (Card Tim Kami) <span class="text-xs text-gray-500 font-normal ml-1">Sebaiknya Pasfoto/Formal</span></label>
@@ -302,17 +328,34 @@
 
                     <!-- Foto Sorotan -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Foto Sorotan Pengurus <span class="text-xs text-gray-500 font-normal ml-1">Otomatis Remove BG</span></label>
-                        <div class="flex items-center gap-4">
-                            <div class="w-16 h-16 rounded-xl bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 overflow-hidden flex-shrink-0">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Foto Sorotan Pengurus
+                            <span class="text-xs text-gray-500 font-normal ml-1">Otomatis Remove BG + Standarisasi Wajah</span>
+                        </label>
+                        <div class="flex items-start gap-4">
+                            <!-- Preview area lebih besar agar proporsi portrait terlihat -->
+                            <div class="w-20 h-28 rounded-xl bg-gray-100 dark:bg-gray-700 border-2 border-dashed border-gray-300 dark:border-gray-600 overflow-hidden flex-shrink-0 relative">
                                 <template x-if="form.photo_sorotan">
-                                    <img :src="form.photo_sorotan" class="w-full h-full object-cover">
+                                    <img :src="form.photo_sorotan" class="w-full h-full object-cover object-top">
                                 </template>
                                 <template x-if="!form.photo_sorotan">
-                                    <svg class="w-8 h-8 text-gray-400 mx-auto mt-4" fill="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                    <div class="flex flex-col items-center justify-center h-full">
+                                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                    </div>
+                                </template>
+                                <!-- Badge face detected -->
+                                <template x-if="sorotanFaceCropped">
+                                    <div class="absolute bottom-0 left-0 right-0 bg-green-500 text-white text-center" style="font-size:8px; padding:2px;">✓ AI Crop</div>
                                 </template>
                             </div>
-                            <input type="file" name="photo_sorotan" accept="image/*" @change="handleSorotanUpload" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100">
+                            <div class="flex-1">
+                                <input type="file" name="photo_sorotan" accept="image/*" @change="handleSorotanUpload" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100">
+                                <!-- Status deteksi wajah -->
+                                <p x-show="sorotanStatus" x-text="sorotanStatus"
+                                   :class="sorotanFaceCropped ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'"
+                                   class="text-xs mt-2 font-medium"></p>
+                                <p class="text-xs text-gray-400 mt-1">Disarankan: foto setengah badan, pencahayaan cukup, wajah terlihat jelas.</p>
+                            </div>
                         </div>
                     </div>
 
@@ -353,4 +396,141 @@
             </div>
         </div>
 </div>
+
+@push('scripts')
+{{-- face-api.js: face detection di browser, tidak perlu install apapun di server --}}
+<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script>
+(function() {
+    // ========================================================
+    // KONSTANTA KONFIGURASI FACE-CROP
+    // Target rasio output: portrait setengah badan (1 : 1.5)
+    // Kepala akan diposisikan ~15% dari atas frame
+    // ========================================================
+    const TARGET_W = 600;        // lebar output (px)
+    const TARGET_H = 900;        // tinggi output = rasio 1:1.5
+    const HEAD_TOP_RATIO = 0.10; // kepala mulai dari 10% dari atas
+    const HEAD_SIZE_RATIO = 0.35; // lebar kepala ~35% dari lebar frame
+
+    let modelsLoaded = false;
+    let modelsLoading = false;
+
+    async function loadModels() {
+        if (modelsLoaded) return true;
+        if (modelsLoading) {
+            // Tunggu hingga loading selesai
+            while (modelsLoading) await new Promise(r => setTimeout(r, 100));
+            return modelsLoaded;
+        }
+        modelsLoading = true;
+        try {
+            // Model kecil: hanya untuk deteksi lokasi wajah (bukan landmark/recognition)
+            const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model';
+            await Promise.all([
+                faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+                faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL),
+            ]);
+            modelsLoaded = true;
+        } catch (err) {
+            console.warn('[FaceAPI] Gagal load model:', err);
+            modelsLoaded = false;
+        }
+        modelsLoading = false;
+        return modelsLoaded;
+    }
+
+    /**
+     * Deteksi wajah pada gambar (dataUrl), lakukan smart crop
+     * sehingga posisi & ukuran kepala seragam di semua foto.
+     * 
+     * @param {string} dataUrl - Data URL gambar asli
+     * @returns {string|null}  - Data URL hasil crop, atau null jika gagal
+     */
+    window.detectAndCropFace = async function(dataUrl) {
+        try {
+            const ok = await loadModels();
+            if (!ok) return null;
+
+            // Buat elemen img dari dataUrl
+            const img = await new Promise((res, rej) => {
+                const el = new Image();
+                el.onload = () => res(el);
+                el.onerror = rej;
+                el.src = dataUrl;
+            });
+
+            // Deteksi wajah dengan landmark (untuk dapat bounding box presisi)
+            const detection = await faceapi
+                .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions({ scoreThreshold: 0.4 }))
+                .withFaceLandmarks(true);
+
+            if (!detection) {
+                console.warn('[FaceAPI] Tidak ada wajah terdeteksi.');
+                return null;
+            }
+
+            const box  = detection.detection.box; // { x, y, width, height }
+            const iW   = img.naturalWidth;
+            const iH   = img.naturalHeight;
+
+            // ── Hitung area crop di foto asli ──────────────────────────────
+            // Kita ingin: kepala memiliki lebar = HEAD_SIZE_RATIO * TARGET_W
+            // di output canvas. Maka scale factor:
+            const faceTargetW = TARGET_W * HEAD_SIZE_RATIO;         // px di output
+            const scale       = faceTargetW / box.width;             // faktor zoom
+
+            // Ukuran crop di foto asli
+            const cropW = TARGET_W / scale;
+            const cropH = TARGET_H / scale;
+
+            // Posisi horizontal: pusatkan wajah
+            const faceCenterX = box.x + box.width / 2;
+            let cropX = faceCenterX - cropW / 2;
+
+            // Posisi vertikal: kepala dimulai HEAD_TOP_RATIO dari atas output
+            // Jadi di foto asli: bagian atas kepala ada di (cropH * HEAD_TOP_RATIO) dari atas crop
+            let cropY = box.y - (cropH * HEAD_TOP_RATIO);
+
+            // Clamp agar tidak keluar batas foto
+            cropX = Math.max(0, Math.min(cropX, iW - cropW));
+            cropY = Math.max(0, Math.min(cropY, iH - cropH));
+
+            // Jika cropW atau cropH melebihi foto asli, sesuaikan
+            const actualCropW = Math.min(cropW, iW);
+            const actualCropH = Math.min(cropH, iH);
+
+            // ── Gambar ke canvas output ────────────────────────────────────
+            const canvas  = document.createElement('canvas');
+            canvas.width  = TARGET_W;
+            canvas.height = TARGET_H;
+            const ctx = canvas.getContext('2d');
+
+            // Background transparan (agar remove.bg nanti dapat area bersih)
+            ctx.clearRect(0, 0, TARGET_W, TARGET_H);
+
+            // Gambar potongan foto ke canvas dengan resampling
+            ctx.drawImage(
+                img,
+                cropX, cropY, actualCropW, actualCropH,  // source rect
+                0, 0, TARGET_W, TARGET_H                  // dest rect
+            );
+
+            return canvas.toDataURL('image/jpeg', 0.92);
+        } catch (err) {
+            console.error('[FaceAPI] Error:', err);
+            return null;
+        }
+    };
+
+    // Pre-load model di background saat halaman siap
+    // (agar saat pengguna upload, model sudah tersedia)
+    if (document.readyState === 'complete') {
+        loadModels();
+    } else {
+        window.addEventListener('load', loadModels);
+    }
+})();
+</script>
+@endpush
+
 @endsection

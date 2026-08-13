@@ -114,13 +114,62 @@ trait ImageUploadTrait
     }
 
     /**
+     * Simpan foto sorotan dari data base64 (hasil face-crop di browser) sebagai WebP.
+     * Digunakan ketika face_cropped=1 dikirim dari form.
+     *
+     * @param string $base64Data  Data URL base64 (misal: data:image/jpeg;base64,...)
+     * @param string $directory   Target directory relative to storage/app/public
+     * @return string|null        Path file tersimpan, atau null jika gagal
+     */
+    public function saveBase64Webp(string $base64Data, string $directory): ?string
+    {
+        // Pisahkan header dan data
+        if (!preg_match('/^data:image\/(\w+);base64,/', $base64Data, $matches)) {
+            return null;
+        }
+
+        $base64 = substr($base64Data, strpos($base64Data, ',') + 1);
+        $decoded = base64_decode($base64);
+        if (!$decoded) return null;
+
+        // Tulis ke file sementara
+        $tempPath = sys_get_temp_dir() . '/' . Str::random(20) . '_facecrp.tmp';
+        file_put_contents($tempPath, $decoded);
+
+        // Buka gambar via GD
+        $image = @imagecreatefromstring($decoded);
+        if (!$image) {
+            @unlink($tempPath);
+            return null;
+        }
+
+        imagepalettetotruecolor($image);
+        imagealphablending($image, false);
+        imagesavealpha($image, true);
+
+        ob_start();
+        imagewebp($image, null, 85);
+        $imageContent = ob_get_clean();
+        imagedestroy($image);
+        @unlink($tempPath);
+
+        if (!$imageContent) return null;
+
+        $filename = Str::random(40) . '_fc.webp';
+        $storePath = trim($directory, '/') . '/' . $filename;
+        Storage::disk('public')->put($storePath, $imageContent);
+
+        return $storePath;
+    }
+
+    /**
      * Remove background from an image using python rembg OR Remove.bg API, convert to WebP, and return the path.
      *
      * @param string $sourcePath Path of the local original file relative to storage/app/public
      * @param string $directory Target directory relative to storage/app/public
      * @return string|null Path to the saved image without background, or null on failure
      */
-    public function removeBackgroundAndSaveWebp(string $sourcePath, string $directory): ?string
+    public function removeBackgroundAndSaveWebp(string $sourcePath, string $directory, bool $faceCropped = false): ?string
     {
         // Path absolut sumber
         $absSource = Storage::disk('public')->path($sourcePath);
@@ -262,7 +311,7 @@ trait ImageUploadTrait
             imagesavealpha($image, true);
             
             // Auto Crop (Trim) ruang kosong (transparan)
-            $croppedImage = $this->autoCropTransparent($image);
+            $croppedImage = $this->autoCropTransparent($image, $faceCropped);
             if ($croppedImage) {
                 imagedestroy($image);
                 $image = $croppedImage;
@@ -290,9 +339,11 @@ trait ImageUploadTrait
      * Auto crop an image to remove transparent boundaries.
      * 
      * @param \GdImage $image
+     * @param bool $faceCropped  Jika true, proporsi sudah distandarkan di browser;
+     *                           hanya lakukan trim transparan tanpa ubah rasio.
      * @return \GdImage|false Cropped image resource or false on failure
      */
-    private function autoCropTransparent($image)
+    private function autoCropTransparent($image, bool $faceCropped = false)
     {
         $width = imagesx($image);
         $height = imagesy($image);
@@ -357,23 +408,29 @@ trait ImageUploadTrait
             return false;
         }
 
-        // --- STANDARISASI RASIO UNTUK MEMBUANG KAKI (FULL BODY) ---
-        // Jika tinggi gambar > 1.3 kali dari lebarnya, kita anggap itu foto seluruh badan atau lebih.
-        // Kita akan potong dari atas (kepala) dan membatasi tingginya maksimal 1.3 kali lebarnya.
-        // Ini memastikan potongan setengah badan yang lebih seragam antar anggota.
-        $idealHeight = (int)($newWidth * 1.3);
-        if ($newHeight > $idealHeight) {
-            $newHeight = $idealHeight; 
-        }
+        if ($faceCropped) {
+            // ── MODE FACE-CROPPED: foto sudah distandarkan di browser ──────
+            // Hanya trim area transparan, JANGAN ubah proporsi/rasio.
+            // Ini memastikan standarisasi posisi kepala yang dilakukan JS terjaga.
+            $paddingTop = (int)($newHeight * 0.02); // padding minimal 2% saja
+            $actualTop  = max(0, $top - $paddingTop);
+            $paddingAdded = $top - $actualTop;
+            $newHeight += $paddingAdded;
+        } else {
+            // ── MODE FALLBACK: foto belum di-crop JS ─────────────────────────
+            // Standarisasi rasio untuk membuang kaki (full body).
+            // Jika tinggi > 1.3x lebar, potong dari atas, batasi tinggi 1.3x lebar.
+            $idealHeight = (int)($newWidth * 1.3);
+            if ($newHeight > $idealHeight) {
+                $newHeight = $idealHeight;
+            }
 
-        // Menambahkan sedikit padding di atas kepala (10% dari tinggi yang baru) agar tidak terlalu mepet
-        $paddingTop = (int)($newHeight * 0.1);
-        
-        // Sesuaikan koordinat top asli jika memungkinkan (jika masih ada ruang transparan di atasnya)
-        $actualTop = max(0, $top - $paddingTop);
-        // Karena kita mengubah top, tinggi juga harus ditambah agar potongan bawah tetap sama
-        $paddingAdded = $top - $actualTop;
-        $newHeight += $paddingAdded;
+            // Padding atas 10% agar tidak terlalu mepet di kepala
+            $paddingTop  = (int)($newHeight * 0.1);
+            $actualTop   = max(0, $top - $paddingTop);
+            $paddingAdded = $top - $actualTop;
+            $newHeight   += $paddingAdded;
+        }
 
         // Lakukan crop
         $croppedImage = imagecreatetruecolor($newWidth, $newHeight);
