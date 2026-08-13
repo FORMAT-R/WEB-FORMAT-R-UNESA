@@ -78,14 +78,15 @@
   .story-list li{padding:12px 0; border-bottom:1px solid var(--rule);}
   .story-list li:first-child{padding-top:0;}
   .story-list h4{font-family:var(--serif-display); font-size:15.5px; font-weight:700; line-height:1.28; margin-bottom:5px;}
-  .story-list p{font-size:11.5px; color:var(--ink-soft); line-height:1.48;}
+  .story-list p{font-size:11.5px; color:var(--ink-soft); line-height:1.48; text-align:justify; text-justify:inter-word;}
   .story-list .jump{font-family:var(--sans); font-size:10px; font-weight:700; color:var(--red); text-transform:uppercase; letter-spacing:.04em;}
 
   /* left column solar feature */
   .aside-feature{margin-top:24px;}
   .aside-feature figure{margin-bottom:8px;}
+  .aside-feature figure img{width:100%; aspect-ratio:16/9; object-fit:cover; display:block; border-radius:4px;}
   .aside-feature h4{font-family:var(--serif-display); font-size:19px; font-weight:700; line-height:1.22; margin-bottom:6px;}
-  .aside-feature p{font-size:11.5px; color:var(--ink-soft); line-height:1.55; margin-bottom:7px;}
+  .aside-feature p{font-size:11.5px; color:var(--ink-soft); line-height:1.55; margin-bottom:7px; text-align:justify; text-justify:inter-word;}
   .aside-feature .byline{font-family:var(--sans); font-size:10px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.04em; margin-bottom:8px;}
 
   /* center hero */
@@ -150,12 +151,13 @@
   /* right rail */
   .side-story{padding-bottom:16px; margin-bottom:16px; border-bottom:1px solid var(--rule);}
   .side-story figure{margin-bottom:8px;}
+  .side-story figure img{width:100%; aspect-ratio:16/9; object-fit:cover; display:block; border-radius:4px;}
   .side-story h4{font-family:var(--serif-display); font-size:18px; font-weight:700; line-height:1.24; margin-bottom:5px;}
   .side-story .kicker{
     font-family:var(--sans); font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
     color:var(--blue); display:block; margin-bottom:4px;
   }
-  .side-story p{font-size:11.5px; color:var(--ink-soft); line-height:1.5; margin-bottom:6px;}
+  .side-story p{font-size:11.5px; color:var(--ink-soft); line-height:1.5; margin-bottom:6px; text-align:justify; text-justify:inter-word;}
   .side-story .byline{font-family:var(--sans); font-size:10px; color:var(--ink-soft);}
   .side-story .jump{font-family:var(--sans); font-size:10px; font-weight:700; color:var(--red); text-transform:uppercase;}
 
@@ -194,13 +196,14 @@
   }
   .weekly-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:24px;}
   .weekly-card figure{margin-bottom:8px;}
+  .weekly-card figure img{width:100%; aspect-ratio:16/9; object-fit:cover; display:block; border-radius:4px;}
   .weekly-card figcaption{
     font-family:var(--sans); font-size:10px; color:var(--ink-soft); margin-top:5px; font-style:italic;
   }
   .weekly-card h4{
     font-family:var(--serif-display); font-size:17px; font-weight:700; line-height:1.26; margin-bottom:6px;
   }
-  .weekly-card p{font-size:12px; color:var(--ink-soft); line-height:1.52; margin-bottom:7px;}
+  .weekly-card p{font-size:12px; color:var(--ink-soft); line-height:1.52; margin-bottom:7px; text-align:justify; text-justify:inter-word;}
   .weekly-card .jump{
     font-family:var(--sans); font-size:10px; font-weight:700; color:var(--red); text-transform:uppercase; letter-spacing:.04em;
   }
@@ -479,55 +482,6 @@
     // ─────────────────────────────────────────────────────────────────────────
 
     const target = getTarget();
-
-    // ── Object-fit cover fix untuk html2canvas (mencegah gambar gepeng) ───────
-    const replacedImages = [];
-    const images = target.querySelectorAll('img');
-
-    for (const img of images) {
-      if (!img.complete || img.naturalWidth === 0 || img.naturalHeight === 0) continue;
-
-      const rect = img.getBoundingClientRect();
-      const style = window.getComputedStyle(img);
-      const isCover = style.objectFit === 'cover' || img.closest('.hero-image');
-
-      if (isCover && rect.width > 0 && rect.height > 0) {
-        const offCanvas = document.createElement('canvas');
-        const dpr = 2;
-        offCanvas.width = rect.width * dpr;
-        offCanvas.height = rect.height * dpr;
-        const ctx = offCanvas.getContext('2d');
-
-        const imgRatio = img.naturalWidth / img.naturalHeight;
-        const targetRatio = rect.width / rect.height;
-
-        let sw, sh, sx, sy;
-        if (imgRatio > targetRatio) {
-          sh = img.naturalHeight;
-          sw = sh * targetRatio;
-          sx = (img.naturalWidth - sw) / 2;
-          sy = 0;
-        } else {
-          sw = img.naturalWidth;
-          sh = sw / targetRatio;
-          sx = 0;
-          sy = (img.naturalHeight - sh) / 2;
-        }
-
-        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, offCanvas.width, offCanvas.height);
-
-        replacedImages.push({
-          img: img,
-          originalSrc: img.src,
-          originalStyle: img.getAttribute('style') || ''
-        });
-
-        img.src = offCanvas.toDataURL('image/png');
-        img.style.objectFit = 'fill';
-      }
-    }
-    // ─────────────────────────────────────────────────────────────────────────
-
     const canvas = await html2canvas(target, {
       scale: 2,
       useCORS: true,
@@ -538,17 +492,58 @@
       scrollY: 0,
       windowWidth: target.scrollWidth,
       windowHeight: target.scrollHeight,
-    });
+      onclone: (clonedDoc) => {
+        const clonedImages = Array.from(clonedDoc.querySelectorAll('img'));
+        const realImages = Array.from(target.querySelectorAll('img'));
 
-    // Restore images after capture
-    for (const item of replacedImages) {
-      item.img.src = item.originalSrc;
-      if (item.originalStyle) {
-        item.img.setAttribute('style', item.originalStyle);
-      } else {
-        item.img.removeAttribute('style');
+        clonedImages.forEach((clonedImg, idx) => {
+          const realImg = realImages[idx];
+          if (!realImg || !realImg.complete || realImg.naturalWidth === 0 || realImg.naturalHeight === 0) return;
+
+          const rect = realImg.getBoundingClientRect();
+          if (rect.width <= 0 || rect.height <= 0) return;
+
+          const offCanvas = clonedDoc.createElement('canvas');
+          const dpr = 2;
+          offCanvas.width = rect.width * dpr;
+          offCanvas.height = rect.height * dpr;
+          offCanvas.style.width = rect.width + 'px';
+          offCanvas.style.height = rect.height + 'px';
+
+          const style = window.getComputedStyle(realImg);
+          if (style.borderRadius) offCanvas.style.borderRadius = style.borderRadius;
+          if (style.border) offCanvas.style.border = style.border;
+          if (style.boxShadow) offCanvas.style.boxShadow = style.boxShadow;
+          offCanvas.style.display = 'block';
+
+          const ctx = offCanvas.getContext('2d');
+          const imgRatio = realImg.naturalWidth / realImg.naturalHeight;
+          const targetRatio = rect.width / rect.height;
+
+          let sw, sh, sx, sy;
+          if (imgRatio > targetRatio) {
+            sh = realImg.naturalHeight;
+            sw = sh * targetRatio;
+            sx = (realImg.naturalWidth - sw) / 2;
+            sy = 0;
+          } else {
+            sw = realImg.naturalWidth;
+            sh = sw / targetRatio;
+            sx = 0;
+            sy = (realImg.naturalHeight - sh) / 2;
+          }
+
+          try {
+            ctx.drawImage(realImg, sx, sy, sw, sh, 0, 0, offCanvas.width, offCanvas.height);
+            if (clonedImg.parentNode) {
+              clonedImg.parentNode.replaceChild(offCanvas, clonedImg);
+            }
+          } catch (e) {
+            console.warn('Canvas conversion skipped:', e);
+          }
+        });
       }
-    }
+    });
 
     // Restore drop-cap ke CSS pseudo-element (balikin tampilan browser normal)
     if (firstPara && savedParaHTML !== null) {
