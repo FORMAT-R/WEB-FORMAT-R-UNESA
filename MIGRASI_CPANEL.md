@@ -177,5 +177,17 @@ Ini wajib dilakukan agar Laravel menyadari adanya rute baru dan kolom baru:
 Langkah 6: Restart Pekerja Latar Belakang (Queue Worker)
 Karena kita mengubah logika AI di ProcessMemberPhotoBackground.php dan ImageUploadTrait.php, kita harus mematikan pekerja latar belakang yang lama agar cron job cPanel menghidupkan pekerja yang baru (yang memuat kode terbaru).
 /opt/cpanel/ea-php83/root/usr/bin/php artisan queue:restart
+
+
+PHP="/opt/cpanel/ea-php83/root/usr/bin/php"                                                                                             
+    DIR="/home/formatrunesa/formatr_core/web_format_r_unesa"                                                                                
+                                                                                                                                            
+    # 1. Rebuild config cache dengan key baru                                                                                               
+    $PHP $DIR/artisan config:cache                                                                                                          
+                                                                                                                                            
+    # 2. Restart worker agar baca config baru                                                                                               
+    pkill -f "queue:work"; sleep 2                                                                                                          
+    cd $DIR && nohup $PHP artisan queue:work --sleep=3 --tries=3 --timeout=1800 > /home/formatrunesa/queue_worker.log 2>&1 &                
+    echo "Worker PID: $!"          
 ---
 **Selesai!** Website FORMAT-R Anda kini siap digunakan secara publik di cPanel dengan dukungan AI Remove.bg Multi-API Key!

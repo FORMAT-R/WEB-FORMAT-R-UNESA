@@ -311,10 +311,15 @@ trait ImageUploadTrait
             imagesavealpha($image, true);
             
             // Auto Crop (Trim) ruang kosong (transparan)
-            $croppedImage = $this->autoCropTransparent($image, $faceCropped);
-            if ($croppedImage) {
-                imagedestroy($image);
-                $image = $croppedImage;
+            // Jika faceCropped=true: JS sudah menghasilkan canvas dengan komposisi wajah
+            // yang tepat (600×900). Memanggil autoCropTransparent akan men-trim sisi-sisi
+            // dan merusak proporsi tersebut. Cukup skip crop server-side.
+            if (!$faceCropped) {
+                $croppedImage = $this->autoCropTransparent($image, false);
+                if ($croppedImage) {
+                    imagedestroy($image);
+                    $image = $croppedImage;
+                }
             }
 
             // Konversi ke webp di memori
