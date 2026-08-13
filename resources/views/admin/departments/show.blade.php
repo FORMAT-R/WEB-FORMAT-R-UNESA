@@ -110,6 +110,7 @@
     editingId: null,
     sorotanStatus: '',
     sorotanFaceCropped: false,
+    isDetectingFace: false,
     form: {
         name: '',
         position: '',
@@ -121,6 +122,7 @@
         this.editingId = null;
         this.sorotanStatus = '';
         this.sorotanFaceCropped = false;
+        this.isDetectingFace = false;
         this.form = { name: '', position: 'Staff Muda', cabinet_id: '{{ $selectedCabinetId }}', photo: '', photo_sorotan: '' };
         this.showModal = true;
     },
@@ -129,6 +131,7 @@
         this.editingId = member.id;
         this.sorotanStatus = member.photo_sorotan_url ? 'Foto sorotan sudah ada — upload baru untuk mengganti.' : '';
         this.sorotanFaceCropped = false;
+        this.isDetectingFace = false;
         this.form = { ...member, photo: member.photo_url, photo_sorotan: member.photo_sorotan_url };
         this.showModal = true;
     },
@@ -150,25 +153,33 @@
 
         this.sorotanStatus = '⏳ Mendeteksi wajah...';
         this.sorotanFaceCropped = false;
+        this.isDetectingFace = true;
 
-        // Baca file sebagai data URL untuk preview & deteksi
-        const dataUrl = await new Promise(res => {
-            const r = new FileReader();
-            r.onload = ev => res(ev.target.result);
-            r.readAsDataURL(file);
-        });
+        try {
+            // Baca file sebagai data URL untuk preview & deteksi
+            const dataUrl = await new Promise(res => {
+                const r = new FileReader();
+                r.onload = ev => res(ev.target.result);
+                r.readAsDataURL(file);
+            });
 
-        // Coba face detection via face-api.js
-        const cropped = await window.detectAndCropFace(dataUrl);
+            // Coba face detection via face-api.js
+            const cropped = await window.detectAndCropFace(dataUrl);
 
-        if (cropped) {
-            this.form.photo_sorotan = cropped;
-            this.sorotanFaceCropped = true;
-            this.sorotanStatus = '✅ Wajah terdeteksi — foto otomatis disesuaikan!';
-        } else {
-            this.form.photo_sorotan = dataUrl;
-            this.sorotanFaceCropped = false;
-            this.sorotanStatus = '⚠️ Wajah tidak terdeteksi — menggunakan foto asli (fallback).';
+            if (cropped) {
+                this.form.photo_sorotan = cropped;
+                this.sorotanFaceCropped = true;
+                this.sorotanStatus = '✅ Wajah terdeteksi — foto otomatis disesuaikan!';
+            } else {
+                this.form.photo_sorotan = dataUrl;
+                this.sorotanFaceCropped = false;
+                this.sorotanStatus = '⚠️ Wajah tidak terdeteksi — menggunakan foto asli (fallback).';
+            }
+        } catch (err) {
+            console.error('Error cropping face:', err);
+            this.sorotanStatus = '⚠️ Terjadi kesalahan saat deteksi wajah.';
+        } finally {
+            this.isDetectingFace = false;
         }
     },
 
@@ -298,7 +309,7 @@
                     </button>
                 </div>
 
-                <form :action="editingId ? '/admin/members/' + editingId : '{{ route('admin.members.store') }}'" method="POST" enctype="multipart/form-data" class="space-y-4" id="memberForm" @submit="handleFormSubmit">
+                <form :action="editingId ? '/admin/members/' + editingId : '{{ route('admin.members.store') }}'" method="POST" enctype="multipart/form-data" class="space-y-4" id="memberForm" @submit="if (isDetectingFace) $event.preventDefault()">
                     @csrf
                     <template x-if="editingId">
                         <input type="hidden" name="_method" value="PUT">
@@ -333,10 +344,10 @@
                             <span class="text-xs text-gray-500 font-normal ml-1">Otomatis Remove BG + Standarisasi Wajah</span>
                         </label>
                         <div class="flex items-start gap-4">
-                            <!-- Preview area lebih besar agar proporsi portrait terlihat -->
-                            <div class="w-20 h-28 rounded-xl bg-gray-100 dark:bg-gray-700 border-2 border-dashed border-gray-300 dark:border-gray-600 overflow-hidden flex-shrink-0 relative">
+                            <!-- Preview area: rasio 1:1.5 sesuai output face-crop JS (600×900) -->
+                            <div class="w-24 h-36 rounded-xl bg-gray-100 dark:bg-gray-700 border-2 border-dashed border-gray-300 dark:border-gray-600 overflow-hidden flex-shrink-0 relative">
                                 <template x-if="form.photo_sorotan">
-                                    <img :src="form.photo_sorotan" class="w-full h-full object-cover object-top">
+                                    <img :src="form.photo_sorotan" class="w-full h-full object-contain">
                                 </template>
                                 <template x-if="!form.photo_sorotan">
                                     <div class="flex flex-col items-center justify-center h-full">
@@ -390,7 +401,18 @@
 
                     <div class="mt-6 flex justify-end gap-3">
                         <button type="button" @click="showModal = false" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50">Batal</button>
-                        <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-xl hover:bg-blue-700">Simpan Anggota</button>
+                        <button type="submit" 
+                                :disabled="isDetectingFace" 
+                                :class="isDetectingFace ? 'opacity-60 cursor-not-allowed bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'" 
+                                class="px-4 py-2 text-sm font-medium text-white border border-transparent rounded-xl flex items-center gap-2 transition">
+                            <template x-if="isDetectingFace">
+                                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </template>
+                            <span x-text="isDetectingFace ? 'Mendeteksi Wajah...' : 'Simpan Anggota'"></span>
+                        </button>
                     </div>
                 </form>
             </div>
