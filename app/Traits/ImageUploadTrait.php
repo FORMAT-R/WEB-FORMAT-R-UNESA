@@ -23,7 +23,7 @@ trait ImageUploadTrait
 
         // Jika gambar sudah webp, atau format lain yang tidak didukung GD secara default di script ini,
         // simpan secara normal tanpa konversi.
-        if (!in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
+        if (!in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
             return $file->store($directory, 'public');
         }
 
@@ -32,6 +32,13 @@ trait ImageUploadTrait
             $image = @imagecreatefromjpeg($path);
         } elseif ($extension === 'png') {
             $image = @imagecreatefrompng($path);
+            if ($image) {
+                imagepalettetotruecolor($image);
+                imagealphablending($image, true);
+                imagesavealpha($image, true);
+            }
+        } elseif ($extension === 'webp') {
+            $image = @imagecreatefromwebp($path);
             if ($image) {
                 imagepalettetotruecolor($image);
                 imagealphablending($image, true);
