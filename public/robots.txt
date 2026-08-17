@@ -3,4 +3,4 @@ Disallow: /admin/
 Disallow: /api/
 Allow: /
 
-Sitemap: https://formatrunesa.com/sitemap.xml
+Sitemap: https://formatrunesa.my.id/sitemap.xml
