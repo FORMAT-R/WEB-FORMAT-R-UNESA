@@ -910,7 +910,7 @@
             @if(isset($penghargaan['bulan_ini']) && $penghargaan['bulan_ini']->count() > 0)
             <div style="text-align: center; margin-bottom: 24px;">
                 <p style="font-size: 1.1rem; color: var(--ink-soft); font-family: 'Inter', sans-serif;">
-                    Fungsionaris Terbaik Bulan <span style="font-weight: 700; color: var(--navy);">{{ \Carbon\Carbon::parse($penghargaan['bulan_ini']->first()->period)->translatedFormat('F Y') }}</span>
+                    Fungsionaris Terbaik Bulan <span style="font-weight: 700; color: var(--navy);">{{ \Carbon\Carbon::createFromDate($penghargaan['bulan_ini']->first()->year, $penghargaan['bulan_ini']->first()->month, 1)->translatedFormat('F Y') }}</span>
                 </p>
             </div>
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:32px; margin: 0 auto;">

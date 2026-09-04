@@ -42,7 +42,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Foto -->
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Upload Gambar (Rasio 9:16) <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Upload Gambar (Rasio 4:5) <span class="text-red-500">*</span></label>
                     <div class="flex items-center gap-4">
                         <div class="w-16 h-16 rounded-xl bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 overflow-hidden flex-shrink-0">
                             <template x-if="form.photoPreview">
