@@ -186,18 +186,53 @@
                                 <input type="hidden" :name="`committees[${idx}][sort_order]`" :value="idx">
                                 <input type="hidden" :name="`committees[${idx}][existing_photo]`" :value="c.existing_photo || ''">
 
-                                <!-- Pilih Fungsionaris -->
-                                <div class="md:col-span-3">
+                                <!-- Pilih Fungsionaris (Cari / Searchable) -->
+                                <div class="md:col-span-3 relative" @click.away="c.openSearch = false">
                                     <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-                                        Pilih Fungsionaris <span class="font-normal text-gray-400">(Opsional)</span>
+                                        Cari Fungsionaris <span class="font-normal text-gray-400">(Ketik nama)</span>
                                     </label>
-                                    <select @change="onMemberSelect($event, c)"
-                                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm">
-                                        <option value="">-- Input Manual --</option>
-                                        <template x-for="m in members" :key="m.id">
-                                            <option :value="m.id" :selected="c.member_id == m.id" x-text="`${m.name} (${m.department ? (m.department.abbreviation || m.department.name) : '-'})`"></option>
+                                    <div class="relative">
+                                        <input type="text"
+                                            x-model="c.searchQuery"
+                                            @focus="c.openSearch = true"
+                                            @input="c.openSearch = true"
+                                            placeholder="Ketik untuk mencari..."
+                                            class="w-full px-3 py-2 pr-8 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                        <button type="button" x-show="c.searchQuery" @click="clearMember(c)"
+                                            class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xs">
+                                            &times;
+                                        </button>
+                                    </div>
+
+                                    <!-- Dropdown List Hasil Pencarian -->
+                                    <div x-show="c.openSearch"
+                                        x-transition
+                                        class="absolute z-30 left-0 right-0 mt-1 max-h-56 overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 text-sm">
+                                        <div @click="selectMember(c, null)"
+                                            class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
+                                            -- Input Manual (Kosongkan) --
+                                        </div>
+                                        <template x-for="m in getFilteredMembers(c.searchQuery)" :key="m.id">
+                                            <div @click="selectMember(c, m)"
+                                                class="px-3 py-2 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer flex items-center gap-2">
+                                                <div class="w-6 h-6 rounded-full overflow-hidden bg-gray-200 flex-shrink-0 flex items-center justify-center text-xs">
+                                                    <template x-if="m.photo_url">
+                                                        <img :src="m.photo_url" class="w-full h-full object-cover">
+                                                    </template>
+                                                    <template x-if="!m.photo_url">
+                                                        <span x-text="m.name.charAt(0)"></span>
+                                                    </template>
+                                                </div>
+                                                <div class="truncate">
+                                                    <span class="font-medium text-gray-800 dark:text-gray-200" x-text="m.name"></span>
+                                                    <span class="text-xs text-gray-400 ml-1" x-text="`(${m.department ? (m.department.abbreviation || m.department.name) : '-'})`"></span>
+                                                </div>
+                                            </div>
                                         </template>
-                                    </select>
+                                        <div x-show="getFilteredMembers(c.searchQuery).length === 0" class="px-3 py-2 text-xs text-gray-400">
+                                            Tidak ada fungsionaris ditemukan
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Nama Panitia -->
@@ -383,13 +418,19 @@
                     isSubmitting: false,
                     status: '{{ old('status', 'upcoming') }}',
                     members: membersData,
-                    committees: {!! json_encode(old('committees', [['name' => '', 'role' => '', 'photo' => null, 'existing_photo' => null, 'preview_photo' => null, 'member_id' => '', 'sort_order' => 0]])) !!}.map((c, i) => ({ 
-                        ...c, 
-                        id: c.id || Date.now() + i,
-                        existing_photo: c.existing_photo || (typeof c.photo === 'string' ? c.photo : null),
-                        preview_photo: c.preview_photo || (c.existing_photo ? (c.existing_photo.startsWith('http') || c.existing_photo.startsWith('/storage') ? c.existing_photo : '/storage/' + c.existing_photo) : null),
-                        member_id: c.member_id || ''
-                    })),
+                    committees: {!! json_encode(old('committees', [['name' => '', 'role' => '', 'photo' => null, 'existing_photo' => null, 'preview_photo' => null, 'member_id' => '', 'sort_order' => 0]])) !!}.map((c, i) => {
+                        const existingPhoto = c.existing_photo || (typeof c.photo === 'string' ? c.photo : null);
+                        const matchedMember = c.member_id ? membersData.find(m => m.id == c.member_id) : membersData.find(m => m.name && m.name.toLowerCase().trim() === (c.name || '').toLowerCase().trim());
+                        return { 
+                            ...c, 
+                            id: c.id || Date.now() + i,
+                            existing_photo: existingPhoto,
+                            preview_photo: c.preview_photo || (existingPhoto ? (existingPhoto.startsWith('http') || existingPhoto.startsWith('/storage') ? existingPhoto : '/storage/' + existingPhoto) : null),
+                            member_id: c.member_id || (matchedMember ? matchedMember.id : ''),
+                            searchQuery: matchedMember ? matchedMember.name : (c.name || ''),
+                            openSearch: false
+                        };
+                    }),
                     speakers: {!! json_encode(old('speakers', [['name' => '', 'role' => '', 'topic' => '', 'photo' => null, 'sort_order' => 0]])) !!}.map((s, i) => ({ ...s, id: s.id || Date.now() + i + 1000 })),
                     documentations: {!! json_encode(old('documentations', [])) !!},
                     addCommittee() {
@@ -401,26 +442,41 @@
                             existing_photo: null, 
                             preview_photo: null, 
                             member_id: '', 
+                            searchQuery: '',
+                            openSearch: false,
                             sort_order: this.committees.length 
                         });
                     },
                     removeCommittee(idx) { this.committees.splice(idx, 1); },
-                    onMemberSelect(event, committee) {
-                        const memberId = event.target.value;
-                        committee.member_id = memberId;
-                        if (!memberId) return;
-
-                        const selected = this.members.find(m => m.id == memberId);
-                        if (selected) {
-                            committee.name = selected.name;
-                            if (selected.photo) {
-                                committee.existing_photo = selected.photo;
-                                committee.preview_photo = selected.photo_url;
-                            } else {
-                                committee.existing_photo = null;
-                                committee.preview_photo = null;
-                            }
+                    getFilteredMembers(query) {
+                        if (!query || query.trim() === '') return this.members;
+                        const q = query.toLowerCase().trim();
+                        return this.members.filter(m => m.name.toLowerCase().includes(q) || (m.department && (m.department.name.toLowerCase().includes(q) || (m.department.abbreviation && m.department.abbreviation.toLowerCase().includes(q)))));
+                    },
+                    selectMember(committee, member) {
+                        committee.openSearch = false;
+                        if (!member) {
+                            committee.member_id = '';
+                            committee.searchQuery = '';
+                            return;
                         }
+                        committee.member_id = member.id;
+                        committee.searchQuery = member.name;
+                        committee.name = member.name;
+                        if (member.photo) {
+                            committee.existing_photo = member.photo;
+                            committee.preview_photo = member.photo_url;
+                        } else {
+                            committee.existing_photo = null;
+                            committee.preview_photo = null;
+                        }
+                    },
+                    clearMember(committee) {
+                        committee.member_id = '';
+                        committee.searchQuery = '';
+                        committee.name = '';
+                        committee.existing_photo = null;
+                        committee.preview_photo = null;
                     },
                     onPhotoChange(event, committee) {
                         const file = event.target.files[0];
