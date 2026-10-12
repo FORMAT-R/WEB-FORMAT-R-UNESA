@@ -331,7 +331,7 @@
                     <div class="image-preview" x-data="{ image: null }" x-ref="coverPreview">
                         <template x-if="image">
                             <img :src="image" alt="Cover Event">
-                            <button type="button" class="remove-btn" @click="image = null">
+                            <button type="button" class="remove-btn" @click="if (confirm('Apakah Anda yakin ingin menghapus cover ini?')) image = null">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
                         </template>
@@ -362,7 +362,7 @@
                         <template x-for="(image, index) in galleryImages" :key="index">
                             <div class="gallery-item">
                                 <img :src="image.url" :alt="image.caption">
-                                <button type="button" class="remove-btn" @click="galleryImages.splice(index, 1)">
+                                <button type="button" class="remove-btn" @click="if (confirm('Apakah Anda yakin ingin menghapus foto galeri ini?')) galleryImages.splice(index, 1)">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                                 </button>
                                 <input type="hidden" name="gallery[]" :value="image.url">

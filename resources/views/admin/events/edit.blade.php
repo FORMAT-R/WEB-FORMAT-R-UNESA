@@ -304,6 +304,8 @@
 
             {{-- Dokumentasi (Hanya untuk Ongoing & Completed) --}}
             <div x-show="status === 'ongoing' || status === 'completed'" class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700" style="display: none;">
+                <!-- Fallback hidden input to ensure documentations field is always recognized by backend when empty -->
+                <input type="hidden" name="documentations_submitted" value="1">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white">Dokumentasi (Maks. 15)</h3>
@@ -403,7 +405,11 @@
                     sort_order: this.committees.length
                 }); 
             },
-            removeCommittee(idx) { this.committees.splice(idx, 1); },
+            removeCommittee(idx) { 
+                if (confirm('Apakah Anda yakin ingin menghapus panitia ini?')) {
+                    this.committees.splice(idx, 1); 
+                }
+            },
             getFilteredMembers(query) {
                 if (!query || query.trim() === '') return this.members;
                 const q = query.toLowerCase().trim();
@@ -441,9 +447,17 @@
                 }
             },
             addSpeaker() { this.speakers.push({id: Date.now() + 1000, name: '', role: '', topic: '', photo: null, sort_order: this.speakers.length}); },
-            removeSpeaker(idx) { this.speakers.splice(idx, 1); },
+            removeSpeaker(idx) { 
+                if (confirm('Apakah Anda yakin ingin menghapus pemateri ini?')) {
+                    this.speakers.splice(idx, 1); 
+                }
+            },
             addDoc() { if(this.documentations.length < 15) this.documentations.push({title: '', photo: null}); },
-            removeDoc(idx) { this.documentations.splice(idx, 1); },
+            removeDoc(idx) { 
+                if (confirm('Apakah Anda yakin ingin menghapus foto dokumentasi ini?')) {
+                    this.documentations.splice(idx, 1); 
+                }
+            },
             initSortable() {
                 let el = document.getElementById('committees-container');
                 if (el) {

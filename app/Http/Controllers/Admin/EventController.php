@@ -202,11 +202,13 @@ class EventController extends Controller
         }
 
         // Save Documentations (only if ongoing or completed)
-        if (in_array($event->status, ['ongoing', 'completed']) && $request->has('documentations')) {
+        if (in_array($event->status, ['ongoing', 'completed'])) {
             $existingDocIds = $event->documentations->pluck('id')->toArray();
             $updatedDocIds = [];
 
-            foreach ($request->documentations as $idx => $d) {
+            $docList = $request->input('documentations', []);
+
+            foreach ($docList as $idx => $d) {
                 if ($idx >= 15) break; // Limit to 15 photos
 
                 $data = [
