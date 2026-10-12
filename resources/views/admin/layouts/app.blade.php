@@ -149,6 +149,80 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <!-- Chart.js (Untuk Chart di Dashboard) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SweetAlert2 untuk Modal Dialog Modern -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Global helper untuk konfirmasi dialog modern yang menyatu dengan tema
+        window.confirmDelete = function(optionsOrMessage, onConfirm) {
+            let title = 'Konfirmasi Hapus';
+            let text = 'Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.';
+            let confirmBtnText = 'Ya, Hapus!';
+            let cancelBtnText = 'Batal';
+
+            if (typeof optionsOrMessage === 'string') {
+                text = optionsOrMessage;
+            } else if (typeof optionsOrMessage === 'object' && optionsOrMessage !== null) {
+                if (optionsOrMessage.title) title = optionsOrMessage.title;
+                if (optionsOrMessage.text) text = optionsOrMessage.text;
+                if (optionsOrMessage.confirmText) confirmBtnText = optionsOrMessage.confirmText;
+                if (optionsOrMessage.cancelText) cancelBtnText = optionsOrMessage.cancelText;
+            }
+
+            const isDark = document.documentElement.classList.contains('dark');
+
+            return Swal.fire({
+                title: title,
+                text: text,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: confirmBtnText,
+                cancelButtonText: cancelBtnText,
+                reverseButtons: true,
+                background: isDark ? '#1e293b' : '#ffffff',
+                color: isDark ? '#f8fafc' : '#0f172a',
+                customClass: {
+                    popup: 'rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl',
+                    confirmButton: 'px-5 py-2.5 rounded-xl font-medium text-sm shadow-sm',
+                    cancelButton: 'px-5 py-2.5 rounded-xl font-medium text-sm shadow-sm'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (typeof onConfirm === 'function') {
+                        onConfirm();
+                    }
+                    return true;
+                }
+                return false;
+            });
+        };
+
+        // Otomatis tangani form penghapusan dengan data-confirm atau onsubmit konvensional
+        document.addEventListener('DOMContentLoaded', () => {
+            document.addEventListener('submit', (e) => {
+                const form = e.target;
+                if (form.matches('form[data-confirm]') || form.querySelector('input[name="_method"][value="DELETE"]')) {
+                    if (form.dataset.confirmed === 'true') {
+                        return; // Lolos jika sudah dikonfirmasi
+                    }
+
+                    // Cek pesan kustom atau default
+                    let msg = form.getAttribute('data-confirm');
+                    if (!msg) {
+                        const submitBtn = form.querySelector('button[type="submit"]');
+                        msg = submitBtn && submitBtn.title ? `Hapus ${submitBtn.title}?` : 'Apakah Anda yakin ingin menghapus data ini?';
+                    }
+
+                    e.preventDefault();
+                    window.confirmDelete(msg, () => {
+                        form.dataset.confirmed = 'true';
+                        form.submit();
+                    });
+                }
+            });
+        });
+    </script>
 
 </head>
 <body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 overflow-x-hidden selection:bg-primary-500 selection:text-white transition-colors duration-200" 

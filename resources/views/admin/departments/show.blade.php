@@ -185,12 +185,12 @@
 
     deleteId: null,
     deleteMember(id) {
-        if(confirm('Apakah Anda yakin ingin menghapus anggota ini?')) {
+        window.confirmDelete('Apakah Anda yakin ingin menghapus anggota ini?', () => {
             this.deleteId = id;
             this.$nextTick(() => {
                 this.$refs.deleteForm.submit();
             });
-        }
+        });
     }
 }">
     <!-- Hidden form for deleting member -->

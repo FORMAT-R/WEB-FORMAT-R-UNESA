@@ -406,9 +406,9 @@
                 }); 
             },
             removeCommittee(idx) { 
-                if (confirm('Apakah Anda yakin ingin menghapus panitia ini?')) {
+                window.confirmDelete('Apakah Anda yakin ingin menghapus panitia ini?', () => {
                     this.committees.splice(idx, 1); 
-                }
+                });
             },
             getFilteredMembers(query) {
                 if (!query || query.trim() === '') return this.members;
@@ -448,15 +448,15 @@
             },
             addSpeaker() { this.speakers.push({id: Date.now() + 1000, name: '', role: '', topic: '', photo: null, sort_order: this.speakers.length}); },
             removeSpeaker(idx) { 
-                if (confirm('Apakah Anda yakin ingin menghapus pemateri ini?')) {
+                window.confirmDelete('Apakah Anda yakin ingin menghapus pemateri ini?', () => {
                     this.speakers.splice(idx, 1); 
-                }
+                });
             },
             addDoc() { if(this.documentations.length < 15) this.documentations.push({title: '', photo: null}); },
             removeDoc(idx) { 
-                if (confirm('Apakah Anda yakin ingin menghapus foto dokumentasi ini?')) {
+                window.confirmDelete('Apakah Anda yakin ingin menghapus foto dokumentasi ini?', () => {
                     this.documentations.splice(idx, 1); 
-                }
+                });
             },
             initSortable() {
                 let el = document.getElementById('committees-container');
