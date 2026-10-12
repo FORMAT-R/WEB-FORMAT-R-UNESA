@@ -160,7 +160,10 @@
                 {{-- Panitia --}}
                 <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Susunan Panitia</h3>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Susunan Panitia</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Pilih dari fungsionaris (foto otomatis) atau isi & unggah manual.</p>
+                        </div>
                         <button type="button" @click="addCommittee()"
                             class="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200">
                             + Tambah Panitia
@@ -168,7 +171,7 @@
                     </div>
                     <div class="space-y-4" id="committees-container">
                         <template x-for="(c, idx) in committees" :key="c.id || idx">
-                            <div class="committee-item grid grid-cols-1 md:grid-cols-4 gap-4 items-end bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700 relative pl-10"
+                            <div class="committee-item grid grid-cols-1 md:grid-cols-12 gap-4 items-end bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700 relative pl-10"
                                 :data-id="idx">
                                 <!-- Drag Handle -->
                                 <div
@@ -179,44 +182,71 @@
                                     </svg>
                                 </div>
 
-                                <!-- Hidden Sort Order -->
+                                <!-- Hidden Sort Order & Existing Photo -->
                                 <input type="hidden" :name="`committees[${idx}][sort_order]`" :value="idx">
+                                <input type="hidden" :name="`committees[${idx}][existing_photo]`" :value="c.existing_photo || ''">
 
-                                <div>
-                                    <label
-                                        class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Nama</label>
+                                <!-- Pilih Fungsionaris -->
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                        Pilih Fungsionaris <span class="font-normal text-gray-400">(Opsional)</span>
+                                    </label>
+                                    <select @change="onMemberSelect($event, c)"
+                                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm">
+                                        <option value="">-- Input Manual --</option>
+                                        <template x-for="m in members" :key="m.id">
+                                            <option :value="m.id" :selected="c.member_id == m.id" x-text="`${m.name} (${m.department ? (m.department.abbreviation || m.department.name) : '-'})`"></option>
+                                        </template>
+                                    </select>
+                                </div>
+
+                                <!-- Nama Panitia -->
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Nama Panitia <span class="text-red-500">*</span></label>
                                     <input type="text" :name="`committees[${idx}][name]`" x-model="c.name"
-                                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm">
+                                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm"
+                                        placeholder="Nama Lengkap">
                                 </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Jabatan
-                                        (Ketik manual)</label>
+
+                                <!-- Jabatan / Role -->
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Jabatan <span class="text-red-500">*</span></label>
                                     <input type="text" :name="`committees[${idx}][role]`" x-model="c.role"
+                                        placeholder="Cth: Ketua Pelaksana"
                                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm">
                                 </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Foto
-                                        Panitia <span class="font-normal">(Fokus Wajah)</span></label>
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-400">
-                                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                                <path fill-rule="evenodd"
-                                                    d="M12 2a5 5 0 100 10 5 5 0 000-10zm-7 14a7 7 0 1114 0H5z"
-                                                    clip-rule="evenodd" />
-                                            </svg>
+
+                                <!-- Foto Panitia -->
+                                <div class="md:col-span-3">
+                                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                        Foto Panitia <span class="font-normal" x-show="c.preview_photo">(Otomatis/Ganti)</span>
+                                    </label>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0 border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-400">
+                                            <template x-if="c.preview_photo">
+                                                <img :src="c.preview_photo" class="w-full h-full object-cover object-top">
+                                            </template>
+                                            <template x-if="!c.preview_photo">
+                                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path fill-rule="evenodd" d="M12 2a5 5 0 100 10 5 5 0 000-10zm-7 14a7 7 0 1114 0H5z" clip-rule="evenodd" />
+                                                </svg>
+                                            </template>
                                         </div>
                                         <input type="file" :name="`committees[${idx}][photo]`" accept="image/*"
+                                            @change="onPhotoChange($event, c)"
                                             class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-blue-50 file:text-blue-700">
                                     </div>
                                 </div>
-                                <div class="flex justify-end pb-1">
+
+                                <!-- Action Buttons -->
+                                <div class="md:col-span-1 flex justify-end pb-1">
                                     <button type="button" @click="removeCommittee(idx)"
-                                        class="text-red-500 hover:text-red-700 p-2">Hapus</button>
+                                        class="text-red-500 hover:text-red-700 p-2" title="Hapus Panitia">Hapus</button>
                                 </div>
                             </div>
                         </template>
                     </div>
+                </div>
                 </div>
 
                 {{-- Pemateri --}}
@@ -336,16 +366,68 @@
     @push('scripts')
         <script>
             function eventForm() {
+                const membersData = {!! json_encode($members->map(function($m) {
+                    return [
+                        'id' => $m->id,
+                        'name' => $m->name,
+                        'photo' => $m->photo,
+                        'photo_url' => $m->photo ? \Illuminate\Support\Facades\Storage::url($m->photo) : null,
+                        'department' => $m->department ? [
+                            'name' => $m->department->name,
+                            'abbreviation' => $m->department->abbreviation,
+                        ] : null
+                    ];
+                })) !!};
+
                 return {
                     isSubmitting: false,
                     status: '{{ old('status', 'upcoming') }}',
-                    committees: {!! json_encode(old('committees', [['name' => '', 'role' => '', 'photo' => null, 'sort_order' => 0]])) !!}.map((c, i) => ({ ...c, id: c.id || Date.now() + i })),
+                    members: membersData,
+                    committees: {!! json_encode(old('committees', [['name' => '', 'role' => '', 'photo' => null, 'existing_photo' => null, 'preview_photo' => null, 'member_id' => '', 'sort_order' => 0]])) !!}.map((c, i) => ({ 
+                        ...c, 
+                        id: c.id || Date.now() + i,
+                        existing_photo: c.existing_photo || (typeof c.photo === 'string' ? c.photo : null),
+                        preview_photo: c.preview_photo || (c.existing_photo ? (c.existing_photo.startsWith('http') || c.existing_photo.startsWith('/storage') ? c.existing_photo : '/storage/' + c.existing_photo) : null),
+                        member_id: c.member_id || ''
+                    })),
                     speakers: {!! json_encode(old('speakers', [['name' => '', 'role' => '', 'topic' => '', 'photo' => null, 'sort_order' => 0]])) !!}.map((s, i) => ({ ...s, id: s.id || Date.now() + i + 1000 })),
                     documentations: {!! json_encode(old('documentations', [])) !!},
                     addCommittee() {
-                        this.committees.push({ id: Date.now(), name: '', role: '', photo: null, sort_order: this.committees.length });
+                        this.committees.push({ 
+                            id: Date.now(), 
+                            name: '', 
+                            role: '', 
+                            photo: null, 
+                            existing_photo: null, 
+                            preview_photo: null, 
+                            member_id: '', 
+                            sort_order: this.committees.length 
+                        });
                     },
                     removeCommittee(idx) { this.committees.splice(idx, 1); },
+                    onMemberSelect(event, committee) {
+                        const memberId = event.target.value;
+                        committee.member_id = memberId;
+                        if (!memberId) return;
+
+                        const selected = this.members.find(m => m.id == memberId);
+                        if (selected) {
+                            committee.name = selected.name;
+                            if (selected.photo) {
+                                committee.existing_photo = selected.photo;
+                                committee.preview_photo = selected.photo_url;
+                            } else {
+                                committee.existing_photo = null;
+                                committee.preview_photo = null;
+                            }
+                        }
+                    },
+                    onPhotoChange(event, committee) {
+                        const file = event.target.files[0];
+                        if (file) {
+                            committee.preview_photo = URL.createObjectURL(file);
+                        }
+                    },
                     addSpeaker() {
                         this.speakers.push({ id: Date.now(), name: '', role: '', topic: '', photo: null, sort_order: this.speakers.length });
                     },

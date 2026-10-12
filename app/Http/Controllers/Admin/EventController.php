@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\EventCommittee;
 use App\Models\EventDocumentation;
 use App\Models\EventSpeaker;
+use App\Models\Member;
 
 class EventController extends Controller
 {
@@ -30,7 +31,8 @@ class EventController extends Controller
     public function create()
     {
         $departments = \App\Models\Department::all();
-        return view('admin.events.create', compact('departments'));
+        $members = Member::with('department')->orderBy('name')->get();
+        return view('admin.events.create', compact('departments', 'members'));
     }
 
     /**
@@ -91,7 +93,8 @@ class EventController extends Controller
     {
         $event = Event::with(['documentations', 'committees'])->findOrFail($id);
         $departments = \App\Models\Department::all();
-        return view('admin.events.edit', compact('event', 'departments'));
+        $members = Member::with('department')->orderBy('name')->get();
+        return view('admin.events.edit', compact('event', 'departments', 'members'));
     }
 
     /**
@@ -165,11 +168,14 @@ class EventController extends Controller
 
                 if (isset($c['photo']) && $request->hasFile("committees.{$idx}.photo")) {
                     $data['photo'] = $this->uploadImageWebp($c['photo'], 'events/committees');
+                } elseif (!empty($c['existing_photo'])) {
+                    $data['photo'] = $c['existing_photo'];
                 }
 
                 if (isset($c['id']) && $c['id'] && !str_starts_with($c['id'], '17')) { // exclude mock IDs created by Date.now() from JS
                     $committee = EventCommittee::find($c['id']);
                     if ($committee) {
+                        // If replacing photo or keeping photo, don't delete if it is reused from member
                         $committee->update($data);
                         $updatedCommitteeIds[] = $committee->id;
                     } else {
@@ -187,7 +193,9 @@ class EventController extends Controller
             foreach ($toDelete as $id) {
                 $c = EventCommittee::find($id);
                 if ($c) {
-                    if ($c->photo) Storage::disk('public')->delete($c->photo);
+                    if ($c->photo && !Member::where('photo', $c->photo)->orWhere('photo_sorotan', $c->photo)->orWhere('photo_nobg', $c->photo)->exists()) {
+                        Storage::disk('public')->delete($c->photo);
+                    }
                     $c->delete();
                 }
             }
