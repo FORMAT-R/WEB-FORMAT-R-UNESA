@@ -126,7 +126,7 @@
                 <div class="flex items-center gap-2">
                     <a href="{{ route('admin.berita.show', $item->id) }}" target="_blank" class="text-sm text-green-600 hover:text-green-700 font-medium">Preview</a>
                     <a href="{{ route('admin.berita.edit', $item->id) }}" class="text-sm text-blue-600 hover:text-blue-700 font-medium">Edit</a>
-                    <form action="{{ route('admin.berita.destroy', $item->id) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus berita ini?');">
+                    <form action="{{ route('admin.berita.destroy', $item->id) }}" method="POST" class="inline" data-confirm="Apakah Anda yakin ingin menghapus berita ini?">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="text-sm text-red-600 hover:text-red-700 font-medium">Hapus</button>

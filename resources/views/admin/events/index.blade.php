@@ -175,7 +175,7 @@
             
             <div class="p-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between mt-auto bg-gray-50 dark:bg-slate-800">
                 <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                    <form action="{{ route('admin.events.destroy', $event->id) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus event ini?');">
+                    <form action="{{ route('admin.events.destroy', $event->id) }}" method="POST" class="inline" data-confirm="Apakah Anda yakin ingin menghapus event ini?">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="text-red-600 hover:text-red-700 font-medium text-sm">Hapus</button>

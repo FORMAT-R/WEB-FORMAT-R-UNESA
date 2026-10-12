@@ -100,7 +100,7 @@
                                     </svg>
                                 </a>
                                 @if(auth()->id() !== $user->id)
-                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?');">
+                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline-block" data-confirm="Apakah Anda yakin ingin menghapus pengguna ini?">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/30 p-2 rounded-lg transition-colors">

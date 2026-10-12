@@ -388,7 +388,7 @@
                                 @endforelse
                             </div>
                             <div class="px-4 py-3 border-t border-gray-100 dark:border-gray-700 flex justify-between gap-2">
-                                <a href="{{ route('admin.notifications.send') }}" class="w-full text-center px-2 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition-colors" onclick="return confirm('Kirim email pengingat ini ke seluruh pengguna?');">Kirim Notifikasi via Email</a>
+                                <a href="{{ route('admin.notifications.send') }}" class="w-full text-center px-2 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition-colors" onclick="event.preventDefault(); window.confirmDelete({ title: 'Kirim Email', text: 'Kirim email pengingat ini ke seluruh pengguna?', confirmText: 'Ya, Kirim!' }, () => { window.location.href = this.href; });">Kirim Notifikasi via Email</a>
                             </div>
                         </div>
                     </div>

@@ -60,7 +60,7 @@
                             <form action="{{ route('admin.pembinas.toggle', $p->id) }}" method="POST" class="inline">
                                 @csrf
                                 @method('PATCH')
-                                <button type="submit" class="text-[10px] font-medium text-blue-600 dark:text-blue-400 hover:underline transition-colors" onclick="return confirm('Jadikan Pembina ini sebagai yang aktif di halaman depan?');">
+                                <button type="submit" class="text-[10px] font-medium text-blue-600 dark:text-blue-400 hover:underline transition-colors" data-confirm="Jadikan Pembina ini sebagai yang aktif di halaman depan?">
                                     Jadikan Aktif
                                 </button>
                             </form>
@@ -70,7 +70,7 @@
                         <a href="{{ route('admin.pembinas.edit', $p->id) }}" class="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors" title="Edit">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                         </a>
-                        <form action="{{ route('admin.pembinas.destroy', $p->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus pembina ini?');">
+                        <form action="{{ route('admin.pembinas.destroy', $p->id) }}" method="POST" class="inline" data-confirm="Yakin ingin menghapus pembina ini?">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors" title="Hapus">
